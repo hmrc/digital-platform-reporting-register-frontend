@@ -24,7 +24,7 @@ GET        /registration/agent                           controllers.CannotUseSe
 
 GET        /registration/non-administrator               controllers.CannotUseServiceAssistantController.onPageLoad()
 
-GET        /registrationType                        controllers.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode)
-POST       /registrationType                        controllers.RegistrationTypeController.onSubmit(mode: Mode = NormalMode)
-GET        /changeRegistrationType                  controllers.RegistrationTypeController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeRegistrationType                  controllers.RegistrationTypeController.onSubmit(mode: Mode = CheckMode)
+GET        /registration/eligibility                     controllers.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/eligibility                     controllers.RegistrationTypeController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-eligibility              controllers.RegistrationTypeController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-eligibility              controllers.RegistrationTypeController.onSubmit(mode: Mode = CheckMode)
