@@ -37,7 +37,6 @@ class RegistrationTypeController @Inject()(
                                        navigator: Navigator,
                                        identify: IdentifierAction,
                                        getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
                                        formProvider: RegistrationTypeFormProvider,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: RegistrationTypeView
