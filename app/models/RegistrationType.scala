@@ -19,16 +19,17 @@ package models
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import viewmodels.govuk.all.HintViewModel
 
 sealed trait RegistrationType
 
 object RegistrationType extends Enumerable.Implicits {
 
-  case object PlatformOwner extends WithName("platformOwner") with RegistrationType
+  case object PlatformOperator extends WithName("platformOperator") with RegistrationType
   case object ThirdParty extends WithName("thirdParty") with RegistrationType
 
   val values: Seq[RegistrationType] = Seq(
-    PlatformOwner, ThirdParty
+    PlatformOperator, ThirdParty
   )
 
   def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
@@ -36,7 +37,8 @@ object RegistrationType extends Enumerable.Implicits {
       RadioItem(
         content = Text(messages(s"registrationType.${value.toString}")),
         value   = Some(value.toString),
-        id      = Some(s"value_$index")
+        id      = Some(s"value_$index"),
+        hint    = Some(HintViewModel(Text(messages(s"registrationType.${value.toString}.hint"))))
       )
   }
 

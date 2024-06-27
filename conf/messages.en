@@ -69,8 +69,10 @@ cannotUseServiceAssistant.p4.link.href = https://www.gov.uk/guidance/sign-in-to-
 
 registrationType.title = What are you registering for this service as?
 registrationType.heading = What are you registering for this service as?
-registrationType.platformOwner = An operator of a digital platform
+registrationType.platformOperator = An operator of a digital platform
+registrationType.platformOperator.hint = You manage or work within a website or app that allows sellers to connect to customers for teh sale of goods and services. 
 registrationType.thirdParty = A third party reporting on behalf of a digital platform
+registrationType.thirdParty.hint = You could be an agent, accountant, solicitor, or other third party reporting for a Digital Platform Operator.
 registrationType.checkYourAnswersLabel = What are you registering for this service as?
-registrationType.error.required = Select registrationType
-registrationType.change.hidden = RegistrationType
+registrationType.error.required = Select what you are registering for this service as
+registrationType.change.hidden = what you are registering for this service as
