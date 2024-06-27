@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import javax.inject.Inject
 
-trait ModelGenerators {
+import forms.mappings.Mappings
+import play.api.data.Form
+import models.RegistrationType
 
-  implicit lazy val arbitraryRegistrationType: Arbitrary[RegistrationType] =
-    Arbitrary {
-      Gen.oneOf(RegistrationType.values.toSeq)
-    }
+class RegistrationTypeFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[RegistrationType] =
+    Form(
+      "value" -> enumerable[RegistrationType]("registrationType.error.required")
+    )
 }
