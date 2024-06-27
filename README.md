@@ -1,7 +1,7 @@
 
-# digital-platform-reporting-register-frontend
+# Digital Platform Reporting Register frontend
 
-This is a placeholder README.md for a new repository
+This frontend allows users to register and subscribe to use the Digital Platform Reporting service.
 
 ### License
 
