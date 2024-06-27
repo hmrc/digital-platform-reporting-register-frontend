@@ -47,3 +47,22 @@ signedOut.guidance = We did not save your answers.
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+
+cannotUseServiceAgent.title = You’re unable to use this service with your agent services sign in details
+cannotUseServiceAgent.heading = You’re unable to use this service with your agent services sign in details
+cannotUseServiceAgent.p1 = You must register using individual or organisation credentials, not your agent credentials.
+cannotUseServiceAgent.p2.1 = You need to
+cannotUseServiceAgent.p2.link1.text = sign in with your own or your organisation’s details
+cannotUseServiceAgent.p2.link1.href = https://www.tax.service.gov.uk/account
+cannotUseServiceAgent.p2.2 = You can also
+cannotUseServiceAgent.p2.link2.text = create new sign in details
+cannotUseServiceAgent.p2.link2.href = https://www.access.service.gov.uk/login/create-account
+
+cannotUseServiceAssistant.title = You are unable to use this service
+cannotUseServiceAssistant.heading = You are unable to use this service
+cannotUseServiceAssistant.p1 = You’ve signed in as a standard user. Only people in your organisation with an administrator role can register for the service.
+cannotUseServiceAssistant.p2 = You need to find an administrator who can then sign in with their Government Gateway details.
+cannotUseServiceAssistant.p3 = Once registered, they can give you permission to use the service to send digital platform reports using your own Government Gateway details.
+cannotUseServiceAssistant.p4 = Your administrator can add, delete or change access for team members in the ‘Manage account’ section within your organisation’s
+cannotUseServiceAssistant.p4.link.text = business tax account
+cannotUseServiceAssistant.p4.link.href = https://www.gov.uk/guidance/sign-in-to-your-hmrc-business-tax-account
