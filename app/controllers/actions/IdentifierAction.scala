@@ -20,10 +20,12 @@ import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
 import models.requests.IdentifierRequest
-import play.api.mvc.Results._
-import play.api.mvc._
-import uk.gov.hmrc.auth.core._
+import play.api.mvc.Results.*
+import play.api.mvc.*
+import uk.gov.hmrc.auth.core.*
+import uk.gov.hmrc.auth.core.AffinityGroup._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -42,10 +44,22 @@ class AuthenticatedIdentifierAction @Inject()(
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised().retrieve(Retrievals.internalId) {
-      _.map {
-        internalId => block(IdentifierRequest(request, internalId))
-      }.getOrElse(throw new UnauthorizedException("Unable to retrieve internal Id"))
+    authorised().retrieve(
+      Retrievals.affinityGroup and
+        Retrievals.credentialRole and
+        Retrievals.internalId
+    ) {
+      case Some(Agent) ~ _ ~_ =>
+        Future.successful(Redirect(routes.CannotUseServiceAgentController.onPageLoad()))
+        
+      case Some(Organisation) ~ Some(Assistant) ~ _ =>
+        Future.successful(Redirect(routes.CannotUseServiceAssistantController.onPageLoad()))
+
+      case Some(Individual) ~ _ ~ _ =>
+        Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
+        
+      case Some(Organisation) ~ _ ~ Some(internalId) =>
+        block(IdentifierRequest(request, internalId))
     } recover {
       case _: NoActiveSession =>
         Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
