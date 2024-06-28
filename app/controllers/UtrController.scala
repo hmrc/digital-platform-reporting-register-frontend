@@ -16,17 +16,22 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.UtrFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
 import pages.UtrPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.UtrView
+import views.html.{UtrCorporationTaxView, UtrPartnershipView, UtrSelfAssessmentView}
+import models.BusinessType
+import models.BusinessType.*
+import pages.BusinessTypePage
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,34 +44,54 @@ class UtrController @Inject()(
                                         requireData: DataRequiredAction,
                                         formProvider: UtrFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: UtrView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                        corporationTaxView: UtrCorporationTaxView,
+                                        partnershipView: UtrPartnershipView,
+                                        selfAssessmentView: UtrSelfAssessmentView
+                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with AnswerExtractor {
 
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-
       val preparedForm = request.userAnswers.get(UtrPage) match {
         case None => form
         case Some(value) => form.fill(value)
       }
-
-      Ok(view(preparedForm, mode))
+      getAnswer(BusinessTypePage) {
+        businessType =>
+          renderView(businessType, preparedForm, mode) match {
+            case Some(view) => Ok(view)
+            case _          => Redirect(routes.JourneyRecoveryController.onPageLoad())
+          }
+      }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          getAnswerAsync(BusinessTypePage) {
+            businessType => Future.successful(
+              renderView(businessType, formWithErrors, mode) match {
+                case Some(view) => BadRequest(view)
+                case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+              }
+            )
+          },
 
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(UtrPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
+            _ <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(UtrPage, mode, updatedAnswers))
       )
   }
+
+  private def renderView(businessType: BusinessType, form: Form[_], mode: Mode)(implicit request: Request[_]) =
+    businessType match {
+      case LimitedCompany | AssociationOrTrust => Some(corporationTaxView(form, mode))
+      case Llp | Partnership                   => Some(partnershipView(form, mode))
+      case SoleTrader                          => Some(selfAssessmentView(form, mode))
+      case Individual                          => None
+    }
 }

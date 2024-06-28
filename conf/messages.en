@@ -119,8 +119,24 @@ soleTraderName.error.lastName.length = lastName must be 100 characters or less
 soleTraderName.firstName.change.hidden = firstName
 soleTraderName.lastName.change.hidden = lastName
 
-utr.title = utr
-utr.heading = utr
+utrCorporationTax.title =o
+utrCorporationTax.heading =
+utrCorporationTax.p1 =
+utrCorporationTax.link.text =
+utrCorporationTax.link.href =
+
+utrPartnership.title =
+utrPartnership.heading =
+utrPartnership.p1 =
+utrPartnership.link.text =
+utrPartnership.link.href =
+
+utrSelfAssessment.title =
+utrSelfAssessment.heading =
+utrSelfAssessment.p1 =
+utrSelfAssessment.link.text =
+utrSelfAssessment.link.href =
+
 utr.checkYourAnswersLabel = utr
 utr.error.required = Enter utr
 utr.error.length = Utr must be 100 characters or less
