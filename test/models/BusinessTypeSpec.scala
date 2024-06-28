@@ -16,6 +16,7 @@
 
 package models
 
+import models.BusinessType._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -23,6 +24,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.OptionValues
 import play.api.libs.json.{JsError, JsString, Json}
+import play.api.test.Helpers.stubMessages
 
 class BusinessTypeSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
 
@@ -59,6 +61,20 @@ class BusinessTypeSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
           Json.toJson(businessType) mustEqual JsString(businessType.toString)
       }
+    }
+
+    "must give the correct options for Platform Operators" in {
+
+      val result = BusinessType.options(RegistrationType.PlatformOperator)(stubMessages())
+
+      result.flatMap(_.value) mustEqual Seq(LimitedCompany, Partnership, Llp, AssociationOrTrust).map(_.toString)
+    }
+
+    "must give the correct options for Third Parties" in {
+
+      val result = BusinessType.options(RegistrationType.ThirdParty)(stubMessages())
+
+      result.flatMap(_.value) mustEqual Seq(LimitedCompany, Partnership, Llp, AssociationOrTrust, SoleTrader, Individual).map(_.toString)
     }
   }
 }

@@ -17,15 +17,16 @@
 package forms
 
 import javax.inject.Inject
-
 import forms.mappings.Mappings
 import play.api.data.Form
-import models.BusinessType
+import models.{BusinessType, RegistrationType}
 
 class BusinessTypeFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[BusinessType] =
+  def apply(registrationType: RegistrationType): Form[BusinessType] =
     Form(
-      "value" -> enumerable[BusinessType]("businessType.error.required")
+      "value" ->
+        enumerable[BusinessType]("businessType.error.required")
+          .verifying("businessType.error.required", BusinessType.valuesForRegistrationType(registrationType).contains)
     )
 }

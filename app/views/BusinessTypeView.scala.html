@@ -22,9 +22,9 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, registrationType: RegistrationType)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("businessType.title"))) {
+@layout(pageTitle = title(form, messages(s"businessType.title.${registrationType.toString}"))) {
 
     @formHelper(action = routes.BusinessTypeController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
@@ -35,9 +35,9 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("businessType.heading")).asPageHeading(),
-                items  = BusinessType.options
-            )
+                legend = LegendViewModel(messages(s"businessType.heading.${registrationType.toString}")).asPageHeading(),
+                items  = BusinessType.options(registrationType)
+            ).withHint(HintViewModel(content = messages("businessType.hint")))
         )
 
         @govukButton(

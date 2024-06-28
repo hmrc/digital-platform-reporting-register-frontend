@@ -17,27 +17,87 @@
 package forms
 
 import forms.behaviours.OptionFieldBehaviours
-import models.BusinessType
+import models.BusinessType.*
+import models.RegistrationType.*
+import models.{BusinessType, RegistrationType}
 import play.api.data.FormError
 
 class BusinessTypeFormProviderSpec extends OptionFieldBehaviours {
 
-  val form = new BusinessTypeFormProvider()()
+  val formProvider = new BusinessTypeFormProvider()
 
   ".value" - {
 
     val fieldName = "value"
     val requiredKey = "businessType.error.required"
 
-    behave like optionsField[BusinessType](
-      form,
-      fieldName,
-      validValues  = BusinessType.values,
-      invalidError = FormError(fieldName, "error.invalid")
-    )
+    "for a Platform Operator" - {
+
+      val form = formProvider(PlatformOperator)
+      val validOptions = Seq(LimitedCompany, Partnership, Llp, AssociationOrTrust)
+
+      "must bind valid options" in {
+
+        for (value <- validOptions) {
+
+          val result = form.bind(Map(fieldName -> value.toString)).apply(fieldName)
+          result.value.value mustEqual value.toString
+          result.errors mustBe empty
+        }
+      }
+
+      "must not bind options that only apply to Third Parties" in {
+
+        for(value <- Seq(SoleTrader, Individual)) {
+
+          val result = form.bind(Map(fieldName -> value.toString)).apply(fieldName)
+          result.errors must contain only FormError(fieldName, requiredKey)
+        }
+      }
+
+      "must not bind invalid options" in {
+
+        val generator = stringsExceptSpecificValues(validOptions.map(_.toString))
+
+        forAll(generator -> "invalidValue") {
+          value =>
+
+            val result = form.bind(Map(fieldName -> value)).apply(fieldName)
+            result.errors must contain only FormError(fieldName, "error.invalid")
+        }
+      }
+    }
+
+    "for a Third Party" - {
+
+      val form = formProvider(ThirdParty)
+      val validOptions = Seq(LimitedCompany, Partnership, Llp, AssociationOrTrust, SoleTrader, Individual)
+
+      "must bind valid options" in {
+
+        for (value <- validOptions) {
+
+          val result = form.bind(Map(fieldName -> value.toString)).apply(fieldName)
+          result.value.value mustEqual value.toString
+          result.errors mustBe empty
+        }
+      }
+
+      "must not bind invalid options" in {
+
+        val generator = stringsExceptSpecificValues(validOptions.map(_.toString))
+
+        forAll(generator -> "invalidValue") {
+          value =>
+
+            val result = form.bind(Map(fieldName -> value)).apply(fieldName)
+            result.errors must contain only FormError(fieldName, "error.invalid")
+        }
+      }
+    }
 
     behave like mandatoryField(
-      form,
+      formProvider(RegistrationType.PlatformOperator),
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
