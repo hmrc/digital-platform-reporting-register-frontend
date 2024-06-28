@@ -7,7 +7,8 @@ This frontend allows users to register and subscribe to use the Digital Platform
 
 Run the following commands in a Terminal before going to the URL below using any browser. Note that you need to have Service Manager installed.
 
-    sm --start DPRS_ALL
+    sm2 --start DPRS_ALL
+    sm2 --stop DIGITAL_PLATFORM_REPORTING_REGISTER_FRONTEND
     sbt run
 Go to http://localhost:20003/digital-platform-reporting
 
