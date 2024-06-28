@@ -33,3 +33,28 @@ GET        /registration/reporting-user-type             controllers.BusinessTyp
 POST       /registration/reporting-user-type             controllers.BusinessTypeController.onSubmit(mode: Mode = NormalMode)
 GET        /registration/change-reporting-user-type      controllers.BusinessTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-reporting-user-type      controllers.BusinessTypeController.onSubmit(mode: Mode = CheckMode)
+
+GET        /businessName                        controllers.BusinessNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /businessName                        controllers.BusinessNameController.onSubmit(mode: Mode = NormalMode)
+GET        /changeBusinessName                  controllers.BusinessNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeBusinessName                  controllers.BusinessNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /hasUtr                        controllers.HasUtrController.onPageLoad(mode: Mode = NormalMode)
+POST       /hasUtr                        controllers.HasUtrController.onSubmit(mode: Mode = NormalMode)
+GET        /changeHasUtr                  controllers.HasUtrController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeHasUtr                  controllers.HasUtrController.onSubmit(mode: Mode = CheckMode)
+
+GET        /registeredInUk                        controllers.RegisteredInUkController.onPageLoad(mode: Mode = NormalMode)
+POST       /registeredInUk                        controllers.RegisteredInUkController.onSubmit(mode: Mode = NormalMode)
+GET        /changeRegisteredInUk                  controllers.RegisteredInUkController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeRegisteredInUk                  controllers.RegisteredInUkController.onSubmit(mode: Mode = CheckMode)
+
+GET        /soleTraderName                        controllers.SoleTraderNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /soleTraderName                        controllers.SoleTraderNameController.onSubmit(mode: Mode = NormalMode)
+GET        /changeSoleTraderName                  controllers.SoleTraderNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeSoleTraderName                  controllers.SoleTraderNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /utr                        controllers.UtrController.onPageLoad(mode: Mode = NormalMode)
+POST       /utr                        controllers.UtrController.onSubmit(mode: Mode = NormalMode)
+GET        /changeUtr                  controllers.UtrController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeUtr                  controllers.UtrController.onSubmit(mode: Mode = CheckMode)

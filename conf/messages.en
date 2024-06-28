@@ -91,3 +91,41 @@ businessType.individual = An individual not connected to a business
 businessType.checkYourAnswersLabel = What type of business are you?
 businessType.error.required = Select what type of business you are
 businessType.change.hidden = what type of business you are
+
+businessName.title = businessName
+businessName.heading = businessName
+businessName.checkYourAnswersLabel = businessName
+businessName.error.required = Enter businessName
+businessName.error.length = BusinessName must be 100 characters or less
+businessName.change.hidden = BusinessName
+
+hasUtr.title = hasUtr
+hasUtr.heading = hasUtr
+hasUtr.checkYourAnswersLabel = hasUtr
+hasUtr.error.required = Select yes if hasUtr
+hasUtr.change.hidden = HasUtr
+
+registeredInUk.title = registeredInUk
+registeredInUk.heading = registeredInUk
+registeredInUk.checkYourAnswersLabel = registeredInUk
+registeredInUk.error.required = Select yes if registeredInUk
+registeredInUk.change.hidden = RegisteredInUk
+
+soleTraderName.title = soleTraderName
+soleTraderName.heading = soleTraderName
+soleTraderName.firstName = firstName
+soleTraderName.lastName = lastName
+soleTraderName.checkYourAnswersLabel = SoleTraderName
+soleTraderName.error.firstName.required = Enter firstName
+soleTraderName.error.lastName.required = Enter lastName
+soleTraderName.error.firstName.length = firstName must be 100 characters or less
+soleTraderName.error.lastName.length = lastName must be 100 characters or less
+soleTraderName.firstName.change.hidden = firstName
+soleTraderName.lastName.change.hidden = lastName
+
+utr.title = utr
+utr.heading = utr
+utr.checkYourAnswersLabel = utr
+utr.error.required = Enter utr
+utr.error.length = Utr must be 100 characters or less
+utr.change.hidden = Utr
