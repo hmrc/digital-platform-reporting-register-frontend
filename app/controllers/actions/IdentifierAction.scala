@@ -49,7 +49,7 @@ class AuthenticatedIdentifierAction @Inject()(
         Retrievals.credentialRole and
         Retrievals.internalId
     ) {
-      case Some(Agent) ~ _ ~_ =>
+      case Some(Agent) ~ _ ~ _ =>
         Future.successful(Redirect(routes.CannotUseServiceAgentController.onPageLoad()))
         
       case Some(Organisation) ~ Some(Assistant) ~ _ =>

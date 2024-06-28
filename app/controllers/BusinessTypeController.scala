@@ -16,12 +16,13 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.BusinessTypeFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
-import pages.BusinessTypePage
+import pages.{BusinessTypePage, RegistrationTypePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -40,33 +41,44 @@ class BusinessTypeController @Inject()(
                                        formProvider: BusinessTypeFormProvider,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: BusinessTypeView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
-  val form = formProvider()
+                                     )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
+    with I18nSupport
+    with AnswerExtractor {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
+      getAnswer(RegistrationTypePage) {
+        registrationType =>
 
-      val preparedForm = request.userAnswers.get(BusinessTypePage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+          val form = formProvider(registrationType)
+          
+          val preparedForm = request.userAnswers.get(BusinessTypePage) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+
+          Ok(view(preparedForm, mode, registrationType))
       }
-
-      Ok(view(preparedForm, mode))
   }
-
+  
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getAnswerAsync(RegistrationTypePage) {
+        registrationType =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessTypePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(BusinessTypePage, mode, updatedAnswers))
-      )
+          val form = formProvider(registrationType)
+          
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, registrationType))),
+  
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessTypePage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(BusinessTypePage, mode, updatedAnswers))
+          )
+      }
   }
 }

@@ -18,16 +18,16 @@ package controllers
 
 import base.SpecBase
 import forms.BusinessTypeFormProvider
-import models.{NormalMode, BusinessType, UserAnswers}
+import models.{BusinessType, NormalMode, RegistrationType, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.BusinessTypePage
+import pages.{BusinessTypePage, RegistrationTypePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.BusinessTypeView
 
@@ -35,18 +35,20 @@ import scala.concurrent.Future
 
 class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private def onwardRoute = Call("GET", "/foo")
 
-  lazy val businessTypeRoute = routes.BusinessTypeController.onPageLoad(NormalMode).url
+  private lazy val businessTypeRoute = routes.BusinessTypeController.onPageLoad(NormalMode).url
 
-  val formProvider = new BusinessTypeFormProvider()
-  val form = formProvider()
+  private val registrationType = RegistrationType.PlatformOperator
+  private val baseAnswers = emptyUserAnswers.set(RegistrationTypePage, registrationType).success.value
+  private val formProvider = new BusinessTypeFormProvider()
+  private val form = formProvider(registrationType)
 
   "BusinessType Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, businessTypeRoute)
@@ -56,13 +58,13 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[BusinessTypeView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, registrationType)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(BusinessTypePage, BusinessType.values.head).success.value
+      val userAnswers = baseAnswers.set(BusinessTypePage, BusinessType.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -74,7 +76,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(BusinessType.values.head), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(BusinessType.values.head), NormalMode, registrationType)(request, messages(application)).toString
       }
     }
 
@@ -85,7 +87,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -106,7 +108,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request =
@@ -120,7 +122,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, registrationType)(request, messages(application)).toString
       }
     }
 
@@ -138,9 +140,40 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Journey Recovery for a GET if registration type has not been answered" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, businessTypeRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "redirect to Journey Recovery for a POST if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, businessTypeRoute)
+            .withFormUrlEncodedBody(("value", BusinessType.values.head.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "redirect to Journey Recovery for a POST if registration type has not been answered" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =

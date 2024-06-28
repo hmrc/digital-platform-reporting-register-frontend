@@ -26,19 +26,32 @@ object BusinessType extends Enumerable.Implicits {
 
   case object LimitedCompany extends WithName("limitedCompany") with BusinessType
   case object Partnership extends WithName("partnership") with BusinessType
+  case object Llp extends WithName("llp") with BusinessType
+  case object AssociationOrTrust extends WithName("associationOrTrust") with BusinessType
+  case object SoleTrader extends WithName("soleTrader") with BusinessType
+  case object Individual extends WithName("individual") with BusinessType
 
   val values: Seq[BusinessType] = Seq(
-    LimitedCompany, Partnership
+    LimitedCompany, Partnership, Llp, AssociationOrTrust, SoleTrader, Individual
   )
+  
+  def valuesForRegistrationType(registrationType: RegistrationType): Seq[BusinessType] =
+    registrationType match {
+      case RegistrationType.PlatformOperator =>
+        Seq(LimitedCompany, Partnership, Llp, AssociationOrTrust)
+      case RegistrationType.ThirdParty =>
+        Seq(LimitedCompany, Partnership, Llp, AssociationOrTrust, SoleTrader, Individual)
+    }
 
-  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
-    case (value, index) =>
-      RadioItem(
-        content = Text(messages(s"businessType.${value.toString}")),
-        value   = Some(value.toString),
-        id      = Some(s"value_$index")
-      )
-  }
+  def options(registrationType: RegistrationType)(implicit messages: Messages): Seq[RadioItem] =
+    valuesForRegistrationType(registrationType).zipWithIndex.map {
+      case (value, index) =>
+        RadioItem(
+          content = Text(messages(s"businessType.${value.toString}")),
+          value   = Some(value.toString),
+          id      = Some(s"value_$index")
+        )
+    }
 
   implicit val enumerable: Enumerable[BusinessType] =
     Enumerable(values.map(v => v.toString -> v): _*)
