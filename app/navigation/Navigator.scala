@@ -28,8 +28,15 @@ class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case RegistrationTypePage => _ => routes.BusinessTypeController.onPageLoad(NormalMode)
+    case HasUtrPage           => hasUtrRoute
     case _                    => _ => routes.IndexController.onPageLoad()
   }
+
+  private def hasUtrRoute(answers: UserAnswers): Call =
+    answers.get(HasUtrPage).map {
+      case true => routes.UtrController.onPageLoad(NormalMode)
+      case false => routes.BusinessNameController.onPageLoad(NormalMode)
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
