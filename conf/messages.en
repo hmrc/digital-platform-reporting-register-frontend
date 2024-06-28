@@ -76,3 +76,11 @@ registrationType.thirdParty.hint = You could be an agent, accountant, solicitor,
 registrationType.checkYourAnswersLabel = What are you registering for this service as?
 registrationType.error.required = Select what you are registering for this service as
 registrationType.change.hidden = what you are registering for this service as
+
+businessType.title = What type of business are you?
+businessType.heading = What type of business are you?
+businessType.limited = Limited company
+businessType.partnership = Partnership
+businessType.checkYourAnswersLabel = What type of business are you?
+businessType.error.required = Select businessType
+businessType.change.hidden = BusinessType
