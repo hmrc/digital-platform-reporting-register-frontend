@@ -17,15 +17,15 @@
 package controllers
 
 import base.SpecBase
+import models.NormalMode
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import views.html.IndexView
+import play.api.test.Helpers.*
 
 class IndexControllerSpec extends SpecBase {
 
   "Index Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must redirect to Registration Type" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
@@ -34,11 +34,8 @@ class IndexControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IndexView]
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.RegistrationTypeController.onPageLoad(NormalMode).url
       }
     }
   }
