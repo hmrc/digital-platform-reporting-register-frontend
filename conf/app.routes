@@ -28,3 +28,8 @@ GET        /registration/eligibility                     controllers.Registratio
 POST       /registration/eligibility                     controllers.RegistrationTypeController.onSubmit(mode: Mode = NormalMode)
 GET        /registration/change-eligibility              controllers.RegistrationTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-eligibility              controllers.RegistrationTypeController.onSubmit(mode: Mode = CheckMode)
+
+GET        /businessType                        controllers.BusinessTypeController.onPageLoad(mode: Mode = NormalMode)
+POST       /businessType                        controllers.BusinessTypeController.onSubmit(mode: Mode = NormalMode)
+GET        /changeBusinessType                  controllers.BusinessTypeController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeBusinessType                  controllers.BusinessTypeController.onSubmit(mode: Mode = CheckMode)
