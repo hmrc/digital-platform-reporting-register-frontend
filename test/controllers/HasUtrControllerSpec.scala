@@ -89,25 +89,38 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      for (businessType <- Seq(SoleTrader, Individual)) {
+      "for a Sole Trader" in {
 
-        s"for a ${businessType.toString}" in {
+        val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
 
-          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
 
-          val application = applicationBuilder(userAnswers = Some(answers)).build()
+        running(application) {
+          val request = FakeRequest(GET, hasUtrRoute)
 
-          running(application) {
-            val request = FakeRequest(GET, hasUtrRoute)
+          val result = route(application, request).value
 
-            val result = route(application, request).value
+          val view = application.injector.instanceOf[HasUtrSelfAssessmentView]
 
-            val view = application.injector.instanceOf[HasUtrSelfAssessmentView]
-
-            status(result) mustEqual OK
-            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
-          }
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
         }
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET for an Individual" in {
+
+      val answers = emptyUserAnswers.set(BusinessTypePage, Individual).success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, hasUtrRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -211,29 +224,44 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
         }
       }
 
-      for (businessType <- Seq(SoleTrader, Individual)) {
+      "for a SoleTrader" in {
 
-        s"for a ${businessType.toString}" in {
+        val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
 
-          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
 
-          val application = applicationBuilder(userAnswers = Some(answers)).build()
+        running(application) {
+          val request =
+            FakeRequest(POST, hasUtrRoute)
+              .withFormUrlEncodedBody(("value", ""))
 
-          running(application) {
-            val request =
-              FakeRequest(POST, hasUtrRoute)
-                .withFormUrlEncodedBody(("value", ""))
+          val boundForm = form.bind(Map("value" -> ""))
 
-            val boundForm = form.bind(Map("value" -> ""))
+          val view = application.injector.instanceOf[HasUtrSelfAssessmentView]
 
-            val view = application.injector.instanceOf[HasUtrSelfAssessmentView]
+          val result = route(application, request).value
 
-            val result = route(application, request).value
-
-            status(result) mustEqual BAD_REQUEST
-            contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-          }
+          status(result) mustEqual BAD_REQUEST
+          contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
         }
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST for an Individual" in {
+
+      val answers = emptyUserAnswers.set(BusinessTypePage, Individual).success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, hasUtrRoute)
+            .withFormUrlEncodedBody(("value", ""))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 

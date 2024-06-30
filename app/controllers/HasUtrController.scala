@@ -27,6 +27,7 @@ import pages.{BusinessTypePage, HasUtrPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.twirl.api.Html
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{HasUtrCorporationTaxView, HasUtrPartnershipView, HasUtrSelfAssessmentView}
@@ -60,7 +61,9 @@ class HasUtrController @Inject()(
             case Some(value) => form.fill(value)
           }
 
-          Ok(renderView(businessType, preparedForm, mode))
+          renderView(businessType, preparedForm, mode)
+            .map(Ok(_))
+            .getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
   }
 
@@ -71,7 +74,9 @@ class HasUtrController @Inject()(
 
           form.bindFromRequest().fold(
             formWithErrors =>
-              Future.successful(BadRequest(renderView(businessType, formWithErrors, mode))),
+              renderView(businessType, formWithErrors, mode)
+                .map(html => Future.successful(BadRequest(html)))
+                .getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))),
 
             value =>
               for {
@@ -82,10 +87,11 @@ class HasUtrController @Inject()(
       }
   }
 
-  private def renderView(businessType: BusinessType, form: Form[_], mode: Mode)(implicit request: Request[_]) =
+  private def renderView(businessType: BusinessType, form: Form[_], mode: Mode)(implicit request: Request[_]): Option[Html] =
     businessType match {
-      case LimitedCompany | AssociationOrTrust => corporationTaxView(form, mode)
-      case Llp | Partnership => partnershipView(form, mode)
-      case SoleTrader | Individual => selfAssessmentView(form, mode)
+      case LimitedCompany | AssociationOrTrust => Some(corporationTaxView(form, mode))
+      case Llp | Partnership => Some(partnershipView(form, mode))
+      case SoleTrader => Some(selfAssessmentView(form, mode))
+      case Individual => None
     }
 }
