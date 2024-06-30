@@ -28,9 +28,9 @@ class SoleTraderNameFormProvider @Inject() extends Mappings {
    def apply(): Form[SoleTraderName] = Form(
      mapping(
       "firstName" -> text("soleTraderName.error.firstName.required")
-        .verifying(maxLength(100, "soleTraderName.error.firstName.length")),
+        .verifying(maxLength(35, "soleTraderName.error.firstName.length")),
       "lastName" -> text("soleTraderName.error.lastName.required")
-        .verifying(maxLength(100, "soleTraderName.error.lastName.length"))
+        .verifying(maxLength(35, "soleTraderName.error.lastName.length"))
     )(SoleTraderName.apply)(x => Some((x.firstName, x.lastName)))
    )
  }
