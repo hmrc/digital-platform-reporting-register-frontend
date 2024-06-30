@@ -36,12 +36,14 @@
 
         <h1 class="govuk-heading-xl">@messages("soleTraderName.heading")</h1>
 
+        <p class="govuk-body">@messages("soleTraderName.p1")</p>
+
         @govukInput(
             InputViewModel(
                 field = form("firstName"),
                 label = LabelViewModel(messages("soleTraderName.firstName"))
             )
-            .withWidth(Full)
+            .withWidth(Fixed20)
         )
 
         @govukInput(
@@ -49,7 +51,7 @@
                 field = form("lastName"),
                 label = LabelViewModel(messages("soleTraderName.lastName"))
             )
-            .withWidth(Full)
+            .withWidth(Fixed20)
         )
 
         @govukButton(
