@@ -16,17 +16,20 @@
 
 @import viewmodels.InputWidth._
 
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    newTabLink: HmrcNewTabLinkHelper
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("utr.title"))) {
+@layout(pageTitle = title(form, messages("utrCorporationTax.title"))) {
 
     @formHelper(action = routes.UtrController.onSubmit(mode)) {
 
@@ -34,10 +37,21 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        <h1 class="govuk-heading-xl">@messages("utrCorporationTax.heading")</h1>
+
+        <p class="govuk-body">@messages("utrCorporationTax.p1")</p>
+
+        <p class="govuk-body">
+            @newTabLink(NewTabLinkHelper(
+                text = messages("utrCorporationTax.link.text"),
+                href = Some(messages("utrCorporationTax.link.href"))
+            ))
+        </p>
+
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("utr.heading")).asPageHeading()
+                label = LabelViewModel(messages("utrCorporationTax.heading"))
             )
             .withWidth(Full)
         )

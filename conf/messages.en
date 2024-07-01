@@ -131,8 +131,24 @@ soleTraderName.error.lastName.required = Enter your last name
 soleTraderName.error.firstName.length = First name must be 35 characters or less
 soleTraderName.error.lastName.length = Last name must be 35 characters or less
 
-utr.title = utr
-utr.heading = utr
+utrCorporationTax.title =
+utrCorporationTax.heading =
+utrCorporationTax.p1 =
+utrCorporationTax.link.text =
+utrCorporationTax.link.href =
+
+utrPartnership.title =
+utrPartnership.heading =
+utrPartnership.p1 =
+utrPartnership.link.text =
+utrPartnership.link.href =
+
+utrSelfAssessment.title =
+utrSelfAssessment.heading =
+utrSelfAssessment.p1 =
+utrSelfAssessment.link.text =
+utrSelfAssessment.link.href =
+
 utr.checkYourAnswersLabel = utr
 utr.error.required = Enter utr
 utr.error.length = Utr must be 100 characters or less

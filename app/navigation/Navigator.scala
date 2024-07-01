@@ -22,12 +22,14 @@ import play.api.mvc.Call
 import controllers.routes
 import pages._
 import models._
+import models.BusinessType.SoleTrader
 
 @Singleton
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case RegistrationTypePage => _ => routes.BusinessTypeController.onPageLoad(NormalMode)
+    case UtrPage              => navigateFromUtrPage(_, NormalMode)
     case HasUtrPage           => hasUtrRoute
     case BusinessTypePage     => _ => routes.RegisteredInUkController.onPageLoad(NormalMode)
     case RegisteredInUkPage   => registeredInUkRoute
@@ -57,4 +59,11 @@ class Navigator @Inject()() {
     case CheckMode =>
       checkRouteMap(page)(userAnswers)
   }
+
+  private def navigateFromUtrPage(userAnswers: UserAnswers, mode: Mode) =
+    userAnswers.get(BusinessTypePage) match {
+      case Some(SoleTrader) => routes.SoleTraderNameController.onPageLoad(mode)
+      case Some(_)          => routes.BusinessNameController.onPageLoad(mode)
+      case None             => routes.JourneyRecoveryController.onPageLoad()
+    }
 }
