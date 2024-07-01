@@ -119,7 +119,7 @@ soleTraderName.error.lastName.length = lastName must be 100 characters or less
 soleTraderName.firstName.change.hidden = firstName
 soleTraderName.lastName.change.hidden = lastName
 
-utrCorporationTax.title =o
+utrCorporationTax.title =
 utrCorporationTax.heading =
 utrCorporationTax.p1 =
 utrCorporationTax.link.text =
