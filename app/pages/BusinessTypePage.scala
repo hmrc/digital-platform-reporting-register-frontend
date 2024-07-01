@@ -27,6 +27,6 @@ case object BusinessTypePage extends QuestionPage[BusinessType] {
 
   override def toString: String = "businessType"
 
-  override def nextPageNormalMode(answers: UserAnswers): Call =
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
     routes.RegisteredInUkController.onPageLoad(NormalMode)
 }

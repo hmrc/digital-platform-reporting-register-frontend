@@ -27,6 +27,6 @@ case object SoleTraderNamePage extends QuestionPage[SoleTraderName] {
 
   override def toString: String = "soleTraderName"
 
-  override def nextPageNormalMode(answers: UserAnswers): Call =
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
     routes.IndexController.onPageLoad()
 }

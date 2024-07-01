@@ -27,7 +27,7 @@ case object UtrPage extends QuestionPage[String] {
 
   override def toString: String = "utr"
 
-  override def nextPageNormalMode(answers: UserAnswers): Call =
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
     answers.get(BusinessTypePage).map {
       case BusinessType.SoleTrader => routes.SoleTraderNameController.onPageLoad(NormalMode)
       case _ => routes.BusinessNameController.onPageLoad(NormalMode)

@@ -27,7 +27,7 @@ case object HasUtrPage extends QuestionPage[Boolean] {
 
   override def toString: String = "hasUtr"
 
-  override def nextPageNormalMode(answers: UserAnswers): Call =
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
     answers.get(this).map {
       case true  => routes.UtrController.onPageLoad(NormalMode)
       case false => routes.BusinessNameController.onPageLoad(NormalMode)

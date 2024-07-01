@@ -13,6 +13,6 @@ case object $className$Page extends QuestionPage[LocalDate] {
 
   override def toString: String = "$className;format="decap"$"
 
-  override def nextPageNormalMode(answers: UserAnswers): Call =
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
     routes.IndexController.onPageLoad()
 }

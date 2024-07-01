@@ -33,7 +33,7 @@ class AnswerExtractorSpec extends SpecBase {
   private object TestPage extends QuestionPage[Int] {
     override def path: JsPath = JsPath \ "test"
 
-    override def nextPageNormalMode(answers: UserAnswers): Call = Call("GET", "foo")
+    override protected def nextPageNormalMode(answers: UserAnswers): Call = Call("GET", "foo")
   }
 
   private def buildRequest(answers: UserAnswers): DataRequest[AnyContent] =
