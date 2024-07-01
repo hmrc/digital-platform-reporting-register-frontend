@@ -47,16 +47,17 @@ class UtrController @Inject()(
                                         selfAssessmentView: UtrSelfAssessmentView
                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with AnswerExtractor {
 
-  val form = formProvider()
-
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-      val preparedForm = request.userAnswers.get(UtrPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
       getAnswer(BusinessTypePage) {
         businessType =>
+          val form = getForm(businessType)
+
+          val preparedForm = request.userAnswers.get(UtrPage) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+
           renderView(businessType, preparedForm, mode) match {
             case Some(view) => Ok(view)
             case _          => Redirect(routes.JourneyRecoveryController.onPageLoad())
@@ -66,23 +67,25 @@ class UtrController @Inject()(
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          getAnswerAsync(BusinessTypePage) {
-            businessType => Future.successful(
+      getAnswerAsync(BusinessTypePage) {
+        businessType =>
+          val form = getForm(businessType)
+
+          form.bindFromRequest().fold(
+            formWithErrors => Future.successful(
               renderView(businessType, formWithErrors, mode) match {
                 case Some(view) => BadRequest(view)
                 case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
               }
-            )
-          },
+            ),
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(UtrPage, value))
-            _ <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(UtrPage.nextPage(mode, updatedAnswers))
-      )
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(UtrPage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(UtrPage.nextPage(mode, updatedAnswers))
+          )
+      }
   }
 
   private def renderView(businessType: BusinessType, form: Form[_], mode: Mode)(implicit request: Request[_]) =
@@ -92,4 +95,12 @@ class UtrController @Inject()(
       case SoleTrader                          => Some(selfAssessmentView(form, mode))
       case Individual                          => None
     }
+
+  private def getForm(businessType: BusinessType) = {
+    formProvider(businessType match {
+      case LimitedCompany | AssociationOrTrust => "utrCorporationTax"
+      case Llp | Partnership => "utrPartnership"
+      case SoleTrader => "utrSelfAssessment"
+    })
+  }
 }

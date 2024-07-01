@@ -131,28 +131,29 @@ soleTraderName.error.lastName.required = Enter your last name
 soleTraderName.error.firstName.length = First name must be 35 characters or less
 soleTraderName.error.lastName.length = Last name must be 35 characters or less
 
-utrCorporationTax.title =
-utrCorporationTax.heading =
-utrCorporationTax.p1 =
-utrCorporationTax.link.text =
-utrCorporationTax.link.href =
+utrCorporationTax.title = What is your Corporation Tax Unique Taxpayer Reference (UTR)?
+utrCorporationTax.heading = What is your Corporation Tax Unique Taxpayer Reference (UTR)?
+utrCorporationTax.p1 = Your UTR can be 10 or 13 digits long. It will be on tax returns and other letters about Corporation Tax. It may be called 'reference', 'UTR' or 'official user'.
+utrCorporationTax.link.text = Ask for a copy of your Corporation Tax UTR (opens in new tab)
+utrCorporationTax.link.href = https://www.tax.service.gov.uk/ask-for-copy-of-your-corporation-tax-utr
+utrCorporationTax.error.required = Enter your Corporation Tax Unique Taxpayer Reference
+utrCorporationTax.error.format = Enter a Corporation Tax Unique Taxpayer Reference in the correct format
 
-utrPartnership.title =
-utrPartnership.heading =
-utrPartnership.p1 =
-utrPartnership.link.text =
-utrPartnership.link.href =
+utrPartnership.title = What is your Partnership Unique Taxpayer Reference (UTR)?
+utrPartnership.heading = What is your Partnership Unique Taxpayer Reference (UTR)?
+utrPartnership.p1 = Your UTR can be 10 or 13 digits long. You can find it in your Business Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
+utrPartnership.link.text = How to find your UTR (opens in a new tab)
+utrPartnership.link.href = https://www.gov.uk/find-utr-number
+utrPartnership.error.required = Enter your Partnership Unique Taxpayer Reference
+utrPartnership.error.format = Enter a Partnership Unique Taxpayer Reference in the correct format
 
-utrSelfAssessment.title =
-utrSelfAssessment.heading =
-utrSelfAssessment.p1 =
-utrSelfAssessment.link.text =
-utrSelfAssessment.link.href =
-
-utr.checkYourAnswersLabel = utr
-utr.error.required = Enter utr
-utr.error.length = Utr must be 100 characters or less
-utr.change.hidden = Utr
+utrSelfAssessment.title = What is your Self Assessment Unique Taxpayer Reference (UTR)?
+utrSelfAssessment.heading = What is your Self Assessment Unique Taxpayer Reference (UTR)?
+utrSelfAssessment.p1 = Your UTR can be 10 or 13 digits long. You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
+utrSelfAssessment.link.text = How to find your UTR (opens in a new tab)
+utrSelfAssessment.link.href = https://www.gov.uk/find-utr-number
+utrSelfAssessment.error.required = Enter your Self Assessment Unique Taxpayer Reference
+utrSelfAssessment.error.format = Enter a Self Assessment Unique Taxpayer Reference in the correct format
 
 dateOfBirth.title = DateOfBirth
 dateOfBirth.heading = DateOfBirth
