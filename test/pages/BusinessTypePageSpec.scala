@@ -17,11 +17,12 @@
 package pages
 
 import controllers.routes
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{BusinessType, CheckMode, NormalMode, UserAnswers}
+import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class BusinessTypePageSpec extends AnyFreeSpec with Matchers {
+class BusinessTypePageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
 
@@ -29,9 +30,24 @@ class BusinessTypePageSpec extends AnyFreeSpec with Matchers {
 
     "in Normal Mode" - {
 
-      "must go to Registered in UK" in {
+      "must go to Has Nino for an Individual business type" in {
+        
+        val answers = emptyAnswers.set(BusinessTypePage, BusinessType.Individual).success.value
+        BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.HasNinoController.onPageLoad(NormalMode)
+      }
+      
+      "must go to Registered in UK for all other business types" in {
 
-        BusinessTypePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.RegisteredInUkController.onPageLoad(NormalMode)
+        for (businessType <- BusinessType.values.filterNot(_ == BusinessType.Individual)) {
+          
+          val answers = emptyAnswers.set(BusinessTypePage, businessType).success.value
+          BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.RegisteredInUkController.onPageLoad(NormalMode)
+        }
+      }
+      
+      "must go to Journey Recovery if business type has not been answered" in {
+        
+        BusinessTypePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
     }
 

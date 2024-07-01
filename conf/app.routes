@@ -64,10 +64,10 @@ POST       /dateOfBirth                  controllers.DateOfBirthController.onSub
 GET        /changeDateOfBirth                        controllers.DateOfBirthController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeDateOfBirth                        controllers.DateOfBirthController.onSubmit(mode: Mode = CheckMode)
 
-GET        /hasNino                        controllers.HasNinoController.onPageLoad(mode: Mode = NormalMode)
-POST       /hasNino                        controllers.HasNinoController.onSubmit(mode: Mode = NormalMode)
-GET        /changeHasNino                  controllers.HasNinoController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeHasNino                  controllers.HasNinoController.onSubmit(mode: Mode = CheckMode)
+GET        /registration/have-ni-number                        controllers.HasNinoController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/have-ni-number                        controllers.HasNinoController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-have-ni-number                  controllers.HasNinoController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-have-ni-number                  controllers.HasNinoController.onSubmit(mode: Mode = CheckMode)
 
 GET        /individualName                        controllers.IndividualNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /individualName                        controllers.IndividualNameController.onSubmit(mode: Mode = NormalMode)
