@@ -39,6 +39,21 @@ class NavigatorSpec extends SpecBase {
 
         navigator.nextPage(RegistrationTypePage, NormalMode, emptyUserAnswers) mustEqual routes.BusinessTypeController.onPageLoad(NormalMode)
       }
+
+      "must go from Has UTR" - {
+
+        "to Utr when the answer is yes" in {
+
+          val answers = emptyUserAnswers.set(HasUtrPage, true).success.value
+          navigator.nextPage(HasUtrPage, NormalMode, answers) mustEqual routes.UtrController.onPageLoad(NormalMode)
+        }
+
+        "to business name when the answer is no" in {
+
+          val answers = emptyUserAnswers.set(HasUtrPage, false).success.value
+          navigator.nextPage(HasUtrPage, NormalMode, answers) mustEqual routes.BusinessNameController.onPageLoad(NormalMode)
+        }
+      }
     }
 
     "in Check mode" - {

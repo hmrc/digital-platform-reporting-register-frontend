@@ -39,10 +39,10 @@ POST       /businessName                        controllers.BusinessNameControll
 GET        /changeBusinessName                  controllers.BusinessNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeBusinessName                  controllers.BusinessNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /hasUtr                        controllers.HasUtrController.onPageLoad(mode: Mode = NormalMode)
-POST       /hasUtr                        controllers.HasUtrController.onSubmit(mode: Mode = NormalMode)
-GET        /changeHasUtr                  controllers.HasUtrController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeHasUtr                  controllers.HasUtrController.onSubmit(mode: Mode = CheckMode)
+GET        /registration/have-utr                        controllers.HasUtrController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/have-utr                        controllers.HasUtrController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-have-utr                  controllers.HasUtrController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-have-utr                  controllers.HasUtrController.onSubmit(mode: Mode = CheckMode)
 
 GET        /registeredInUk                        controllers.RegisteredInUkController.onPageLoad(mode: Mode = NormalMode)
 POST       /registeredInUk                        controllers.RegisteredInUkController.onSubmit(mode: Mode = NormalMode)

@@ -16,57 +16,82 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.HasUtrFormProvider
+import models.BusinessType.*
+
 import javax.inject.Inject
-import models.Mode
+import models.{BusinessType, Mode}
 import navigation.Navigator
-import pages.HasUtrPage
+import pages.{BusinessTypePage, HasUtrPage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.twirl.api.Html
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.HasUtrView
+import views.html.{HasUtrCorporationTaxView, HasUtrPartnershipView, HasUtrSelfAssessmentView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class HasUtrController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
-                                         navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         formProvider: HasUtrFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: HasUtrView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                  override val messagesApi: MessagesApi,
+                                  sessionRepository: SessionRepository,
+                                  navigator: Navigator,
+                                  identify: IdentifierAction,
+                                  getData: DataRetrievalAction,
+                                  requireData: DataRequiredAction,
+                                  formProvider: HasUtrFormProvider,
+                                  val controllerComponents: MessagesControllerComponents,
+                                  corporationTaxView: HasUtrCorporationTaxView,
+                                  selfAssessmentView: HasUtrSelfAssessmentView,
+                                  partnershipView: HasUtrPartnershipView
+                                 )(implicit ec: ExecutionContext)
+  extends FrontendBaseController with I18nSupport with AnswerExtractor {
 
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
+      getAnswer(BusinessTypePage) {
+        businessType =>
 
-      val preparedForm = request.userAnswers.get(HasUtrPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+          val preparedForm = request.userAnswers.get(HasUtrPage) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+
+          renderView(businessType, preparedForm, mode)
+            .map(Ok(_))
+            .getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
-
-      Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getAnswerAsync(BusinessTypePage) {
+        businessType =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              renderView(businessType, formWithErrors, mode)
+                .map(html => Future.successful(BadRequest(html)))
+                .getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))),
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(HasUtrPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(HasUtrPage, mode, updatedAnswers))
-      )
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(HasUtrPage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(HasUtrPage, mode, updatedAnswers))
+          )
+      }
   }
+
+  private def renderView(businessType: BusinessType, form: Form[_], mode: Mode)(implicit request: Request[_]): Option[Html] =
+    businessType match {
+      case LimitedCompany | AssociationOrTrust => Some(corporationTaxView(form, mode))
+      case Llp | Partnership => Some(partnershipView(form, mode))
+      case SoleTrader => Some(selfAssessmentView(form, mode))
+      case Individual => None
+    }
 }

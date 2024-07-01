@@ -95,11 +95,24 @@ businessName.error.required = Enter businessName
 businessName.error.length = BusinessName must be 100 characters or less
 businessName.change.hidden = BusinessName
 
-hasUtr.title = hasUtr
-hasUtr.heading = hasUtr
-hasUtr.checkYourAnswersLabel = hasUtr
-hasUtr.error.required = Select yes if hasUtr
-hasUtr.change.hidden = HasUtr
+hasUtr.error.required = Select yes if you have a Unique Taxpayer Reference
+hasUtrCorporationTax.title = Do you have a Corporation Tax Unique Taxpayer Reference (UTR)?
+hasUtrCorporationTax.heading = Do you have a Corporation Tax Unique Taxpayer Reference (UTR)?
+hasUtrCorporationTax.p1 = Your UTR can be 10 or 13 digits long. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’.
+hasUtrCorporationTax.link.text = Ask for a copy of your Corporation Tax UTR
+hasUtrCorporationTax.link.href = https://www.tax.service.gov.uk/ask-for-copy-of-your-corporation-tax-utr
+
+hasUtrPartnership.title = Do you have a Partnership Unique Taxpayer Reference (UTR)?
+hasUtrPartnership.heading = Do you have a Partnership Unique Taxpayer Reference (UTR)?
+hasUtrPartnership.p1 = Your UTR can be 10 or 13 digits long. You can find it in your Business Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
+hasUtrPartnership.link.text = How to find your UTR
+hasUtrPartnership.link.href = https://www.gov.uk/find-utr-number
+
+hasUtrSelfAssessment.title = Do you have a Self Assessment Unique Taxpayer Reference (UTR)?
+hasUtrSelfAssessment.heading = Do you have a Self Assessment Unique Taxpayer Reference (UTR)?
+hasUtrSelfAssessment.p1 = Your UTR can be 10 or 13 digits long. You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
+hasUtrSelfAssessment.link.text = How to find your UTR
+hasUtrSelfAssessment.link.href = https://www.gov.uk/find-utr-number
 
 registeredInUk.title = registeredInUk
 registeredInUk.heading = registeredInUk
