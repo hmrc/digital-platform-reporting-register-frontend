@@ -16,6 +16,7 @@
 
 package pages
 
+import controllers.routes
 import models.{SoleTraderName, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -26,5 +27,6 @@ case object SoleTraderNamePage extends QuestionPage[SoleTraderName] {
 
   override def toString: String = "soleTraderName"
 
-  override def nextPageNormalMode(answers: UserAnswers): Call = ???
+  override def nextPageNormalMode(answers: UserAnswers): Call =
+    routes.IndexController.onPageLoad()
 }

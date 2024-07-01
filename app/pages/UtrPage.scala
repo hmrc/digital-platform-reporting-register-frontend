@@ -16,7 +16,8 @@
 
 package pages
 
-import models.UserAnswers
+import controllers.routes
+import models.{BusinessType, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -26,5 +27,9 @@ case object UtrPage extends QuestionPage[String] {
 
   override def toString: String = "utr"
 
-  override def nextPageNormalMode(answers: UserAnswers): Call = ???
+  override def nextPageNormalMode(answers: UserAnswers): Call =
+    answers.get(BusinessTypePage).map {
+      case BusinessType.SoleTrader => routes.SoleTraderNameController.onPageLoad(NormalMode)
+      case _ => routes.BusinessNameController.onPageLoad(NormalMode)
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }

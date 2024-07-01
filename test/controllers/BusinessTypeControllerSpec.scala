@@ -18,14 +18,12 @@ package controllers
 
 import base.SpecBase
 import forms.BusinessTypeFormProvider
-import models.{BusinessType, NormalMode, RegistrationType, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import models.{BusinessType, NormalMode, RegistrationType}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{BusinessTypePage, RegistrationTypePage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -34,8 +32,6 @@ import views.html.BusinessTypeView
 import scala.concurrent.Future
 
 class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
-
-  private def onwardRoute = Call("GET", "/foo")
 
   private lazy val businessTypeRoute = routes.BusinessTypeController.onPageLoad(NormalMode).url
 
@@ -88,10 +84,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -102,7 +95,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual BusinessTypePage.nextPage(NormalMode, baseAnswers).url
       }
     }
 

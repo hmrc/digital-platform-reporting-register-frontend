@@ -1,5 +1,6 @@
 package pages
 
+import controllers.routes
 import models.UserAnswers
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -10,5 +11,6 @@ case object $className$Page extends QuestionPage[Int] {
   
   override def toString: String = "$className;format="decap"$"
 
-  override def nextPageNormalMode(answers: UserAnswers): Call = ???
+  override def nextPageNormalMode(answers: UserAnswers): Call =
+    routes.IndexController.onPageLoad()
 }

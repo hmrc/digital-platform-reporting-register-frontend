@@ -21,7 +21,6 @@ import forms.RegistrationTypeFormProvider
 
 import javax.inject.Inject
 import models.{Mode, UserAnswers}
-import navigation.Navigator
 import pages.RegistrationTypePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -34,7 +33,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class RegistrationTypeController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        sessionRepository: SessionRepository,
-                                       navigator: Navigator,
                                        identify: IdentifierAction,
                                        getData: DataRetrievalAction,
                                        formProvider: RegistrationTypeFormProvider,
@@ -66,7 +64,7 @@ class RegistrationTypeController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.getOrElse(UserAnswers(request.userId)).set(RegistrationTypePage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(RegistrationTypePage, mode, updatedAnswers))
+          } yield Redirect(RegistrationTypePage.nextPage(mode, updatedAnswers))
       )
   }
 }

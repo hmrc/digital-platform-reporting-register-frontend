@@ -1,5 +1,6 @@
 package pages
 
+import controllers.routes
 import java.time.LocalDate
 
 import models.UserAnswers
@@ -12,5 +13,6 @@ case object $className$Page extends QuestionPage[LocalDate] {
 
   override def toString: String = "$className;format="decap"$"
 
-  override def nextPageNormalMode(answers: UserAnswers): Call = ???
+  override def nextPageNormalMode(answers: UserAnswers): Call =
+    routes.IndexController.onPageLoad()
 }

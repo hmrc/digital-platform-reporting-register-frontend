@@ -16,7 +16,7 @@
 
 package pages
 
-import models.{RegistrationType, UserAnswers}
+import models.{NormalMode, RegistrationType, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -26,5 +26,6 @@ case object RegistrationTypePage extends QuestionPage[RegistrationType] {
 
   override def toString: String = "registrationType"
 
-  override def nextPageNormalMode(answers: UserAnswers): Call = ???
+  override def nextPageNormalMode(answers: UserAnswers): Call =
+    controllers.routes.BusinessTypeController.onPageLoad(NormalMode)
 }
