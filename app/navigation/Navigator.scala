@@ -29,6 +29,9 @@ class Navigator @Inject()() {
   private val normalRoutes: Page => UserAnswers => Call = {
     case RegistrationTypePage => _ => routes.BusinessTypeController.onPageLoad(NormalMode)
     case HasUtrPage           => hasUtrRoute
+    case BusinessTypePage     => _ => routes.RegisteredInUkController.onPageLoad(NormalMode)
+    case RegisteredInUkPage   => registeredInUkRoute
+    case _                    => _ => routes.IndexController.onPageLoad()
     case _                    => _ => routes.IndexController.onPageLoad()
   }
 
@@ -37,7 +40,13 @@ class Navigator @Inject()() {
       case true => routes.UtrController.onPageLoad(NormalMode)
       case false => routes.BusinessNameController.onPageLoad(NormalMode)
     }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
-
+  
+  private def registeredInUkRoute(answers: UserAnswers): Call =
+    answers.get(RegisteredInUkPage).map {
+      case true =>  routes.UtrController.onPageLoad(NormalMode)
+      case false => routes.HasUtrController.onPageLoad(NormalMode)
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+  
   private val checkRouteMap: Page => UserAnswers => Call = {
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
