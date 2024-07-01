@@ -18,18 +18,19 @@ package controllers
 
 import base.SpecBase
 import forms.UtrFormProvider
+import models.BusinessType.{AssociationOrTrust, Individual, LimitedCompany, Llp, Partnership, SoleTrader}
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.UtrPage
+import pages.{BusinessTypePage, UtrPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.UtrView
+import views.html.{UtrCorporationTaxView, UtrPartnershipView, UtrSelfAssessmentView}
 
 import scala.concurrent.Future
 
@@ -42,39 +43,89 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val utrRoute = routes.UtrController.onPageLoad(NormalMode).url
 
+  val utr = "1234567890"
+
   "Utr Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET" - {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      for (businessType <- Seq(LimitedCompany, AssociationOrTrust)) {
 
-      running(application) {
-        val request = FakeRequest(GET, utrRoute)
+        s"for a ${businessType.toString}" in {
 
-        val result = route(application, request).value
+          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
 
-        val view = application.injector.instanceOf[UtrView]
+          val application = applicationBuilder(userAnswers = Some(answers)).build()
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+          running(application) {
+            val request = FakeRequest(GET, utrRoute)
+
+            val result = route(application, request).value
+
+            val view = application.injector.instanceOf[UtrCorporationTaxView]
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+          }
+        }
+      }
+
+      for (businessType <- Seq(Llp, Partnership)) {
+
+        s"for a ${businessType.toString}" in {
+
+          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
+
+          val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+          running(application) {
+            val request = FakeRequest(GET, utrRoute)
+
+            val result = route(application, request).value
+
+            val view = application.injector.instanceOf[UtrPartnershipView]
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+          }
+        }
+      }
+
+      "for a Sole Trader" in {
+
+        val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
+
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, utrRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[UtrSelfAssessmentView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        }
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
+      val answers = emptyUserAnswers
+        .set(BusinessTypePage, SoleTrader).success.value
+        .set(UtrPage, utr).success.value
 
-      val userAnswers = UserAnswers(userAnswersId).set(UtrPage, "answer").success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         val request = FakeRequest(GET, utrRoute)
 
-        val view = application.injector.instanceOf[UtrView]
+        val view = application.injector.instanceOf[UtrSelfAssessmentView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(utr), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -95,7 +146,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, utrRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", utr))
 
         val result = route(application, request).value
 
@@ -106,7 +157,9 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
+
+      val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         val request =
@@ -115,7 +168,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[UtrView]
+        val view = application.injector.instanceOf[UtrSelfAssessmentView]
 
         val result = route(application, request).value
 
@@ -145,7 +198,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, utrRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", utr))
 
         val result = route(application, request).value
 
