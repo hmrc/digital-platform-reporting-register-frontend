@@ -16,9 +16,23 @@
 
 package pages
 
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import play.api.mvc.Call
 import scala.language.implicitConversions
 
-trait Page
+trait Page {
+  
+  def nextPage(mode: Mode, answers: UserAnswers): Call =
+    mode match {
+      case NormalMode => nextPageNormalMode(answers)
+      case CheckMode  => nextPageCheckMode(answers)
+    }
+  
+  def nextPageNormalMode(answers: UserAnswers): Call
+  
+  def nextPageCheckMode(answers: UserAnswers): Call =
+    controllers.routes.CheckYourAnswersController.onPageLoad()
+}
 
 object Page {
 
