@@ -20,7 +20,6 @@ import controllers.actions._
 import forms.BusinessNameFormProvider
 import javax.inject.Inject
 import models.Mode
-import navigation.Navigator
 import pages.BusinessNamePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -33,7 +32,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessNameController @Inject()(
                                         override val messagesApi: MessagesApi,
                                         sessionRepository: SessionRepository,
-                                        navigator: Navigator,
                                         identify: IdentifierAction,
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
@@ -66,7 +64,7 @@ class BusinessNameController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessNamePage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(BusinessNamePage, mode, updatedAnswers))
+          } yield Redirect(BusinessNamePage.nextPage(mode, updatedAnswers))
       )
   }
 }

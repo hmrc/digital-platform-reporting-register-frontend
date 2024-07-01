@@ -21,7 +21,6 @@ import forms.BusinessTypeFormProvider
 
 import javax.inject.Inject
 import models.Mode
-import navigation.Navigator
 import pages.{BusinessTypePage, RegistrationTypePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -34,7 +33,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class BusinessTypeController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        sessionRepository: SessionRepository,
-                                       navigator: Navigator,
                                        identify: IdentifierAction,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
@@ -77,7 +75,7 @@ class BusinessTypeController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessTypePage, value))
                 _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(BusinessTypePage, mode, updatedAnswers))
+              } yield Redirect(BusinessTypePage.nextPage(mode, updatedAnswers))
           )
       }
   }

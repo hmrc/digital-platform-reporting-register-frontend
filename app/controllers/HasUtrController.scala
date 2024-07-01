@@ -22,7 +22,6 @@ import models.BusinessType.*
 
 import javax.inject.Inject
 import models.{BusinessType, Mode}
-import navigation.Navigator
 import pages.{BusinessTypePage, HasUtrPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -37,7 +36,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class HasUtrController @Inject()(
                                   override val messagesApi: MessagesApi,
                                   sessionRepository: SessionRepository,
-                                  navigator: Navigator,
                                   identify: IdentifierAction,
                                   getData: DataRetrievalAction,
                                   requireData: DataRequiredAction,
@@ -82,7 +80,7 @@ class HasUtrController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(HasUtrPage, value))
                 _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(HasUtrPage, mode, updatedAnswers))
+              } yield Redirect(HasUtrPage.nextPage(mode, updatedAnswers))
           )
       }
   }

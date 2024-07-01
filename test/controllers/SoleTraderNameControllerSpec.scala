@@ -19,14 +19,12 @@ package controllers
 import base.SpecBase
 import forms.SoleTraderNameFormProvider
 import models.{NormalMode, SoleTraderName, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.SoleTraderNamePage
 import play.api.inject.bind
 import play.api.libs.json.Json
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -35,8 +33,6 @@ import views.html.SoleTraderNameView
 import scala.concurrent.Future
 
 class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
-
-  def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new SoleTraderNameFormProvider()
   val form = formProvider()
@@ -95,10 +91,7 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -109,7 +102,7 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual SoleTraderNamePage.nextPage(NormalMode, emptyUserAnswers).url
       }
     }
 

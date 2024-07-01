@@ -16,11 +16,20 @@
 
 package pages
 
+import controllers.routes
+import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object RegisteredInUkPage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "registeredInUk"
+
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
+    answers.get(this).map {
+      case true  => routes.UtrController.onPageLoad(NormalMode)
+      case false => routes.HasUtrController.onPageLoad(NormalMode)
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }

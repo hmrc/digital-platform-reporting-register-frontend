@@ -16,12 +16,17 @@
 
 package pages
 
-import models.SoleTraderName
+import controllers.routes
+import models.{SoleTraderName, UserAnswers}
 import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 case object SoleTraderNamePage extends QuestionPage[SoleTraderName] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "soleTraderName"
+
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
+    routes.IndexController.onPageLoad()
 }
