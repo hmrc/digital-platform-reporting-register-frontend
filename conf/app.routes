@@ -58,3 +58,23 @@ GET        /utr                        controllers.UtrController.onPageLoad(mode
 POST       /utr                        controllers.UtrController.onSubmit(mode: Mode = NormalMode)
 GET        /changeUtr                  controllers.UtrController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeUtr                  controllers.UtrController.onSubmit(mode: Mode = CheckMode)
+
+GET        /dateOfBirth                  controllers.DateOfBirthController.onPageLoad(mode: Mode = NormalMode)
+POST       /dateOfBirth                  controllers.DateOfBirthController.onSubmit(mode: Mode = NormalMode)
+GET        /changeDateOfBirth                        controllers.DateOfBirthController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeDateOfBirth                        controllers.DateOfBirthController.onSubmit(mode: Mode = CheckMode)
+
+GET        /hasNino                        controllers.HasNinoController.onPageLoad(mode: Mode = NormalMode)
+POST       /hasNino                        controllers.HasNinoController.onSubmit(mode: Mode = NormalMode)
+GET        /changeHasNino                  controllers.HasNinoController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeHasNino                  controllers.HasNinoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /individualName                        controllers.IndividualNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /individualName                        controllers.IndividualNameController.onSubmit(mode: Mode = NormalMode)
+GET        /changeIndividualName                  controllers.IndividualNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeIndividualName                  controllers.IndividualNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /nino                        controllers.NinoController.onPageLoad(mode: Mode = NormalMode)
+POST       /nino                        controllers.NinoController.onSubmit(mode: Mode = NormalMode)
+GET        /changeNino                  controllers.NinoController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeNino                  controllers.NinoController.onSubmit(mode: Mode = CheckMode)

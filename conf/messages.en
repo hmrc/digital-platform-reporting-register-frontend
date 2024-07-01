@@ -153,3 +153,38 @@ utr.checkYourAnswersLabel = utr
 utr.error.required = Enter utr
 utr.error.length = Utr must be 100 characters or less
 utr.change.hidden = Utr
+
+dateOfBirth.title = DateOfBirth
+dateOfBirth.heading = DateOfBirth
+dateOfBirth.hint = For example, 12 11 2007.
+dateOfBirth.checkYourAnswersLabel = DateOfBirth
+dateOfBirth.error.required.all = Enter the dateOfBirth
+dateOfBirth.error.required.two = The dateOfBirth must include {0} and {1}
+dateOfBirth.error.required = The dateOfBirth must include {0}
+dateOfBirth.error.invalid = Enter a real DateOfBirth
+dateOfBirth.change.hidden = DateOfBirth
+
+hasNino.title = hasNino
+hasNino.heading = hasNino
+hasNino.checkYourAnswersLabel = hasNino
+hasNino.error.required = Select yes if hasNino
+hasNino.change.hidden = HasNino
+
+individualName.title = individualName
+individualName.heading = individualName
+individualName.firstName = firstName
+individualName.lastName = lastName
+individualName.checkYourAnswersLabel = IndividualName
+individualName.error.firstName.required = Enter firstName
+individualName.error.lastName.required = Enter lastName
+individualName.error.firstName.length = firstName must be 100 characters or less
+individualName.error.lastName.length = lastName must be 100 characters or less
+individualName.firstName.change.hidden = firstName
+individualName.lastName.change.hidden = lastName
+
+nino.title = nino
+nino.heading = nino
+nino.checkYourAnswersLabel = nino
+nino.error.required = Enter nino
+nino.error.length = Nino must be 100 characters or less
+nino.change.hidden = Nino
