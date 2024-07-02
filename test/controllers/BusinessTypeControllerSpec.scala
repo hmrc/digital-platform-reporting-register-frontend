@@ -94,8 +94,9 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
+        val updatedAnswers = baseAnswers.set(BusinessTypePage, BusinessType.values.head).success.value
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual BusinessTypePage.nextPage(NormalMode, baseAnswers).url
+        redirectLocation(result).value mustEqual BusinessTypePage.nextPage(NormalMode, updatedAnswers).url
       }
     }
 

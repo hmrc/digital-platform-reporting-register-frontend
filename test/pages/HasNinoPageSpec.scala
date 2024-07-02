@@ -18,10 +18,11 @@ package pages
 
 import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
+import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class HasNinoPageSpec extends AnyFreeSpec with Matchers {
+class HasNinoPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
 
@@ -29,9 +30,16 @@ class HasNinoPageSpec extends AnyFreeSpec with Matchers {
 
     "in Normal Mode" - {
 
-      "must go to Index" in {
+      "must go to Nino when the answer is yes" in {
 
-        HasNinoPage.nextPage(NormalMode, emptyAnswers) mustEqual routes.IndexController.onPageLoad()
+        val answers = emptyAnswers.set(HasNinoPage, true).success.value
+        HasNinoPage.nextPage(NormalMode, answers) mustEqual routes.NinoController.onPageLoad(NormalMode)
+      }
+
+      "must go to Individual Name when the answer is no" in {
+
+        val answers = emptyAnswers.set(HasNinoPage, false).success.value
+        HasNinoPage.nextPage(NormalMode, answers) mustEqual routes.IndividualNameController.onPageLoad(NormalMode)
       }
     }
 

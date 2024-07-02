@@ -164,11 +164,12 @@ dateOfBirth.error.required = The dateOfBirth must include {0}
 dateOfBirth.error.invalid = Enter a real DateOfBirth
 dateOfBirth.change.hidden = DateOfBirth
 
-hasNino.title = hasNino
-hasNino.heading = hasNino
-hasNino.checkYourAnswersLabel = hasNino
-hasNino.error.required = Select yes if hasNino
-hasNino.change.hidden = HasNino
+hasNino.title = Do you have a National Insurance number?
+hasNino.heading = Do you have a National Insurance number?
+hasNino.error.required = Select yes if you have a National Insurance number
+hasNino.p1 = You can find your National Insurance number on your payslip, P60 or letters about tax, pension and benefits.
+hasNino.link.text = How to find your National Insurance number
+hasNino.link.href = https://www.gov.uk/find-national-insurance-number
 
 individualName.title = individualName
 individualName.heading = individualName
