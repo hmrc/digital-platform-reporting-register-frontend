@@ -133,7 +133,7 @@ soleTraderName.error.lastName.length = Last name must be 35 characters or less
 
 utrCorporationTax.title = What is your Corporation Tax Unique Taxpayer Reference (UTR)?
 utrCorporationTax.heading = What is your Corporation Tax Unique Taxpayer Reference (UTR)?
-utrCorporationTax.p1 = Your UTR can be 10 or 13 digits long. It will be on tax returns and other letters about Corporation Tax. It may be called 'reference', 'UTR' or 'official user'.
+utrCorporationTax.p1 = Your UTR can be 10 or 13 digits long. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official user’.
 utrCorporationTax.link.text = Ask for a copy of your Corporation Tax UTR (opens in new tab)
 utrCorporationTax.link.href = https://www.tax.service.gov.uk/ask-for-copy-of-your-corporation-tax-utr
 utrCorporationTax.error.required = Enter your Corporation Tax Unique Taxpayer Reference
