@@ -26,6 +26,7 @@ class UtrFormProvider @Inject() extends Mappings {
   def apply(key: String): Form[String] =
     Form(
       "value" -> text(s"$key.error.required")
-        .verifying(maxLength(100, s"$key.error.format"))
+        .verifying(minLength(10, s"$key.error.format"))
+        .verifying(maxLength(13, s"$key.error.format"))
     )
 }

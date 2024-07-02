@@ -35,7 +35,6 @@ import scala.concurrent.Future
 class UtrControllerSpec extends SpecBase with MockitoSugar {
   
   val formProvider = new UtrFormProvider()
-  val form = formProvider()
 
   lazy val utrRoute = routes.UtrController.onPageLoad(NormalMode).url
 
@@ -44,6 +43,8 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
   "Utr Controller" - {
 
     "must return OK and the correct view for a GET" - {
+
+      val form = formProvider("utrCorporationTax")
 
       for (businessType <- Seq(LimitedCompany, AssociationOrTrust)) {
 
@@ -68,6 +69,8 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
       for (businessType <- Seq(Llp, Partnership)) {
 
+        val form = formProvider("utrPartnership")
+
         s"for a ${businessType.toString}" in {
 
           val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
@@ -89,6 +92,8 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
       "for a Sole Trader" in {
 
+        val form = formProvider("utrSelfAssessment")
+
         val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
 
         val application = applicationBuilder(userAnswers = Some(answers)).build()
@@ -107,6 +112,9 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
+
+      val form = formProvider("utrSelfAssessment")
+
       val answers = emptyUserAnswers
         .set(BusinessTypePage, SoleTrader).success.value
         .set(UtrPage, utr).success.value
@@ -149,6 +157,8 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
+
+      val form = formProvider("utrSelfAssessment")
 
       val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
 
