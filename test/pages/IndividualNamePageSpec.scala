@@ -17,11 +17,12 @@
 package pages
 
 import controllers.routes
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{CheckMode, IndividualName, NormalMode, UserAnswers}
+import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class IndividualNamePageSpec extends AnyFreeSpec with Matchers {
+class IndividualNamePageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
 
@@ -29,9 +30,16 @@ class IndividualNamePageSpec extends AnyFreeSpec with Matchers {
 
     "in Normal Mode" - {
 
-      "must go to Index" in {
+      "must go to Date Of Birth page if there is an answer" in {
 
-        IndividualNamePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.IndexController.onPageLoad()
+        val answers = emptyAnswers.set(IndividualNamePage, IndividualName("", "")).success.value
+
+        IndividualNamePage.nextPage(NormalMode, answers) mustEqual routes.DateOfBirthController.onPageLoad(NormalMode)
+      }
+
+      "must go to error page if there is no data" in {
+
+        IndividualNamePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
     }
 

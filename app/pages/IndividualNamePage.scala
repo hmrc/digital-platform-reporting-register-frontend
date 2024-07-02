@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.{IndividualName, UserAnswers}
+import models.{IndividualName, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -28,5 +28,8 @@ case object IndividualNamePage extends QuestionPage[IndividualName] {
   override def toString: String = "individualName"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.IndexController.onPageLoad()
+    answers.get(this) match {
+      case Some(_) => routes.DateOfBirthController.onPageLoad(NormalMode)
+      case None    => routes.JourneyRecoveryController.onPageLoad()
+    }
 }
