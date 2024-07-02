@@ -23,9 +23,10 @@ import play.api.data.Form
 
 class UtrFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(key: String): Form[String] =
     Form(
-      "value" -> text("utr.error.required")
-        .verifying(maxLength(100, "utr.error.length"))
+      "value" -> text(s"$key.error.required")
+        .verifying(minLength(10, s"$key.error.format"))
+        .verifying(maxLength(13, s"$key.error.format"))
     )
 }

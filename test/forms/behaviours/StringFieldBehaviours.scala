@@ -20,6 +20,21 @@ import play.api.data.{Form, FormError}
 
 trait StringFieldBehaviours extends FieldBehaviours {
 
+    def fieldWithMinLength(form: Form[_],
+                           fieldName: String,
+                           minLength: Int,
+                           lengthError: FormError): Unit = {
+  
+      s"not bind strings shorter than $minLength characters" in {
+  
+        forAll(stringsShorterThan(minLength) -> "shortString") {
+          (string: String) =>
+            val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+            result.errors must contain only lengthError
+        }
+      }
+    }
+  
     def fieldWithMaxLength(form: Form[_],
                            fieldName: String,
                            maxLength: Int,

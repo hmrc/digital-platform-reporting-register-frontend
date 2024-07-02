@@ -21,11 +21,14 @@ import play.api.data.FormError
 
 class UtrFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "utr.error.required"
-  val lengthKey = "utr.error.length"
-  val maxLength = 100
+  val base = "utr"
+  
+  val requiredKey = s"$base.error.required"
+  val formatKey = s"$base.error.format"
+  val minLength = 10
+  val maxLength = 13
 
-  val form = new UtrFormProvider()()
+  val form = new UtrFormProvider()(base)
 
   ".value" - {
 
@@ -34,14 +37,21 @@ class UtrFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      stringsWithMinMaxLength(minLength, maxLength)
     )
 
     behave like fieldWithMaxLength(
       form,
       fieldName,
       maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      lengthError = FormError(fieldName, formatKey, Seq(maxLength))
+    )
+
+    behave like fieldWithMinLength(
+      form,
+      fieldName,
+      minLength = minLength,
+      lengthError = FormError(fieldName, formatKey, Seq(minLength))
     )
 
     behave like mandatoryField(
