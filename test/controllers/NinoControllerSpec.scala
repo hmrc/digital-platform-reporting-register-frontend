@@ -92,8 +92,9 @@ class NinoControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
+        val updatedAnswers = emptyUserAnswers.set(NinoPage, "123456789").success.value
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual NinoPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual NinoPage.nextPage(NormalMode, updatedAnswers).url
       }
     }
 
