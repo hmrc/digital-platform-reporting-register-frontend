@@ -39,12 +39,15 @@ class IndividualNameControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val individualNameRoute = routes.IndividualNameController.onPageLoad(NormalMode).url
 
+  val firstName = "Joe"
+  val lastName  = "Smith"
+
   val userAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
       IndividualNamePage.toString -> Json.obj(
-        "firstName" -> "value 1",
-        "lastName" -> "value 2"
+        "firstName" -> firstName,
+        "lastName" -> lastName
       )
     )
   )
@@ -79,7 +82,7 @@ class IndividualNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(IndividualName("value 1", "value 2")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(IndividualName(firstName, lastName)), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -97,12 +100,12 @@ class IndividualNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, individualNameRoute)
-            .withFormUrlEncodedBody(("firstName", "value 1"), ("lastName", "value 2"))
+            .withFormUrlEncodedBody(("firstName", firstName), ("lastName", lastName))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndividualNamePage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual IndividualNamePage.nextPage(NormalMode, userAnswers).url
       }
     }
 

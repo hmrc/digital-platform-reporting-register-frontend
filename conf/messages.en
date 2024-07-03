@@ -172,17 +172,14 @@ hasNino.p1 = You can find your National Insurance number on your payslip, P60 or
 hasNino.link.text = How to find your National Insurance number
 hasNino.link.href = https://www.gov.uk/find-national-insurance-number
 
-individualName.title = individualName
-individualName.heading = individualName
-individualName.firstName = firstName
-individualName.lastName = lastName
-individualName.checkYourAnswersLabel = IndividualName
-individualName.error.firstName.required = Enter firstName
-individualName.error.lastName.required = Enter lastName
-individualName.error.firstName.length = firstName must be 100 characters or less
-individualName.error.lastName.length = lastName must be 100 characters or less
-individualName.firstName.change.hidden = firstName
-individualName.lastName.change.hidden = lastName
+individualName.title = What is your name?
+individualName.heading = What is your name?
+individualName.firstName = First Name or given name
+individualName.lastName = Last Name or family name
+individualName.error.firstName.required = Enter your first name or given name
+individualName.error.lastName.required = Enter your last name or family name
+individualName.error.firstName.length = First name or given name must be 20 characters or less
+individualName.error.lastName.length = Last name or family name must be 20 characters or less
 
 nino.title = What is your National Insurance number?
 nino.heading = What is your National Insurance number?
