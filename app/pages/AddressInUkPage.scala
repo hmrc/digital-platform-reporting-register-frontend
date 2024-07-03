@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -28,5 +28,8 @@ case object AddressInUkPage extends QuestionPage[Boolean] {
   override def toString: String = "addressInUk"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.IndexController.onPageLoad()
+    answers.get(this).map {
+      case true => routes.UkAddressController.onPageLoad(NormalMode)
+      case false => routes.InternationalAddressController.onPageLoad(NormalMode)
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }
