@@ -18,10 +18,11 @@ package pages
 
 import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
+import org.scalatest.TryValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class DateOfBirthPageSpec extends AnyFreeSpec with Matchers {
+class DateOfBirthPageSpec extends AnyFreeSpec with Matchers with TryValues {
 
   ".nextPage" - {
 
@@ -29,9 +30,23 @@ class DateOfBirthPageSpec extends AnyFreeSpec with Matchers {
 
     "in Normal Mode" - {
 
-      "must go to Index" in {
+      "must go to Index if NINO supplied" in {
 
-        DateOfBirthPage.nextPage(NormalMode, emptyAnswers) mustEqual routes.IndexController.onPageLoad()
+        val answers = emptyAnswers.set(HasNinoPage, true).success.value
+
+        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
+      }
+
+      "must go to Is UK Address if NINO absent" in {
+
+        val answers = emptyAnswers.set(HasNinoPage, false).success.value
+
+        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.UkAddressController.onPageLoad(NormalMode)
+      }
+
+      "must go to error page if no data" in {
+
+        DateOfBirthPage.nextPage(NormalMode, emptyAnswers) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
     }
 

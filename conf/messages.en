@@ -157,11 +157,12 @@ utrSelfAssessment.error.format = Enter a Self Assessment Unique Taxpayer Referen
 
 dateOfBirth.title = What is your date of birth?
 dateOfBirth.heading = What is your date of birth?
-dateOfBirth.hint = For example, 31 3 1980.
+dateOfBirth.hint = For example, 31 3 1980
 dateOfBirth.error.required.all = Enter your date of birth
-dateOfBirth.error.required.two = Your date of birth must include {0} and {1}
-dateOfBirth.error.required = Your date of birth must include {0}
-dateOfBirth.error.invalid = Enter your real date of birth
+dateOfBirth.error.required.two = Enter the {0} and {1}
+dateOfBirth.error.required.one = Enter the {0}
+dateOfBirth.error.invalid = Date of birth must be a real date
+dateOfBirth.error.future = Date of birth must be in the past
 
 hasNino.title = Do you have a National Insurance number?
 hasNino.heading = Do you have a National Insurance number?

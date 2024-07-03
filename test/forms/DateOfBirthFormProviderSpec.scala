@@ -30,11 +30,13 @@ class DateOfBirthFormProviderSpec extends DateBehaviours {
 
     val validData = datesBetween(
       min = LocalDate.of(2000, 1, 1),
-      max = LocalDate.now(ZoneOffset.UTC)
+      max = LocalDate.now(ZoneOffset.UTC).minusDays(1)
     )
 
     behave like dateField(form, "value", validData)
 
     behave like mandatoryDateField(form, "value", "dateOfBirth.error.required.all")
+
+    behave like dateFieldWithMax(form, "value", LocalDate.now(), "dateOfBirth.error.future")
   }
 }

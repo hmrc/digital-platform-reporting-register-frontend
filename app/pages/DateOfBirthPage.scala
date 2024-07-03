@@ -17,9 +17,9 @@
 package pages
 
 import controllers.routes
-import java.time.LocalDate
 
-import models.UserAnswers
+import java.time.LocalDate
+import models.{NormalMode, UserAnswers}
 import play.api.mvc.Call
 import play.api.libs.json.JsPath
 
@@ -30,5 +30,9 @@ case object DateOfBirthPage extends QuestionPage[LocalDate] {
   override def toString: String = "dateOfBirth"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.IndexController.onPageLoad()
+    answers.get(HasNinoPage) match {
+      case Some(true)  => routes.IndexController.onPageLoad()
+      case Some(false) => routes.UkAddressController.onPageLoad(NormalMode)
+      case None        => routes.JourneyRecoveryController.onPageLoad()
+    }
 }
