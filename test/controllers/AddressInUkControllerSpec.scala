@@ -92,8 +92,9 @@ class AddressInUkControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
+        val updatedAnswers = emptyUserAnswers.set(AddressInUkPage, true).success.value
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual AddressInUkPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual AddressInUkPage.nextPage(NormalMode, updatedAnswers).url
       }
     }
 

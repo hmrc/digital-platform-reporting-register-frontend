@@ -189,10 +189,10 @@ nino.checkYourAnswersLabel = nino
 nino.error.required = Enter your National Insurance number
 nino.error.length = Nino must be 100 characters or less
 
-addressInUk.title = addressInUk
-addressInUk.heading = addressInUk
+addressInUk.title = Do you live in the UK, Jersey, Guernsey or the Isle of Man?
+addressInUk.heading = Do you live in the UK, Jersey, Guernsey or the Isle of Man?
 addressInUk.checkYourAnswersLabel = addressInUk
-addressInUk.error.required = Select yes if addressInUk
+addressInUk.error.required = Select yes if you live in the UK, Jersey, Guernsey or the Isle of Man
 addressInUk.change.hidden = AddressInUk
 
 internationalAddress.title = internationalAddress
