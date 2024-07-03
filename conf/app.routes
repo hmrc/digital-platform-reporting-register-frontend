@@ -59,10 +59,10 @@ POST       /registration/enter-utr                  controllers.UtrController.on
 GET        /registration/change-utr                 controllers.UtrController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-utr                 controllers.UtrController.onSubmit(mode: Mode = CheckMode)
 
-GET        /dateOfBirth                  controllers.DateOfBirthController.onPageLoad(mode: Mode = NormalMode)
-POST       /dateOfBirth                  controllers.DateOfBirthController.onSubmit(mode: Mode = NormalMode)
-GET        /changeDateOfBirth                        controllers.DateOfBirthController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeDateOfBirth                        controllers.DateOfBirthController.onSubmit(mode: Mode = CheckMode)
+GET        /registration/individual-dob                  controllers.DateOfBirthController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/individual-dob                  controllers.DateOfBirthController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-individual-dob           controllers.DateOfBirthController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-individual-dob           controllers.DateOfBirthController.onSubmit(mode: Mode = CheckMode)
 
 GET        /registration/have-ni-number                        controllers.HasNinoController.onPageLoad(mode: Mode = NormalMode)
 POST       /registration/have-ni-number                        controllers.HasNinoController.onSubmit(mode: Mode = NormalMode)

@@ -155,15 +155,13 @@ utrSelfAssessment.link.href = https://www.gov.uk/find-utr-number
 utrSelfAssessment.error.required = Enter your Self Assessment Unique Taxpayer Reference
 utrSelfAssessment.error.format = Enter a Self Assessment Unique Taxpayer Reference in the correct format
 
-dateOfBirth.title = DateOfBirth
-dateOfBirth.heading = DateOfBirth
-dateOfBirth.hint = For example, 12 11 2007.
-dateOfBirth.checkYourAnswersLabel = DateOfBirth
-dateOfBirth.error.required.all = Enter the dateOfBirth
-dateOfBirth.error.required.two = The dateOfBirth must include {0} and {1}
-dateOfBirth.error.required = The dateOfBirth must include {0}
-dateOfBirth.error.invalid = Enter a real DateOfBirth
-dateOfBirth.change.hidden = DateOfBirth
+dateOfBirth.title = What is your date of birth?
+dateOfBirth.heading = What is your date of birth?
+dateOfBirth.hint = For example, 31 3 1980.
+dateOfBirth.error.required.all = Enter your date of birth
+dateOfBirth.error.required.two = Your date of birth must include {0} and {1}
+dateOfBirth.error.required = Your date of birth must include {0}
+dateOfBirth.error.invalid = Enter your real date of birth
 
 hasNino.title = Do you have a National Insurance number?
 hasNino.heading = Do you have a National Insurance number?
