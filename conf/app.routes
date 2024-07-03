@@ -54,10 +54,10 @@ POST       /registration/enter-name                        controllers.SoleTrade
 GET        /registration/change-name                       controllers.SoleTraderNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-name                       controllers.SoleTraderNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /utr                        controllers.UtrController.onPageLoad(mode: Mode = NormalMode)
-POST       /utr                        controllers.UtrController.onSubmit(mode: Mode = NormalMode)
-GET        /changeUtr                  controllers.UtrController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeUtr                  controllers.UtrController.onSubmit(mode: Mode = CheckMode)
+GET        /registration/enter-utr                  controllers.UtrController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/enter-utr                  controllers.UtrController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-utr                 controllers.UtrController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-utr                 controllers.UtrController.onSubmit(mode: Mode = CheckMode)
 
 GET        /dateOfBirth                  controllers.DateOfBirthController.onPageLoad(mode: Mode = NormalMode)
 POST       /dateOfBirth                  controllers.DateOfBirthController.onSubmit(mode: Mode = NormalMode)
@@ -69,10 +69,10 @@ POST       /registration/have-ni-number                        controllers.HasNi
 GET        /registration/change-have-ni-number                  controllers.HasNinoController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-have-ni-number                  controllers.HasNinoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /individualName                        controllers.IndividualNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /individualName                        controllers.IndividualNameController.onSubmit(mode: Mode = NormalMode)
-GET        /changeIndividualName                  controllers.IndividualNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeIndividualName                  controllers.IndividualNameController.onSubmit(mode: Mode = CheckMode)
+GET        /registration/individual-name                        controllers.IndividualNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/individual-name                        controllers.IndividualNameController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-individual-name                 controllers.IndividualNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-individual-name                 controllers.IndividualNameController.onSubmit(mode: Mode = CheckMode)
 
 GET        /nino                        controllers.NinoController.onPageLoad(mode: Mode = NormalMode)
 POST       /nino                        controllers.NinoController.onSubmit(mode: Mode = NormalMode)
