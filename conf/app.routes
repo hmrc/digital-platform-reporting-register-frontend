@@ -78,3 +78,18 @@ GET        /registration/what-is-ni-number          controllers.NinoController.o
 POST       /registration/what-is-ni-number          controllers.NinoController.onSubmit(mode: Mode = NormalMode)
 GET        /registration/change-what-is-ni-number   controllers.NinoController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-what-is-ni-number   controllers.NinoController.onSubmit(mode: Mode = CheckMode)
+
+GET        /addressInUk                        controllers.AddressInUkController.onPageLoad(mode: Mode = NormalMode)
+POST       /addressInUk                        controllers.AddressInUkController.onSubmit(mode: Mode = NormalMode)
+GET        /changeAddressInUk                  controllers.AddressInUkController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeAddressInUk                  controllers.AddressInUkController.onSubmit(mode: Mode = CheckMode)
+
+GET        /internationalAddress                        controllers.InternationalAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /internationalAddress                        controllers.InternationalAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /changeInternationalAddress                  controllers.InternationalAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeInternationalAddress                  controllers.InternationalAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET        /ukAddress                        controllers.UkAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /ukAddress                        controllers.UkAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /changeUkAddress                  controllers.UkAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeUkAddress                  controllers.UkAddressController.onSubmit(mode: Mode = CheckMode)
