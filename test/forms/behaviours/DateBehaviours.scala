@@ -45,7 +45,7 @@ class DateBehaviours extends FieldBehaviours {
     }
   }
 
-  def dateFieldWithMax(form: Form[_], key: String, max: LocalDate, formError: FormError): Unit = {
+  def dateFieldWithMax(form: Form[_], key: String, max: LocalDate, errorKey: String, errorArgs: Seq[String] = Seq.empty): Unit = {
 
     s"fail to bind a date greater than ${max.format(DateTimeFormatter.ISO_LOCAL_DATE)}" in {
 
@@ -62,12 +62,12 @@ class DateBehaviours extends FieldBehaviours {
 
           val result = form.bind(data)
 
-          result.errors must contain only formError
+          result.errors must contain only FormError(key, errorKey, errorArgs)
       }
     }
   }
 
-  def dateFieldWithMin(form: Form[_], key: String, min: LocalDate, formError: FormError): Unit = {
+  def dateFieldWithMin(form: Form[_], key: String, min: LocalDate, errorKey: String, errorArgs: Seq[String] = Seq.empty): Unit = {
 
     s"fail to bind a date earlier than ${min.format(DateTimeFormatter.ISO_LOCAL_DATE)}" in {
 
@@ -84,7 +84,7 @@ class DateBehaviours extends FieldBehaviours {
 
           val result = form.bind(data)
 
-          result.errors must contain only formError
+          result.errors must contain only FormError(key, errorKey, errorArgs)
       }
     }
   }
