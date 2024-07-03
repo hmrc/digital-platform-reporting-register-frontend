@@ -184,9 +184,10 @@ individualName.error.lastName.length = lastName must be 100 characters or less
 individualName.firstName.change.hidden = firstName
 individualName.lastName.change.hidden = lastName
 
-nino.title = nino
-nino.heading = nino
+nino.title = What is your National Insurance number?
+nino.heading = What is your National Insurance number?
+nino.p1 = It's on your National Insurance card, benefit letter, payslip or P60.
+nino.hint = For example, ‘QQ 12 34 56 C’.
 nino.checkYourAnswersLabel = nino
-nino.error.required = Enter nino
+nino.error.required = Enter your National Insurance number
 nino.error.length = Nino must be 100 characters or less
-nino.change.hidden = Nino

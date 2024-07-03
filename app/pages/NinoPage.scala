@@ -20,6 +20,7 @@ import controllers.routes
 import models.UserAnswers
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+import models.NormalMode
 
 case object NinoPage extends QuestionPage[String] {
 
@@ -28,5 +29,5 @@ case object NinoPage extends QuestionPage[String] {
   override def toString: String = "nino"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.IndexController.onPageLoad()
+    routes.IndividualNameController.onPageLoad(NormalMode)
 }

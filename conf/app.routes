@@ -74,7 +74,7 @@ POST       /individualName                        controllers.IndividualNameCont
 GET        /changeIndividualName                  controllers.IndividualNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeIndividualName                  controllers.IndividualNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /nino                        controllers.NinoController.onPageLoad(mode: Mode = NormalMode)
-POST       /nino                        controllers.NinoController.onSubmit(mode: Mode = NormalMode)
-GET        /changeNino                  controllers.NinoController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeNino                  controllers.NinoController.onSubmit(mode: Mode = CheckMode)
+GET        /registration/what-is-ni-number          controllers.NinoController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/what-is-ni-number          controllers.NinoController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-what-is-ni-number   controllers.NinoController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-what-is-ni-number   controllers.NinoController.onSubmit(mode: Mode = CheckMode)
