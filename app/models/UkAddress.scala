@@ -16,9 +16,16 @@
 
 package models
 
-import play.api.libs.json._
+import play.api.i18n.Messages
+import play.api.libs.json.*
 
-case class UkAddress (line1: String, line2: String)
+case class UkAddress (
+                       line1: String,
+                       line2: Option[String],
+                       town: String,
+                       county: Option[String],
+                       postCode: String
+                     )
 
 object UkAddress {
 

@@ -32,15 +32,19 @@ object UkAddressSummary  {
     answers.get(UkAddressPage).map {
       answer =>
 
-      val value = HtmlFormat.escape(answer.line1).toString + "<br/>" + HtmlFormat.escape(answer.line2).toString
+      val value =
+        HtmlFormat.escape(answer.line1).toString + "<br/>" +
+        HtmlFormat.escape(answer.line2.getOrElse("")).toString + "<br/>" +
+        HtmlFormat.escape(answer.town).toString + "<br/>" +
+        HtmlFormat.escape(answer.county.getOrElse("")).toString
 
-        SummaryListRowViewModel(
-          key     = "ukAddress.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.UkAddressController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("ukAddress.change.hidden"))
-          )
+      SummaryListRowViewModel(
+        key     = "ukAddress.checkYourAnswersLabel",
+        value   = ValueViewModel(HtmlContent(value)),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.UkAddressController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("ukAddress.change.hidden"))
         )
+      )
     }
 }

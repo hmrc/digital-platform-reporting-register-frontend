@@ -25,9 +25,12 @@ trait ModelGenerators {
   implicit lazy val arbitraryUkAddress: Arbitrary[UkAddress] =
     Arbitrary {
       for {
-        line1 <- arbitrary[String]
-        line2 <- arbitrary[String]
-      } yield UkAddress(line1, line2)
+        line1    <- arbitrary[String]
+        line2    <- arbitrary[String]
+        town     <- arbitrary[String]
+        county   <- arbitrary[String]
+        postCode <- arbitrary[String]
+      } yield UkAddress(line1, Some(line2), town, Some(county), postCode)
     }
 
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
