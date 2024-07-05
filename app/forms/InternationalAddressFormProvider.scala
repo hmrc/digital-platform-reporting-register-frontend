@@ -29,8 +29,16 @@ class InternationalAddressFormProvider @Inject() extends Mappings {
      mapping(
       "line1" -> text("internationalAddress.error.line1.required")
         .verifying(maxLength(100, "internationalAddress.error.line1.length")),
-      "line2" -> text("internationalAddress.error.line2.required")
-        .verifying(maxLength(100, "internationalAddress.error.line2.length"))
-    )(InternationalAddress.apply)(x => Some((x.line1, x.line2)))
+      "line2" -> optional(text("")
+        .verifying(maxLength(100, "internationalAddress.error.line2.length"))),
+      "city" -> text("internationalAddress.error.city.required")
+        .verifying(maxLength(100, "internationalAddress.error.city.length")),
+       "region" -> optional(text("")
+         .verifying(maxLength(100, "internationalAddress.error.region.length"))),
+       "postal" -> optional(text("")
+         .verifying(maxLength(100, "internationalAddress.error.postal.length"))),
+       "country" -> text("internationalAddress.error.country.required")
+         .verifying(maxLength(100, "internationalAddress.error.country.length"))
+    )(InternationalAddress.apply)(x => Some((x.line1, x.line2, x.city, x.region, x.postal, x.country)))
    )
  }
