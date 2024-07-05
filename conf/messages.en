@@ -226,3 +226,10 @@ ukAddress.error.line2.length = Address line 2 must be {0} characters or less
 ukAddress.error.town.length = Town or city must be {0} characters or less
 ukAddress.error.county.length = County must be {0} characters or less
 ukAddress.error.postCode.length = Postcode must be {0} characters or less
+
+ukPostCode.title = ukPostCode
+ukPostCode.heading = ukPostCode
+ukPostCode.checkYourAnswersLabel = ukPostCode
+ukPostCode.error.required = Enter ukPostCode
+ukPostCode.error.length = UkPostCode must be 10 characters or less
+ukPostCode.change.hidden = UkPostCode

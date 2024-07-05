@@ -93,3 +93,8 @@ GET        /ukAddress                        controllers.UkAddressController.onP
 POST       /ukAddress                        controllers.UkAddressController.onSubmit(mode: Mode = NormalMode)
 GET        /changeUkAddress                  controllers.UkAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeUkAddress                  controllers.UkAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET        /ukPostCode                        controllers.UkPostCodeController.onPageLoad(mode: Mode = NormalMode)
+POST       /ukPostCode                        controllers.UkPostCodeController.onSubmit(mode: Mode = NormalMode)
+GET        /changeUkPostCode                  controllers.UkPostCodeController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeUkPostCode                  controllers.UkPostCodeController.onSubmit(mode: Mode = CheckMode)
