@@ -33,9 +33,13 @@ trait ModelGenerators {
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
       for {
-        line1 <- arbitrary[String]
-        line2 <- arbitrary[String]
-      } yield InternationalAddress(line1, line2)
+        line1   <- arbitrary[String]
+        line2   <- arbitrary[Option[String]]
+        city    <- arbitrary[String]
+        region  <- arbitrary[Option[String]]
+        postal  <- arbitrary[Option[String]]
+        country <- arbitrary[String]
+      } yield InternationalAddress(line1, line2, city, region, postal, country)
     }
 
   implicit lazy val arbitraryIndividualName: Arbitrary[IndividualName] =

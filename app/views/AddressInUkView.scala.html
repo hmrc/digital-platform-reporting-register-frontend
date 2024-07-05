@@ -32,12 +32,10 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-xl">@messages("addressInUk.heading")</h1>
-
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("addressInUk.heading")).withCssClass("govuk-visually-hidden")
+                legend = LegendViewModel(messages("addressInUk.heading")).asPageHeading()
             )
         )
 
