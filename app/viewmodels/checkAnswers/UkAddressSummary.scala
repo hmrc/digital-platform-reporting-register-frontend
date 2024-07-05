@@ -23,8 +23,10 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
+
+import scala.language.postfixOps
 
 object UkAddressSummary  {
 
@@ -34,9 +36,9 @@ object UkAddressSummary  {
 
       val value =
         HtmlFormat.escape(answer.line1).toString + "<br/>" +
-        HtmlFormat.escape(answer.line2.getOrElse("")).toString + "<br/>" +
+        answer.line2.map(HtmlFormat.escape(_).toString + "<br/>").getOrElse("") +
         HtmlFormat.escape(answer.town).toString + "<br/>" +
-        HtmlFormat.escape(answer.county.getOrElse("")).toString
+        answer.county.map(HtmlFormat.escape(_).toString).getOrElse("")
 
       SummaryListRowViewModel(
         key     = "ukAddress.checkYourAnswersLabel",

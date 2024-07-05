@@ -208,7 +208,7 @@ internationalAddress.line2.change.hidden = line2
 
 ukAddress.title = What is your address?
 ukAddress.heading = What is your address?
-ukAddress.line1 = Address line 2
+ukAddress.line1 = Address line 1
 ukAddress.line2 = Address line 2 (optional)
 ukAddress.town = Town or city
 ukAddress.county = County (optional)

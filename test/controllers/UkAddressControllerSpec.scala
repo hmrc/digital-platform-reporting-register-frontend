@@ -40,14 +40,17 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
   lazy val ukAddressRoute = routes.UkAddressController.onPageLoad(NormalMode).url
 
   val validUkAddress = UkAddress(
-    "15 Hindburn Close",
+    "## Some Street",
     None,
-    "Bedford",
-    Some("Bedfordshire"),
-    "MK41 7YJ"
+    "Miasto",
+    Some("Narnia"),
+    "??## #??"
   )
 
   val userAnswers = emptyUserAnswers.set(UkAddressPage, validUkAddress).success.value
+
+  private def getParam(key: String, value: Option[String]) =
+    Seq(value.map(key -> _))
 
   "UkAddress Controller" - {
 
@@ -95,15 +98,16 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       running(application) {
+        val params =
+          getParam("line1", Some(validUkAddress.line1)) ++
+          getParam("line2", validUkAddress.line2) ++
+          getParam("town", Some(validUkAddress.town)) ++
+          getParam("county", validUkAddress.county) ++
+          getParam("postCode", Some(validUkAddress.postCode))
+
         val request =
           FakeRequest(POST, ukAddressRoute)
-            .withFormUrlEncodedBody(
-              "line1"    -> validUkAddress.line1,
-              "line2"    -> validUkAddress.line2.getOrElse(""),
-              "town"     -> validUkAddress.town,
-              "county"   -> validUkAddress.county.getOrElse(""),
-              "postCode" -> validUkAddress.postCode
-            )
+            .withFormUrlEncodedBody(params.flatten: _*)
 
         val result = route(application, request).value
 
