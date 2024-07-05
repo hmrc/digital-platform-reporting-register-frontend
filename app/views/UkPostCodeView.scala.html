@@ -34,13 +34,23 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        <h1 class="govuk-heading-xl">@messages("ukPostCode.heading")</h1>
+
+        <p class="govuk-body">
+            @messages("ukPostCode.p1")
+        </p>
+
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("ukPostCode.heading")).asPageHeading()
-            )
+                label = LabelViewModel(messages("ukPostCode.heading")).withCssClass("govuk-visually-hidden")
+            ).withHint(HintViewModel(content = messages("ukPostCode.hint")))
             .withWidth(Full)
         )
+
+        <p class="govuk-body">
+            <a class="govuk-link" href="@routes.UkAddressController.onPageLoad(mode).url">@messages("ukPostCode.link.text")</a>.
+        </p>
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))
