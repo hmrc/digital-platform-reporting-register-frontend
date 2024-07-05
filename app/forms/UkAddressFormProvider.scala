@@ -16,12 +16,12 @@
 
 package forms
 
-import javax.inject.Inject
-
 import forms.mappings.Mappings
-import play.api.data.Form
-import play.api.data.Forms._
 import models.UkAddress
+import play.api.data.Form
+import play.api.data.Forms.*
+
+import javax.inject.Inject
 
 class UkAddressFormProvider @Inject() extends Mappings {
 
@@ -29,8 +29,14 @@ class UkAddressFormProvider @Inject() extends Mappings {
      mapping(
       "line1" -> text("ukAddress.error.line1.required")
         .verifying(maxLength(100, "ukAddress.error.line1.length")),
-      "line2" -> text("ukAddress.error.line2.required")
-        .verifying(maxLength(100, "ukAddress.error.line2.length"))
-    )(UkAddress.apply)(x => Some((x.line1, x.line2)))
+      "line2" -> optional(text("")
+        .verifying(maxLength(100, "ukAddress.error.line2.length"))),
+      "town" -> text("ukAddress.error.town.required")
+        .verifying(maxLength(30, "ukAddress.error.town.length")),
+      "county" -> optional(text("")
+        .verifying(maxLength(30, "ukAddress.error.county.length"))),
+      "postCode" -> text("ukAddress.error.postCode.required")
+        .verifying(maxLength(10, "ukAddress.error.postCode.length"))
+    )(UkAddress.apply)(x => Some((x.line1, x.line2, x.town, x.county, x.postCode)))
    )
  }
