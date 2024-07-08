@@ -14,9 +14,27 @@
  * limitations under the License.
  */
 
-package models.requests
+package models
 
-import models.TaxIdentifier
-import play.api.mvc.{Request, WrappedRequest}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
+import play.api.libs.json.Json
 
-case class IdentifierRequest[A] (request: Request[A], userId: String, taxIdentifier: Option[TaxIdentifier]) extends WrappedRequest[A](request)
+class TaxIdentifierSpec extends AnyFreeSpec with Matchers {
+
+  "must write/read a NINO" in {
+
+    val nino = Nino("foo")
+    val json = Json.toJson(nino)
+    val result = json.as[TaxIdentifier]
+    result mustEqual nino
+  }
+
+  "must write/read a UTR" in {
+
+    val utr = Utr("foo")
+    val json = Json.toJson(utr)
+    val result = json.as[TaxIdentifier]
+    result mustEqual utr
+  }
+}

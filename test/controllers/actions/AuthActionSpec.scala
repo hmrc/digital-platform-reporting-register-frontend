@@ -39,10 +39,11 @@ class AuthActionSpec extends SpecBase {
   private val application = applicationBuilder(userAnswers = None).build()
   private val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
   private val appConfig = application.injector.instanceOf[FrontendAppConfig]
+  private val emptyEnrolments = Enrolments(Set.empty)
 
   class Harness(authAction: IdentifierAction) {
     def onPageLoad(): Action[AnyContent] = authAction { request =>
-      Results.Ok(request.userId)
+      Results.Ok(s"${request.userId}${request.taxIdentifier.map(_.value).getOrElse("")}")
     }
   }
 
@@ -78,7 +79,7 @@ class AuthActionSpec extends SpecBase {
 
       "must redirect the user to the `cannot use service - agent` page" in {
 
-        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Agent) ~ None ~ None), appConfig, bodyParsers)
+        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Agent) ~ None ~ None ~ None ~ emptyEnrolments), appConfig, bodyParsers)
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(FakeRequest())
 
@@ -91,7 +92,7 @@ class AuthActionSpec extends SpecBase {
 
       "must redirect the user to the `cannot use service - assistant` page" in {
 
-        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Organisation) ~ Some(Assistant) ~ None), appConfig, bodyParsers)
+        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Organisation) ~ Some(Assistant) ~ None ~ None ~ emptyEnrolments), appConfig, bodyParsers)
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(FakeRequest())
         status(result) mustBe SEE_OTHER
@@ -102,14 +103,28 @@ class AuthActionSpec extends SpecBase {
 
     "when the user is an organisation user" - {
 
-      "must succeed" in {
+      "must succeed" - {
+        
+        "when the user has a CT UTR enrolment" in {
 
-        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId")), appConfig, bodyParsers)
-        val controller = new Harness(authAction)
-        val result = controller.onPageLoad()(FakeRequest())
-        status(result) mustBe OK
+          val enrolments = Enrolments(Set(Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)))
+          val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments), appConfig, bodyParsers)
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
+          status(result) mustBe OK
 
-        contentAsString(result) mustEqual "internalId"
+          contentAsString(result) mustEqual "internalId utr"
+        }
+        
+        "when the user has no CT UTR enrolment" in {
+
+          val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ emptyEnrolments), appConfig, bodyParsers)
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
+          status(result) mustBe OK
+
+          contentAsString(result) mustEqual "internalId"
+        }
       }
     }
 
@@ -117,7 +132,7 @@ class AuthActionSpec extends SpecBase {
 
       "must redirect the user to `unauthorised`" in {
 
-        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Individual) ~ None ~ None), appConfig, bodyParsers)
+        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Individual) ~ None ~ None ~ None ~ emptyEnrolments), appConfig, bodyParsers)
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(FakeRequest())
 
