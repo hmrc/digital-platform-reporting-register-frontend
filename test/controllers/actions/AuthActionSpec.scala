@@ -130,14 +130,27 @@ class AuthActionSpec extends SpecBase {
 
     "when the user is an individual" - {
 
-      "must redirect the user to `unauthorised`" in {
+      "must succeed" - {
 
-        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Individual) ~ None ~ None ~ None ~ emptyEnrolments), appConfig, bodyParsers)
-        val controller = new Harness(authAction)
-        val result = controller.onPageLoad()(FakeRequest())
+        "when the user's NINO is attached to their auth record" in {
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad().url
+          val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Individual) ~ None ~ Some("internalId") ~ Some(" nino") ~ emptyEnrolments), appConfig, bodyParsers)
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
+          status(result) mustBe OK
+
+          contentAsString(result) mustEqual "internalId nino"
+        }
+
+        "when the user's NINO is not attached to their auth record" in {
+
+          val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Individual) ~ None ~ Some("internalId") ~ None ~ emptyEnrolments), appConfig, bodyParsers)
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
+          status(result) mustBe OK
+
+          contentAsString(result) mustEqual "internalId"
+        }
       }
     }
   }

@@ -19,7 +19,7 @@ package controllers.actions
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
-import models.Utr
+import models.{Nino, Utr}
 import models.requests.IdentifierRequest
 import play.api.mvc.Results.*
 import play.api.mvc.*
@@ -58,8 +58,8 @@ class AuthenticatedIdentifierAction @Inject()(
       case Some(Organisation) ~ Some(Assistant) ~ _ ~ _ ~ _ =>
         Future.successful(Redirect(routes.CannotUseServiceAssistantController.onPageLoad()))
 
-      case Some(Individual) ~ _ ~ _ ~ _ ~ _ =>
-        Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
+      case Some(Individual) ~ _ ~ Some(internalId) ~ maybeNino ~ _ =>
+        block(IdentifierRequest(request, internalId, maybeNino.map(Nino.apply)))
         
       case Some(Organisation) ~ _ ~ Some(internalId) ~ _ ~ enrolments =>
         block(IdentifierRequest(request, internalId, getCtUtrEnrolment(enrolments)))
