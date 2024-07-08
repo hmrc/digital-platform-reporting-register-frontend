@@ -29,7 +29,7 @@ class DataRequiredActionImpl @Inject()(implicit val executionContext: ExecutionC
   override protected def refine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] = {
 
     request.userAnswers
-      .map(data => Future.successful(Right(DataRequest(request.request, request.userId, data))))
+      .map(data => Future.successful(Right(DataRequest(request.request, request.userId, request.taxIdentifier, data))))
       .getOrElse(Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad()))))
   }
 }

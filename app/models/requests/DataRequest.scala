@@ -16,17 +16,19 @@
 
 package models.requests
 
+import models.{TaxIdentifier, UserAnswers}
 import play.api.mvc.{Request, WrappedRequest}
-import models.UserAnswers
 
 case class OptionalDataRequest[A] (
                                     request: Request[A],
                                     userId: String,
+                                    taxIdentifier: Option[TaxIdentifier],
                                     userAnswers: Option[UserAnswers]
                                   ) extends WrappedRequest[A](request)
 
 case class DataRequest[A] (
                             request: Request[A],
                             userId: String,
+                            taxIdentifier: Option[TaxIdentifier],
                             userAnswers: UserAnswers
                           ) extends WrappedRequest[A](request)
