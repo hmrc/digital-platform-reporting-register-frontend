@@ -153,6 +153,19 @@ class AuthActionSpec extends SpecBase {
         }
       }
     }
+    
+    "when auth gives us back an unexpected set of retrievals" - {
+      
+      "must go to Unauthorised" in {
+
+        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(None ~ None ~ None ~ None ~ emptyEnrolments), appConfig, bodyParsers)
+        val controller = new Harness(authAction)
+        val result = controller.onPageLoad()(FakeRequest())
+        
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
+      }
+    }
   }
 }
 
