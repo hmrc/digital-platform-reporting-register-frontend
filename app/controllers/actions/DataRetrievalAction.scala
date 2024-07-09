@@ -29,8 +29,12 @@ class DataRetrievalActionImpl @Inject()(
 
   override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = {
 
-    sessionRepository.get(request.userId).map {
-      OptionalDataRequest(request.request, request.userId, _)
+    sessionRepository.get(request.userId).map { maybeAnswers =>
+      OptionalDataRequest(
+        request = request.request,
+        taxIdentifier = request.taxIdentifier,
+        userId = request.userId,
+        userAnswers = maybeAnswers.map(_.copy(taxIdentifier = request.taxIdentifier)))
     }
   }
 }

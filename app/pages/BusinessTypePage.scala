@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.{BusinessType, NormalMode, UserAnswers}
+import models.{BusinessType, Nino, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -29,7 +29,13 @@ case object BusinessTypePage extends QuestionPage[BusinessType] {
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
     answers.get(this).map {
-      case BusinessType.Individual => routes.HasNinoController.onPageLoad(NormalMode)
-      case _                       => routes.RegisteredInUkController.onPageLoad(NormalMode)
+      case BusinessType.Individual =>
+        answers.taxIdentifier.map {
+          case _: Nino => routes.IndividualNameController.onPageLoad(NormalMode)
+          case _       => routes.HasNinoController.onPageLoad(NormalMode)
+        }.getOrElse(routes.HasNinoController.onPageLoad(NormalMode))
+        
+      case _ =>
+        routes.RegisteredInUkController.onPageLoad(NormalMode)
     }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }

@@ -26,7 +26,7 @@ class UtrPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionVa
 
   ".nextPage" - {
 
-    val emptyAnswers = UserAnswers("id")
+    val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
 

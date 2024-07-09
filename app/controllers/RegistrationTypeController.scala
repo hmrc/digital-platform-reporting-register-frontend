@@ -45,7 +45,12 @@ class RegistrationTypeController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.getOrElse(UserAnswers(request.userId)).get(RegistrationTypePage) match {
+      val answers =
+        request.userAnswers
+          .getOrElse(UserAnswers(request.userId, request.taxIdentifier))
+          .get(RegistrationTypePage)
+        
+      val preparedForm = answers match {
         case None => form
         case Some(value) => form.fill(value)
       }
@@ -62,7 +67,7 @@ class RegistrationTypeController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.getOrElse(UserAnswers(request.userId)).set(RegistrationTypePage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.getOrElse(UserAnswers(request.userId, request.taxIdentifier)).set(RegistrationTypePage, value))
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(RegistrationTypePage.nextPage(mode, updatedAnswers))
       )

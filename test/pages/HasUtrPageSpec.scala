@@ -17,7 +17,8 @@
 package pages
 
 import controllers.routes
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.BusinessType.{Individual, SoleTrader}
+import models.{BusinessType, CheckMode, Nino, NormalMode, UserAnswers, Utr}
 import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -26,7 +27,7 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
 
   ".nextPage" - {
 
-    val emptyAnswers = UserAnswers("id")
+    val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
 
@@ -35,11 +36,62 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
         val answers = emptyAnswers.set(HasUtrPage, true).success.value
         HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.UtrController.onPageLoad(NormalMode)
       }
+      
+      "when the answer is no" - {
+        
+        "must go to business name when the user is not an individual or a sole trader" in {
+          
+          val businessTypes = BusinessType.values.filterNot(x => x == Individual | x == SoleTrader)
 
-      "must go to business name when the answer is yes" in {
+          for (businessType <- businessTypes) {
+            val answers = emptyAnswers
+              .set(HasUtrPage, false).success.value
+              .set(BusinessTypePage, businessType).success.value
 
-        val answers = emptyAnswers.set(HasUtrPage, false).success.value
-        HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.BusinessNameController.onPageLoad(NormalMode)
+            HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.BusinessNameController.onPageLoad(NormalMode)
+          }
+        }
+
+        "must go to Has Nino when the user is an individual or sole trader and we do not know their NINO" in {
+
+          val businessTypes = Seq(Individual, SoleTrader)
+
+          for (businessType <- businessTypes) {
+            val answers = emptyAnswers
+              .set(HasUtrPage, false).success.value
+              .set(BusinessTypePage, businessType).success.value
+
+            HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.HasNinoController.onPageLoad(NormalMode)
+          }
+        }
+
+        "must go to Individual Name when the user is an individual or sole trader and we know their NINO" in {
+
+          val businessTypes = Seq(Individual, SoleTrader)
+
+          for (businessType <- businessTypes) {
+            val answers = emptyAnswers
+              .copy(taxIdentifier = Some(Nino("nino")))
+              .set(HasUtrPage, false).success.value
+              .set(BusinessTypePage, businessType).success.value
+
+            HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.IndividualNameController.onPageLoad(NormalMode)
+          }
+        }
+
+        "must go to Has Nino when the user is an individual or sole trader and we know their UTR instead of their NINO" in {
+
+          val businessTypes = Seq(Individual, SoleTrader)
+
+          for (businessType <- businessTypes) {
+            val answers = emptyAnswers
+              .copy(taxIdentifier = Some(Utr("utr")))
+              .set(HasUtrPage, false).success.value
+              .set(BusinessTypePage, businessType).success.value
+
+            HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.HasNinoController.onPageLoad(NormalMode)
+          }
+        }
       }
     }
 

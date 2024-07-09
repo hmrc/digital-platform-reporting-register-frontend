@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.RegistrationTypeFormProvider
-import models.{NormalMode, RegistrationType, UserAnswers}
+import models.{NormalMode, RegistrationType}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -58,7 +58,7 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(RegistrationTypePage, RegistrationType.values.head).success.value
+      val userAnswers = emptyUserAnswers.set(RegistrationTypePage, RegistrationType.values.head).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

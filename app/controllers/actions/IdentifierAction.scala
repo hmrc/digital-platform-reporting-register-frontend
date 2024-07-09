@@ -19,14 +19,15 @@ package controllers.actions
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
+import models.{Nino, Utr}
 import models.requests.IdentifierRequest
 import play.api.mvc.Results.*
 import play.api.mvc.*
 import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.AffinityGroup._
+import uk.gov.hmrc.auth.core.AffinityGroup.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,19 +48,24 @@ class AuthenticatedIdentifierAction @Inject()(
     authorised().retrieve(
       Retrievals.affinityGroup and
         Retrievals.credentialRole and
-        Retrievals.internalId
+        Retrievals.internalId and
+        Retrievals.nino and
+        Retrievals.allEnrolments
     ) {
-      case Some(Agent) ~ _ ~ _ =>
+      case Some(Agent) ~ _ ~ _ ~ _ ~ _ =>
         Future.successful(Redirect(routes.CannotUseServiceAgentController.onPageLoad()))
         
-      case Some(Organisation) ~ Some(Assistant) ~ _ =>
+      case Some(Organisation) ~ Some(Assistant) ~ _ ~ _ ~ _ =>
         Future.successful(Redirect(routes.CannotUseServiceAssistantController.onPageLoad()))
 
-      case Some(Individual) ~ _ ~ _ =>
-        Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
+      case Some(Individual) ~ _ ~ Some(internalId) ~ maybeNino ~ _ =>
+        block(IdentifierRequest(request, internalId, maybeNino.map(Nino.apply)))
         
-      case Some(Organisation) ~ _ ~ Some(internalId) =>
-        block(IdentifierRequest(request, internalId))
+      case Some(Organisation) ~ _ ~ Some(internalId) ~ _ ~ enrolments =>
+        block(IdentifierRequest(request, internalId, getCtUtrEnrolment(enrolments)))
+
+      case _ =>
+        Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     } recover {
       case _: NoActiveSession =>
         Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
@@ -67,4 +73,12 @@ class AuthenticatedIdentifierAction @Inject()(
         Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
+  
+  private def getCtUtrEnrolment(enrolments: Enrolments): Option[Utr] =
+    enrolments.getEnrolment("IR-CT")
+      .flatMap { enrolment =>
+        enrolment.identifiers
+          .find(_.key == "UTR")
+          .map(identifier => Utr(identifier.value))
+      }
 }

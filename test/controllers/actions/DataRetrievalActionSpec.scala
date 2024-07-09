@@ -17,9 +17,9 @@
 package controllers.actions
 
 import base.SpecBase
-import models.UserAnswers
+import models.{Nino, UserAnswers}
 import models.requests.{IdentifierRequest, OptionalDataRequest}
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import repositories.SessionRepository
@@ -43,7 +43,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
         when(sessionRepository.get("id")) thenReturn Future(None)
         val action = new Harness(sessionRepository)
 
-        val result = action.callTransform(IdentifierRequest(FakeRequest(), "id")).futureValue
+        val result = action.callTransform(IdentifierRequest(FakeRequest(), "id", None)).futureValue
 
         result.userAnswers must not be defined
       }
@@ -51,15 +51,31 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
     "when there is data in the cache" - {
 
-      "must build a userAnswers object and add it to the request" in {
+      "must build a userAnswers object and add it to the request" - {
 
-        val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get("id")) thenReturn Future(Some(UserAnswers("id")))
-        val action = new Harness(sessionRepository)
+        "including the tax identifier when it was present in the request" in {
 
-        val result = action.callTransform(new IdentifierRequest(FakeRequest(), "id")).futureValue
+          val sessionRepository = mock[SessionRepository]
+          when(sessionRepository.get("id")) thenReturn Future(Some(UserAnswers("id", None)))
+          val action = new Harness(sessionRepository)
 
-        result.userAnswers mustBe defined
+          val result = action.callTransform(IdentifierRequest(FakeRequest(), "id", Some(Nino("foo")))).futureValue
+
+          result.userAnswers mustBe defined
+          result.userAnswers.value.taxIdentifier.value mustEqual Nino("foo")
+        }
+
+        "not including a tax identifier when it wasn't present in the request" in {
+
+          val sessionRepository = mock[SessionRepository]
+          when(sessionRepository.get("id")) thenReturn Future(Some(UserAnswers("id", None)))
+          val action = new Harness(sessionRepository)
+
+          val result = action.callTransform(IdentifierRequest(FakeRequest(), "id", None)).futureValue
+
+          result.userAnswers mustBe defined
+          result.userAnswers.value.taxIdentifier must not be defined
+        }
       }
     }
   }

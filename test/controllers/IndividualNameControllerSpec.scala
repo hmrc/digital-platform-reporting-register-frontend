@@ -18,13 +18,12 @@ package controllers
 
 import base.SpecBase
 import forms.IndividualNameFormProvider
-import models.{NormalMode, IndividualName, UserAnswers}
+import models.{NormalMode, IndividualName}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.IndividualNamePage
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -39,18 +38,10 @@ class IndividualNameControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val individualNameRoute = routes.IndividualNameController.onPageLoad(NormalMode).url
 
-  val firstName = "Joe"
-  val lastName  = "Smith"
+  val firstName = "lastName"
+  val lastName  = "firstName"
 
-  val userAnswers = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      IndividualNamePage.toString -> Json.obj(
-        "firstName" -> firstName,
-        "lastName" -> lastName
-      )
-    )
-  )
+  val userAnswers = emptyUserAnswers.set(IndividualNamePage, IndividualName(firstName, lastName)).success.value
 
   "IndividualName Controller" - {
 
