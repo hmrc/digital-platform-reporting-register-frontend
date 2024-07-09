@@ -18,13 +18,12 @@ package controllers
 
 import base.SpecBase
 import forms.SoleTraderNameFormProvider
-import models.{NormalMode, SoleTraderName, UserAnswers}
+import models.{NormalMode, SoleTraderName}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.SoleTraderNamePage
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -39,15 +38,7 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val soleTraderNameRoute = routes.SoleTraderNameController.onPageLoad(NormalMode).url
 
-  val userAnswers = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      SoleTraderNamePage.toString -> Json.obj(
-        "firstName" -> "value 1",
-        "lastName" -> "value 2"
-      )
-    )
-  )
+  val userAnswers = emptyUserAnswers.set(SoleTraderNamePage, SoleTraderName("value 1", "value 2")).success.value
 
   "SoleTraderName Controller" - {
 

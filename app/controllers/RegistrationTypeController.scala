@@ -47,7 +47,8 @@ class RegistrationTypeController @Inject()(
 
       val answers =
         request.userAnswers
-          .getOrElse(UserAnswers(id = request.userId, taxIdentifier = request.taxIdentifier)).get(RegistrationTypePage)
+          .getOrElse(UserAnswers(request.userId, request.taxIdentifier))
+          .get(RegistrationTypePage)
         
       val preparedForm = answers match {
         case None => form
@@ -66,7 +67,7 @@ class RegistrationTypeController @Inject()(
 
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.getOrElse(UserAnswers(id = request.userId, taxIdentifier = request.taxIdentifier)).set(RegistrationTypePage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.getOrElse(UserAnswers(request.userId, request.taxIdentifier)).set(RegistrationTypePage, value))
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(RegistrationTypePage.nextPage(mode, updatedAnswers))
       )

@@ -25,8 +25,8 @@ import scala.util.{Failure, Success, Try}
 
 final case class UserAnswers(
                               id: String,
+                              taxIdentifier: Option[TaxIdentifier],
                               data: JsObject = Json.obj(),
-                              taxIdentifier: Option[TaxIdentifier] = None,
                               lastUpdated: Instant = Instant.now
                             ) {
 
@@ -76,7 +76,7 @@ object UserAnswers {
       (__ \ "_id").read[String] and
       (__ \ "data").read[JsObject] and
       (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
-    ) (UserAnswers.apply(_, _, None, _))
+    ) (UserAnswers.apply(_, None, _, _))
   }
 
   val writes: OWrites[UserAnswers] = {

@@ -56,7 +56,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
         "including the tax identifier when it was present in the request" in {
 
           val sessionRepository = mock[SessionRepository]
-          when(sessionRepository.get("id")) thenReturn Future(Some(UserAnswers("id")))
+          when(sessionRepository.get("id")) thenReturn Future(Some(UserAnswers("id", None)))
           val action = new Harness(sessionRepository)
 
           val result = action.callTransform(IdentifierRequest(FakeRequest(), "id", Some(Nino("foo")))).futureValue
@@ -68,7 +68,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
         "not including a tax identifier when it wasn't present in the request" in {
 
           val sessionRepository = mock[SessionRepository]
-          when(sessionRepository.get("id")) thenReturn Future(Some(UserAnswers("id")))
+          when(sessionRepository.get("id")) thenReturn Future(Some(UserAnswers("id", None)))
           val action = new Harness(sessionRepository)
 
           val result = action.callTransform(IdentifierRequest(FakeRequest(), "id", None)).futureValue

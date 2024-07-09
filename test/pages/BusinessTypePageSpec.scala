@@ -26,7 +26,7 @@ class BusinessTypePageSpec extends AnyFreeSpec with Matchers with TryValues with
 
   ".nextPage" - {
 
-    val emptyAnswers = UserAnswers("id")
+    val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
 

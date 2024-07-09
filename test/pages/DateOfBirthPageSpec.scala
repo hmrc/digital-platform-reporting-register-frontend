@@ -26,7 +26,7 @@ class DateOfBirthPageSpec extends AnyFreeSpec with Matchers with TryValues {
 
   ".nextPage" - {
 
-    val emptyAnswers = UserAnswers("id")
+    val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
 

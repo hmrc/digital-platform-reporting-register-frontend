@@ -41,6 +41,7 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
 
   val userAnswers = UserAnswers(
     userAnswersId,
+    None,
     Json.obj(
       InternationalAddressPage.toString -> Json.obj(
         "line1" -> "Testing Lane",

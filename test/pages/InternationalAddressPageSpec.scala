@@ -26,7 +26,7 @@ class InternationalAddressPageSpec extends AnyFreeSpec with Matchers with TryVal
 
   ".nextPage" - {
 
-    val emptyAnswers = UserAnswers("id")
+    val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
 

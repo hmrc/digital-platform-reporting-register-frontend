@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.HasNinoFormProvider
-import models.{NormalMode, UserAnswers}
+import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -58,7 +58,7 @@ class HasNinoControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(HasNinoPage, true).success.value
+      val userAnswers = emptyUserAnswers.set(HasNinoPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

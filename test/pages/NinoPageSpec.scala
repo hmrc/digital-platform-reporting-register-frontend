@@ -26,7 +26,7 @@ class NinoPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionV
 
   ".nextPage" - {
 
-    val emptyAnswers = UserAnswers("id")
+    val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
 

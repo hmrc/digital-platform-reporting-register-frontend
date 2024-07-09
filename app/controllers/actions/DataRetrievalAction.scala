@@ -32,8 +32,8 @@ class DataRetrievalActionImpl @Inject()(
     sessionRepository.get(request.userId).map { maybeAnswers =>
       OptionalDataRequest(
         request = request.request,
-        userId = request.userId,
         taxIdentifier = request.taxIdentifier,
+        userId = request.userId,
         userAnswers = maybeAnswers.map(_.copy(taxIdentifier = request.taxIdentifier)))
     }
   }

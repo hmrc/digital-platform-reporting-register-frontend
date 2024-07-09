@@ -2,13 +2,12 @@ package controllers
 
 import base.SpecBase
 import forms.$className$FormProvider
-import models.{NormalMode, $className$, UserAnswers}
+import models.{NormalMode, $className$}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.$className$Page
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -22,16 +21,6 @@ class $className$ControllerSpec extends SpecBase with MockitoSugar {
   val form = formProvider()
 
   lazy val $className;format="decap"$Route = routes.$className$Controller.onPageLoad(NormalMode).url
-
-  val userAnswers = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      $className$Page.toString -> Json.obj(
-        "$field1Name$" -> "value 1",
-        "$field2Name$" -> "value 2"
-      )
-    )
-  )
 
   "$className$ Controller" - {
 
@@ -52,6 +41,8 @@ class $className$ControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
+
+      val userAnswers = emptyUserAnswers.set($className$Page, $className$("value 1", "value 2")).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
