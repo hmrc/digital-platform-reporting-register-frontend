@@ -18,13 +18,12 @@ package controllers
 
 import base.SpecBase
 import forms.InternationalAddressFormProvider
-import models.{NormalMode, InternationalAddress, UserAnswers}
+import models.{NormalMode, InternationalAddress}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.InternationalAddressPage
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -39,20 +38,8 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val internationalAddressRoute = routes.InternationalAddressController.onPageLoad(NormalMode).url
 
-  val userAnswers = UserAnswers(
-    userAnswersId,
-    None,
-    Json.obj(
-      InternationalAddressPage.toString -> Json.obj(
-        "line1" -> "Testing Lane",
-        "line2" -> "Testing Road",
-        "city" -> "New York",
-        "region" -> None,
-        "postal" -> "AB1 A",
-        "country" -> "United States"
-      )
-    )
-  )
+  val address = InternationalAddress("line 1", None, "city", None, None, "US")
+  val userAnswers = emptyUserAnswers.set(InternationalAddressPage, address).success.value
 
   "InternationalAddress Controller" - {
 
@@ -84,8 +71,7 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(InternationalAddress("Testing Lane", Some("Testing Road"), "New York", None, Some("AB1 A"),
-          "United States")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(InternationalAddress("line 1", None, "city", None, None, "US")), NormalMode)(request, messages(application)).toString
       }
     }
 
