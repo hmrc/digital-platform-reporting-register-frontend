@@ -17,15 +17,20 @@
 package controllers
 
 import base.SpecBase
+import connectors.RegistrationConnector
+import controllers.actions.FakeTaxIdentifierProvider
 import forms.RegistrationTypeFormProvider
-import models.{NormalMode, RegistrationType}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import models.registration.requests.OrganisationWithUtr
+import models.registration.responses.NoMatchResponse
+import models.{NormalMode, RegistrationType, UserAnswers, Utr}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.RegistrationTypePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.RegistrationTypeView
 
@@ -42,7 +47,7 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, registrationTypeRoute)
@@ -74,29 +79,77 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page when valid data is submitted" - {
 
-      val mockSessionRepository = mock[SessionRepository]
+      "and store the registration response when the user has a UTR available to us" in {
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        val mockSessionRepository = mock[SessionRepository]
+        val mockConnector = mock[RegistrationConnector]
+        val mockTaxIdentifierProvider = mock[FakeTaxIdentifierProvider]
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockConnector.register(any())(any())) thenReturn Future.successful(NoMatchResponse())
+        when(mockTaxIdentifierProvider.taxIdentifier) thenReturn Some(Utr("123"))
 
-      running(application) {
-        val request =
-          FakeRequest(POST, registrationTypeRoute)
-            .withFormUrlEncodedBody(("value", RegistrationType.values.head.toString))
+        val application =
+          applicationBuilder(userAnswers = None)
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[RegistrationConnector].toInstance(mockConnector),
+              bind[FakeTaxIdentifierProvider].toInstance(mockTaxIdentifierProvider)
+            )
+            .build()
 
-        val result = route(application, request).value
+        running(application) {
+          val request =
+            FakeRequest(POST, registrationTypeRoute)
+              .withFormUrlEncodedBody(("value", RegistrationType.values.head.toString))
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual RegistrationTypePage.nextPage(NormalMode, emptyUserAnswers).url
+          val expectedRegistrationRequest = OrganisationWithUtr("123", None)
+          val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+          
+          val result = route(application, request).value
+          
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual RegistrationTypePage.nextPage(NormalMode, emptyUserAnswers).url
+          verify(mockConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
+          verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+          
+          val savedAnswers = answersCaptor.getValue
+          savedAnswers.taxIdentifier.value mustEqual Utr("123")
+          savedAnswers.registrationResponse.value mustEqual NoMatchResponse()
+        }
+      }
+
+      "and not make a registration call when the user does not have UTR available to us" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+        val mockConnector = mock[RegistrationConnector]
+
+        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository),
+              bind[RegistrationConnector].toInstance(mockConnector)
+            )
+            .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, registrationTypeRoute)
+              .withFormUrlEncodedBody(("value", RegistrationType.values.head.toString))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual RegistrationTypePage.nextPage(NormalMode, emptyUserAnswers).url
+          verify(mockConnector, never()).register(any())(any())
+        }
       }
     }
-
+    
     "must return a Bad Request and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
@@ -114,46 +167,6 @@ class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must return OK and the correct view for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, registrationTypeRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[RegistrationTypeView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "redirect to the next page for a POST if no existing data is found" in {
-      
-      val mockSessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-
-      val application =
-        applicationBuilder(userAnswers = None)
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, registrationTypeRoute)
-            .withFormUrlEncodedBody(("value", RegistrationType.values.head.toString))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-
-        redirectLocation(result).value mustEqual RegistrationTypePage.nextPage(NormalMode, emptyUserAnswers).url
       }
     }
   }
