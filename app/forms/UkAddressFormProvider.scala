@@ -17,7 +17,6 @@
 package forms
 
 import forms.common.UkPostCode
-import forms.mappings.Mappings
 import models.UkAddress
 import play.api.data.Form
 import play.api.data.Forms.*
@@ -26,8 +25,8 @@ import javax.inject.Inject
 
 class UkAddressFormProvider @Inject() extends UkPostCode {
 
-   def apply(): Form[UkAddress] = Form(
-     mapping(
+  def apply(): Form[UkAddress] = Form(
+    mapping(
       "line1" -> text("ukAddress.error.line1.required")
         .verifying(maxLength(100, "ukAddress.error.line1.length")),
       "line2" -> optional(text("")
@@ -38,5 +37,5 @@ class UkAddressFormProvider @Inject() extends UkPostCode {
         .verifying(maxLength(30, "ukAddress.error.county.length"))),
       "postCode" -> ukPostCode("ukAddress.error.postCode.required", "ukAddress.error.postCode.length")
     )(UkAddress.apply)(x => Some((x.line1, x.line2, x.town, x.county, x.postCode)))
-   )
- }
+  )
+}
