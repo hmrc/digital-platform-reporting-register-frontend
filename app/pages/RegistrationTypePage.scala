@@ -17,6 +17,7 @@
 package pages
 
 import models.{NormalMode, RegistrationType, UserAnswers}
+import models.registration.responses.MatchResponseWithId
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -27,5 +28,8 @@ case object RegistrationTypePage extends QuestionPage[RegistrationType] {
   override def toString: String = "registrationType"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    controllers.routes.BusinessTypeController.onPageLoad(NormalMode)
+    answers.registrationResponse.map {
+      case _: MatchResponseWithId => controllers.routes.IsThisYourBusinessController.onPageLoad(NormalMode)
+      case _ => controllers.routes.BusinessTypeController.onPageLoad(NormalMode)
+    }.getOrElse(controllers.routes.BusinessTypeController.onPageLoad(NormalMode))
 }
