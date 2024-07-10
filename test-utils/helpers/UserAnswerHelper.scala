@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package models.registration.responses
+package helpers
 
+import models.UserAnswers
 import models.registration.Address
-import play.api.libs.json.{Json, OFormat}
+import models.registration.responses.MatchResponseWithId
 
-final case class MatchResponseWithId(
-                                      safeId: String,
-                                      address: Address,
-                                      organisationName: Option[String]
-                                    ) extends RegistrationResponse
+import java.util.UUID
 
-object MatchResponseWithId {
-  
-  implicit lazy val format: OFormat[MatchResponseWithId] = Json.format
+trait UserAnswerHelper {
+
+  implicit class AddBusinessName(answers: UserAnswers) {
+    def withBusinessName(businessName: String) = answers.copy(
+      registrationResponse = Some(MatchResponseWithId(
+        UUID.randomUUID().toString(),
+        Address("", None, None, None, None, ""),
+        Some(businessName)
+      ))
+    )
+  }
 }

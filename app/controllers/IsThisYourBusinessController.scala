@@ -16,17 +16,19 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.IsThisYourBusinessFormProvider
-import javax.inject.Inject
 import models.Mode
+import models.registration.responses.MatchResponseWithId
+import models.requests.DataRequest
 import pages.IsThisYourBusinessPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IsThisYourBusinessView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IsThisYourBusinessController @Inject()(
@@ -50,7 +52,7 @@ class IsThisYourBusinessController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm, mode))
+      showPage(businessName => Ok(view(preparedForm, businessName, mode)))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -58,7 +60,7 @@ class IsThisYourBusinessController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+          Future.successful(showPage(businessName => BadRequest(view(formWithErrors, businessName, mode)))),
 
         value =>
           for {
@@ -67,4 +69,20 @@ class IsThisYourBusinessController @Inject()(
           } yield Redirect(IsThisYourBusinessPage.nextPage(mode, updatedAnswers))
       )
   }
+
+  private def showPage(page: String => Result)(implicit request: DataRequest[AnyContent]): Result = {
+    request.userAnswers.registrationResponse match {
+      case Some(r) => r match {
+        case r: MatchResponseWithId => r.organisationName match {
+          case Some(name) => page(name)
+          case _          => error
+        }
+        case _                      => error
+      }
+      case _       => error
+    }
+  }
+
+  private def error =
+    Redirect(routes.JourneyRecoveryController.onPageLoad())
 }
