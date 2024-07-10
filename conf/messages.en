@@ -234,3 +234,12 @@ ukPostCode.hint = For example, AA3 1AB.
 ukPostCode.link.text = Or enter the address manually
 ukPostCode.error.required = Enter UK postcode
 ukPostCode.error.length = Uk postcode must be {0} characters or less
+
+isThisYourBusiness.title = isThisYourBusiness
+isThisYourBusiness.heading = isThisYourBusiness
+isThisYourBusiness.checkYourAnswersLabel = isThisYourBusiness
+isThisYourBusiness.error.required = Select yes if isThisYourBusiness
+isThisYourBusiness.change.hidden = IsThisYourBusiness
+
+detailsMatched.title = detailsMatched
+detailsMatched.heading = detailsMatched
