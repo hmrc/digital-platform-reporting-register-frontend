@@ -235,11 +235,9 @@ ukPostCode.link.text = Or enter the address manually
 ukPostCode.error.required = Enter UK postcode
 ukPostCode.error.length = Uk postcode must be {0} characters or less
 
-isThisYourBusiness.title = isThisYourBusiness
-isThisYourBusiness.heading = isThisYourBusiness
-isThisYourBusiness.checkYourAnswersLabel = isThisYourBusiness
-isThisYourBusiness.error.required = Select yes if isThisYourBusiness
-isThisYourBusiness.change.hidden = IsThisYourBusiness
+isThisYourBusiness.title = Is this your business?
+isThisYourBusiness.heading = Is this your business?
+isThisYourBusiness.error.required = Select yes if this is your business
 
 detailsMatched.title = detailsMatched
 detailsMatched.heading = detailsMatched

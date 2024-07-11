@@ -21,7 +21,6 @@ import forms.IsThisYourBusinessFormProvider
 import helpers.UserAnswerHelper
 import models.NormalMode
 import models.registration.Address
-import models.registration.responses.MatchResponseWithId
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -30,6 +29,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import views.ViewUtils
 import views.html.IsThisYourBusinessView
 
 import scala.concurrent.Future
@@ -42,16 +42,27 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
   lazy val isThisYourBusinessRoute = routes.IsThisYourBusinessController.onPageLoad(NormalMode).url
 
   val businessName = "Coca-Cola"
+  
+  val businessAddress = Address(
+    "Manhattan",
+    None,
+    None,
+    None,
+    None,
+    "US"
+  )
 
   "IsThisYourBusiness Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val userAnswers = emptyUserAnswers.withBusinessName(businessName)
+      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
+        val address = ViewUtils.formatAddress(businessAddress)
+        
         val request = FakeRequest(GET, isThisYourBusinessRoute)
 
         val result = route(application, request).value
@@ -59,18 +70,20 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
         val view = application.injector.instanceOf[IsThisYourBusinessView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, businessName, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, businessName, address, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = emptyUserAnswers.withBusinessName(businessName)
+      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
         .set(IsThisYourBusinessPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
+        val address = ViewUtils.formatAddress(businessAddress)
+
         val request = FakeRequest(GET, isThisYourBusinessRoute)
 
         val view = application.injector.instanceOf[IsThisYourBusinessView]
@@ -78,13 +91,13 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), businessName, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), businessName, address, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val userAnswers = emptyUserAnswers.withBusinessName(businessName)
+      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -109,11 +122,13 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val userAnswers = emptyUserAnswers.withBusinessName(businessName)
+      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
+        val address = ViewUtils.formatAddress(businessAddress)
+
         val request =
           FakeRequest(POST, isThisYourBusinessRoute)
             .withFormUrlEncodedBody(("value", ""))
@@ -125,7 +140,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, businessName, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, businessName, address, NormalMode)(request, messages(application)).toString
       }
     }
 

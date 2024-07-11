@@ -24,12 +24,12 @@ import java.util.UUID
 
 trait UserAnswerHelper {
 
-  implicit class AddBusinessName(answers: UserAnswers) {
-    def withBusinessName(businessName: String) = answers.copy(
+  implicit class UserAnswerHelper(answers: UserAnswers) {
+    def withBusiness(name: String, address: Address) = answers.copy(
       registrationResponse = Some(MatchResponseWithId(
         UUID.randomUUID().toString(),
-        Address("", None, None, None, None, ""),
-        Some(businessName)
+        address,
+        Some(name)
       ))
     )
   }
