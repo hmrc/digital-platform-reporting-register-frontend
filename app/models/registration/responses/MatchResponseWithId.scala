@@ -19,13 +19,11 @@ package models.registration.responses
 import models.registration.Address
 import play.api.libs.json.{Json, OFormat}
 
-final case class MatchResponseWithId(
-                                      safeId: String,
-                                      address: Address,
-                                      organisationName: Option[String]
-                                    ) extends RegistrationResponse
+final case class MatchResponseWithId(safeId: String,
+                                     address: Address,
+                                     organisationName: Option[String]) extends RegistrationResponse
 
 object MatchResponseWithId {
-  
+
   implicit lazy val format: OFormat[MatchResponseWithId] = Json.format
 }

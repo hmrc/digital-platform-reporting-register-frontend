@@ -18,34 +18,29 @@ package controllers
 
 import controllers.actions.*
 import forms.UtrFormProvider
-
-import javax.inject.Inject
-import models.Mode
-import pages.UtrPage
+import models.BusinessType.*
+import models.{BusinessType, Mode}
+import pages.{BusinessTypePage, UtrPage}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.{UtrCorporationTaxView, UtrPartnershipView, UtrSelfAssessmentView}
-import models.BusinessType
-import models.BusinessType.*
-import pages.BusinessTypePage
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class UtrController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: UtrFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        corporationTaxView: UtrCorporationTaxView,
-                                        partnershipView: UtrPartnershipView,
-                                        selfAssessmentView: UtrSelfAssessmentView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with AnswerExtractor {
+class UtrController @Inject()(sessionRepository: SessionRepository,
+                              identify: IdentifierAction,
+                              getData: DataRetrievalAction,
+                              requireData: DataRequiredAction,
+                              formProvider: UtrFormProvider,
+                              corporationTaxView: UtrCorporationTaxView,
+                              partnershipView: UtrPartnershipView,
+                              selfAssessmentView: UtrSelfAssessmentView)
+                             (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -60,7 +55,7 @@ class UtrController @Inject()(
 
           renderView(businessType, preparedForm, mode) match {
             case Some(view) => Ok(view)
-            case _          => Redirect(routes.JourneyRecoveryController.onPageLoad())
+            case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
           }
       }
   }
@@ -91,16 +86,16 @@ class UtrController @Inject()(
   private def renderView(businessType: BusinessType, form: Form[_], mode: Mode)(implicit request: Request[_]) =
     businessType match {
       case LimitedCompany | AssociationOrTrust => Some(corporationTaxView(form, mode))
-      case Llp | Partnership                   => Some(partnershipView(form, mode))
-      case SoleTrader                          => Some(selfAssessmentView(form, mode))
-      case Individual                          => None
+      case Llp | Partnership => Some(partnershipView(form, mode))
+      case SoleTrader => Some(selfAssessmentView(form, mode))
+      case Individual => None
     }
 
   private def getForm(businessType: BusinessType) = {
     formProvider(businessType match {
       case LimitedCompany | AssociationOrTrust => "utrCorporationTax"
       case Llp | Partnership => "utrPartnership"
-      case SoleTrader => "utrSelfAssessment"
+      case _ => "utrSelfAssessment"
     })
   }
 }
