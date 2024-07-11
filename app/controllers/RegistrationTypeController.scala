@@ -18,58 +18,49 @@ package controllers
 
 import controllers.actions.*
 import forms.RegistrationTypeFormProvider
-
-import javax.inject.Inject
 import models.{Mode, UserAnswers}
 import pages.RegistrationTypePage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.RegistrationTypeView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrationTypeController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       sessionRepository: SessionRepository,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       formProvider: RegistrationTypeFormProvider,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: RegistrationTypeView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
+                                           identify: IdentifierAction,
+                                           getData: DataRetrievalAction,
+                                           formProvider: RegistrationTypeFormProvider,
+                                           view: RegistrationTypeView)
+                                          (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  extends FrontendController(mcc) with I18nSupport {
 
-  val form = formProvider()
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) {
-    implicit request =>
+    val answers =
+      request.userAnswers
+        .getOrElse(UserAnswers(request.userId, request.taxIdentifier))
+        .get(RegistrationTypePage)
 
-      val answers =
-        request.userAnswers
-          .getOrElse(UserAnswers(request.userId, request.taxIdentifier))
-          .get(RegistrationTypePage)
-        
-      val preparedForm = answers match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+    val preparedForm = answers match {
+      case None => formProvider()
+      case Some(value) => formProvider().fill(value)
+    }
 
-      Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.getOrElse(UserAnswers(request.userId, request.taxIdentifier)).set(RegistrationTypePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(RegistrationTypePage.nextPage(mode, updatedAnswers))
-      )
+    formProvider().bindFromRequest().fold(
+      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+      value =>
+        for {
+          updatedAnswers <- Future.fromTry(request.userAnswers.getOrElse(UserAnswers(request.userId, request.taxIdentifier)).set(RegistrationTypePage, value))
+          _ <- sessionRepository.set(updatedAnswers)
+        } yield Redirect(RegistrationTypePage.nextPage(mode, updatedAnswers))
+    )
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 package object models {
 
@@ -31,24 +31,13 @@ package object models {
 
     def set(path: JsPath, value: JsValue): JsResult[JsValue] =
       (path.path, jsValue) match {
-
-        case (Nil, _) =>
-          JsError("path cannot be empty")
-
-        case ((_: RecursiveSearch) :: _, _) =>
-          JsError("recursive search not supported")
-
-        case ((n: IdxPathNode) :: Nil, _) =>
-          setIndexNode(n, jsValue, value)
-
-        case ((n: KeyPathNode) :: Nil, _) =>
-          setKeyNode(n, jsValue, value)
-
+        case (Nil, _) => JsError("path cannot be empty")
+        case ((_: RecursiveSearch) :: _, _) => JsError("recursive search not supported")
+        case ((n: IdxPathNode) :: Nil, _) => setIndexNode(n, jsValue, value)
+        case ((n: KeyPathNode) :: Nil, _) => setKeyNode(n, jsValue, value)
         case (first :: second :: rest, oldValue) =>
           Reads.optionNoError(Reads.at[JsValue](JsPath(first :: Nil)))
-            .reads(oldValue).flatMap {
-            opt =>
-
+            .reads(oldValue).flatMap { opt =>
               opt.map(JsSuccess(_)).getOrElse {
                 second match {
                   case _: KeyPathNode =>
@@ -59,12 +48,11 @@ package object models {
                     JsError("recursive search is not supported")
                 }
               }.flatMap {
-                _.set(JsPath(second :: rest), value).flatMap {
-                  newValue =>
-                    oldValue.set(JsPath(first :: Nil), newValue)
+                _.set(JsPath(second :: rest), value).flatMap { newValue =>
+                  oldValue.set(JsPath(first :: Nil), newValue)
                 }
               }
-          }
+            }
       }
 
     private def setIndexNode(node: IdxPathNode, oldValue: JsValue, newValue: JsValue): JsResult[JsValue] = {
@@ -78,10 +66,8 @@ package object models {
           } else {
             JsSuccess(JsArray(oldValue.value.updated(index, newValue)))
           }
-        case oldValue: JsArray =>
-          JsError(s"array index out of bounds: $index, $oldValue")
-        case _ =>
-          JsError(s"cannot set an index on $oldValue")
+        case oldValue: JsArray => JsError(s"array index out of bounds: $index, $oldValue")
+        case _ => JsError(s"cannot set an index on $oldValue")
       }
     }
 
@@ -109,7 +95,6 @@ package object models {
     }
 
     def remove(path: JsPath): JsResult[JsValue] = {
-
       (path.path, jsValue) match {
         case (Nil, _) => JsError("path cannot be empty")
         case ((n: KeyPathNode) :: Nil, value: JsObject) if value.keys.contains(n.key) => JsSuccess(value - n.key)
@@ -117,27 +102,19 @@ package object models {
         case ((n: IdxPathNode) :: Nil, value: JsArray) => removeIndexNode(n, value)
         case ((_: KeyPathNode) :: Nil, _) => JsError(s"cannot remove a key on $jsValue")
         case (first :: second :: rest, oldValue) =>
-
           Reads.optionNoError(Reads.at[JsValue](JsPath(first :: Nil)))
-            .reads(oldValue).flatMap {
-            (opt: Option[JsValue]) =>
-
+            .reads(oldValue).flatMap { (opt: Option[JsValue]) =>
               opt.map(JsSuccess(_)).getOrElse {
                 second match {
-                  case _: KeyPathNode =>
-                    JsSuccess(Json.obj())
-                  case _: IdxPathNode =>
-                    JsSuccess(Json.arr())
-                  case _: RecursiveSearch =>
-                    JsError("recursive search is not supported")
+                  case _: KeyPathNode => JsSuccess(Json.obj())
+                  case _: IdxPathNode => JsSuccess(Json.arr())
+                  case _: RecursiveSearch => JsError("recursive search is not supported")
                 }
               }.flatMap {
-                _.remove(JsPath(second :: rest)).flatMap {
-                  newValue =>
-                    oldValue.set(JsPath(first :: Nil), newValue)
-                }
+                _.remove(JsPath(second :: rest)).flatMap { newValue => oldValue.set(JsPath(first :: Nil), newValue) }
               }
-          }
+            }
+        case _ => JsError(s"cannot remove a key on $jsValue")
       }
     }
   }

@@ -16,7 +16,6 @@
 
 package models.registration.requests
 
-import models.BusinessType
 import play.api.libs.json.{JsObject, Json, OWrites}
 
 final case class OrganisationWithUtr(utr: String, details: Option[OrganisationDetails]) extends RegistrationRequest
@@ -37,4 +36,3 @@ object OrganisationWithUtr {
     }
   }
 }
-
