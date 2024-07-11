@@ -34,5 +34,13 @@ class DetailsMatchedPageSpec extends AnyFreeSpec with Matchers {
         DetailsMatchedPage.nextPage(NormalMode, emptyAnswers) mustEqual routes.IndexController.onPageLoad()
       }
     }
+
+    "in Check Mode" - {
+
+      "must go to Check Answers" in {
+
+        DetailsMatchedPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+      }
+    }
   }
 }
