@@ -23,7 +23,7 @@ import models.registration.requests.OrganisationWithUtr
 import models.registration.responses.RegistrationResponse
 import models.{Mode, UserAnswers, Utr}
 import pages.RegistrationTypePage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -78,8 +78,7 @@ class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
       case Utr(utr) =>
         val request = OrganisationWithUtr(utr, None)
 
-        val response = registrationConnector.register(request).map(Some(_))
-        response
+        registrationConnector.register(request).map(Some(_))
       case _ =>
         Future.successful(None)
     }.getOrElse(Future.successful(None))

@@ -18,7 +18,7 @@ package pages
 
 import controllers.routes
 import models.registration.Address
-import models.registration.responses.{MatchResponseWithId, NoMatchResponse, RegistrationResponse}
+import models.registration.responses.{MatchResponseWithId, NoMatchResponse}
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
