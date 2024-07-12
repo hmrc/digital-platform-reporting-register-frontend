@@ -104,4 +104,5 @@ POST       /registration/check-business-details                      controllers
 GET        /registration/change-check-business-details               controllers.IsThisYourBusinessController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-check-business-details               controllers.IsThisYourBusinessController.onSubmit(mode: Mode = CheckMode)
 
-GET        /detailsMatched                       controllers.DetailsMatchedController.onPageLoad()
+GET        /registration/check-details                controllers.DetailsMatchedController.onPageLoad()
+POST       /registration/check-details                controllers.DetailsMatchedController.onSubmit()

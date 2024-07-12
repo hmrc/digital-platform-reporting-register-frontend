@@ -17,11 +17,21 @@
 package controllers
 
 import base.SpecBase
+import models.NormalMode
+import org.mockito.ArgumentMatchers.any
+import pages.DetailsMatchedPage
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.DetailsMatchedView
+import repositories.SessionRepository
+import play.api.inject.bind
+import org.scalatestplus.mockito.MockitoSugar
 
-class DetailsMatchedControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class DetailsMatchedControllerSpec extends SpecBase with MockitoSugar {
+
+  lazy val detailsMatchedRoute = routes.DetailsMatchedController.onPageLoad().url
 
   "DetailsMatched Controller" - {
 
@@ -38,6 +48,26 @@ class DetailsMatchedControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to the next page when continue button clicked" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, detailsMatchedRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual DetailsMatchedPage.nextPage(NormalMode, emptyUserAnswers).url
       }
     }
   }

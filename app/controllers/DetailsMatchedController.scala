@@ -16,7 +16,10 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
+import models.NormalMode
+import pages.DetailsMatchedPage
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,8 +35,13 @@ class DetailsMatchedController @Inject()(
                                        view: DetailsMatchedView
                                      ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad: Action[AnyContent] = identify {
     implicit request =>
       Ok(view())
+  }
+
+  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+       Redirect(DetailsMatchedPage.nextPage(NormalMode, request.userAnswers))
   }
 }
