@@ -241,5 +241,5 @@ isThisYourBusiness.checkYourAnswersLabel = isThisYourBusiness
 isThisYourBusiness.error.required = Select yes if isThisYourBusiness
 isThisYourBusiness.change.hidden = IsThisYourBusiness
 
-detailsMatched.title = detailsMatched
-detailsMatched.heading = detailsMatched
+detailsMatched.title = We have matched your details
+detailsMatched.heading = We have matched your details
