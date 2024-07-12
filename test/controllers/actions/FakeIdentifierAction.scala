@@ -16,20 +16,27 @@
 
 package controllers.actions
 
+import models.TaxIdentifier
+
 import javax.inject.Inject
 import models.requests.IdentifierRequest
-import play.api.mvc._
+import play.api.mvc.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers) extends IdentifierAction {
+class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers, taxIdentifierProvider: FakeTaxIdentifierProvider) extends IdentifierAction {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, "id", None))
+    block(IdentifierRequest(request, "id", taxIdentifierProvider.taxIdentifier))
 
   override def parser: BodyParser[AnyContent] =
     bodyParsers.default
 
   override protected def executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global
+}
+
+class FakeTaxIdentifierProvider @Inject() {
+
+  def taxIdentifier: Option[TaxIdentifier] = None
 }

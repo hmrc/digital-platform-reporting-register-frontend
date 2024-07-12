@@ -16,12 +16,15 @@
 
 package controllers
 
+import connectors.RegistrationConnector
 import controllers.actions.*
 import forms.RegistrationTypeFormProvider
-import models.{Mode, UserAnswers}
+import models.registration.requests.OrganisationWithUtr
+import models.registration.responses.RegistrationResponse
+import models.{Mode, UserAnswers, Utr}
 import pages.RegistrationTypePage
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.RegistrationTypeView
@@ -33,7 +36,8 @@ class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
                                            identify: IdentifierAction,
                                            getData: DataRetrievalAction,
                                            formProvider: RegistrationTypeFormProvider,
-                                           view: RegistrationTypeView)
+                                           view: RegistrationTypeView,
+                                           registrationConnector: RegistrationConnector)
                                           (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
@@ -53,14 +57,29 @@ class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-
+    
     formProvider().bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-      value =>
+      value => {
+        val baseAnswers = request.userAnswers.getOrElse(UserAnswers(request.userId, request.taxIdentifier))
+        
         for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.getOrElse(UserAnswers(request.userId, request.taxIdentifier)).set(RegistrationTypePage, value))
-          _ <- sessionRepository.set(updatedAnswers)
+          matchResult    <- matchIfNecessary(baseAnswers)
+          answers        = baseAnswers.copy(registrationResponse = matchResult)
+          updatedAnswers <- Future.fromTry(answers.set(RegistrationTypePage, value))
+          _              <- sessionRepository.set(updatedAnswers)
         } yield Redirect(RegistrationTypePage.nextPage(mode, updatedAnswers))
+      }
     )
   }
+  
+  private def matchIfNecessary(answers: UserAnswers)(implicit request: Request[_]): Future[Option[RegistrationResponse]] =
+    answers.taxIdentifier.map {
+      case Utr(utr) =>
+        val request = OrganisationWithUtr(utr, None)
+
+        registrationConnector.register(request).map(Some(_))
+      case _ =>
+        Future.successful(None)
+    }.getOrElse(Future.successful(None))
 }

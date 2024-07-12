@@ -17,6 +17,8 @@
 package pages
 
 import controllers.routes
+import models.registration.Address
+import models.registration.responses.{MatchResponseWithId, NoMatchResponse}
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
@@ -29,6 +31,30 @@ class RegistrationTypePageSpec extends AnyFreeSpec with Matchers with TryValues 
     val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
+
+      "when the user has been matched" - {
+        
+        "must go to Is This Your Business" in {
+          
+          val address = Address("line 1", None, None, None, None, "GB")
+          val registrationResponse = MatchResponseWithId("safeId", address, Some("name"))
+          val answers = emptyAnswers.copy(registrationResponse = Some(registrationResponse))
+
+          RegistrationTypePage.nextPage(NormalMode, answers) mustEqual routes.IsThisYourBusinessController.onPageLoad(NormalMode)
+        }
+      }
+      
+      "when the user was not matched" - {
+
+        "must go to Business Type" in {
+
+          val answers = emptyAnswers.copy(registrationResponse = Some(NoMatchResponse()))
+          RegistrationTypePage.nextPage(NormalMode, answers) mustEqual routes.BusinessTypeController.onPageLoad(NormalMode)
+        }
+      }
+    }
+    
+    "when matching was not attempted" -{
 
       "must go to Business Type" in {
 
