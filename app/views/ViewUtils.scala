@@ -16,8 +16,11 @@
 
 package views
 
+import models.Country
+import models.registration.Address
 import play.api.data.Form
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 
 object ViewUtils {
 
@@ -32,5 +35,15 @@ object ViewUtils {
 
   def errorPrefix(form: Form[_])(implicit messages: Messages): String = {
     if (form.hasErrors || form.hasGlobalErrors) messages("error.title.prefix") else ""
+  }
+
+  def formatAddress(address: Address): String = {
+    val code = address.countryCode
+    HtmlFormat.escape(address.addressLine1).toString + "<br/>" +
+      address.addressLine2.map(HtmlFormat.escape(_).toString + "<br/>").getOrElse("") +
+      address.addressLine3.map(HtmlFormat.escape(_).toString + "<br/>").getOrElse("") +
+      address.addressLine4.map(HtmlFormat.escape(_).toString + "<br/>").getOrElse("") +
+      address.postalCode.map(HtmlFormat.escape(_).toString + "<br/>").getOrElse("") +
+      Country.allCountries.find(_.code == code).map(_.name).getOrElse(code)
   }
 }

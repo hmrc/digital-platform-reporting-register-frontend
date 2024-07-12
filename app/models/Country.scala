@@ -18,8 +18,6 @@ package models
 
 import play.api.i18n.Messages
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
-import viewmodels.govuk.select._
 
 final case class Country(code: String, name: String) {
   def message(implicit messages: Messages): String = messages(s"country.$code")
@@ -229,14 +227,4 @@ object Country {
 
   val internationalCountries: Seq[Country] =
     allCountries.filterNot(_.code == "GB")
-
-  def selectItems(countries: Seq[Country])(implicit messages: Messages): Seq[SelectItem] =
-    SelectItem(value = None, text = messages("country.selectCountry")) +:
-      countries.map {
-        country =>
-          SelectItemViewModel(
-            value = country.code,
-            text  = country.message
-          )
-      }
 }

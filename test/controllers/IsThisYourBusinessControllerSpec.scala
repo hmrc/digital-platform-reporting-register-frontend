@@ -18,33 +18,51 @@ package controllers
 
 import base.SpecBase
 import forms.IsThisYourBusinessFormProvider
+import helpers.UserAnswerHelper
 import models.NormalMode
+import models.registration.Address
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.IsThisYourBusinessPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
+import views.ViewUtils
 import views.html.IsThisYourBusinessView
 
 import scala.concurrent.Future
 
-class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar {
+class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with UserAnswerHelper {
 
   val formProvider = new IsThisYourBusinessFormProvider()
   val form = formProvider()
 
   lazy val isThisYourBusinessRoute = routes.IsThisYourBusinessController.onPageLoad(NormalMode).url
 
+  val businessName = "Coca-Cola"
+  
+  val businessAddress = Address(
+    "Manhattan",
+    None,
+    None,
+    None,
+    None,
+    "US"
+  )
+
   "IsThisYourBusiness Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
+        val address = ViewUtils.formatAddress(businessAddress)
+        
         val request = FakeRequest(GET, isThisYourBusinessRoute)
 
         val result = route(application, request).value
@@ -52,17 +70,20 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[IsThisYourBusinessView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, businessName, address, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = emptyUserAnswers.set(IsThisYourBusinessPage, true).success.value
+      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
+        .set(IsThisYourBusinessPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
+        val address = ViewUtils.formatAddress(businessAddress)
+
         val request = FakeRequest(GET, isThisYourBusinessRoute)
 
         val view = application.injector.instanceOf[IsThisYourBusinessView]
@@ -70,18 +91,20 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), businessName, address, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
+
+      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -99,9 +122,13 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
+        val address = ViewUtils.formatAddress(businessAddress)
+
         val request =
           FakeRequest(POST, isThisYourBusinessRoute)
             .withFormUrlEncodedBody(("value", ""))
@@ -113,13 +140,27 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, businessName, address, NormalMode)(request, messages(application)).toString
       }
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, isThisYourBusinessRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a GET if no business name is found" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, isThisYourBusinessRoute)
@@ -139,6 +180,22 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(POST, isThisYourBusinessRoute)
             .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if no business name is found" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, isThisYourBusinessRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
         val result = route(application, request).value
 
