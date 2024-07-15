@@ -17,12 +17,15 @@
 package pages
 
 import controllers.routes
-import models.{CheckMode, InternationalAddress, NormalMode, UserAnswers}
+import models.{CheckMode, Country, InternationalAddress, NormalMode, UserAnswers}
 import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
 class InternationalAddressPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
+
+  val country = Country.internationalCountries.head
+  val address = InternationalAddress("line 1", None, "city", None, None, country)
 
   ".nextPage" - {
 
@@ -32,8 +35,7 @@ class InternationalAddressPageSpec extends AnyFreeSpec with Matchers with TryVal
 
       "must go to Index" in {
 
-        val answers = emptyAnswers.set(InternationalAddressPage, InternationalAddress("Testing Lane", Some("Testing Road"), "New York", None, Some("AB1 A"),
-          "United States")).success.value
+        val answers = emptyAnswers.set(InternationalAddressPage, address).success.value
         InternationalAddressPage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
       }
     }

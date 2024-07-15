@@ -15,13 +15,15 @@
  *@
 
 @import viewmodels.InputWidth._
+@import models.Country._
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukSelect : GovukSelect
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -76,12 +78,14 @@
             .withWidth(Full)
         )
 
-        @govukInput(
-            InputViewModel(
+        @govukSelect(
+            SelectViewModel(
                 field = form("country"),
+                items = selectItems(internationalCountries),
                 label = LabelViewModel(messages("internationalAddress.country"))
             )
-            .withWidth(Full)
+            .withCssClass(Fixed20.toString)
+            .withCssClass("autocomplete")
         )
 
         @govukButton(

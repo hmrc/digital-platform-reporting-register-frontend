@@ -210,6 +210,7 @@ internationalAddress.error.line1.length = Address line 1 must be 100 characters 
 internationalAddress.error.line2.length = Address line 2 must be 100 characters or less
 internationalAddress.line1.change.hidden = line1
 internationalAddress.line2.change.hidden = line2
+internationalAddress.country.selectCountry = Select a Country
 
 ukAddress.title = What is your address?
 ukAddress.heading = What is your address?

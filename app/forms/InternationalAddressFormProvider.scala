@@ -21,7 +21,7 @@ import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms._
-import models.InternationalAddress
+import models.{Country, InternationalAddress}
 
 class InternationalAddressFormProvider @Inject() extends Mappings {
 
@@ -38,7 +38,8 @@ class InternationalAddressFormProvider @Inject() extends Mappings {
        "postal" -> optional(text("")
          .verifying(maxLength(100, "internationalAddress.error.postal.length"))),
        "country" -> text("internationalAddress.error.country.required")
-         .verifying(maxLength(100, "internationalAddress.error.country.length"))
+         .verifying("internationalAddress.error.country.required", value => Country.internationalCountries.exists(_.code == value))
+         .transform[Country](value => Country.internationalCountries.find(_.code == value).get, _.code)
     )(InternationalAddress.apply)(x => Some((x.line1, x.line2, x.city, x.region, x.postal, x.country)))
    )
  }

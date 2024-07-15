@@ -18,6 +18,8 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
+import org.scalacheck.Gen
+import models.Country
 
 class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
 
@@ -141,20 +143,11 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "country"
     val requiredKey = "internationalAddress.error.country.required"
-    val lengthKey = "internationalAddress.error.country.length"
-    val maxLength = 100
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      Gen.oneOf(Country.internationalCountries.map(_.code))
     )
 
     behave like mandatoryField(

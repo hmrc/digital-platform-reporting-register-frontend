@@ -41,7 +41,7 @@ object InternationalAddressSummary  {
                   HtmlFormat.escape(answer.city).toString + "<br/>" +
                   region +
                   postal +
-                  HtmlFormat.escape(answer.country).toString
+                  HtmlFormat.escape(answer.country.name).toString
 
         SummaryListRowViewModel(
           key     = "internationalAddress.checkYourAnswersLabel",
