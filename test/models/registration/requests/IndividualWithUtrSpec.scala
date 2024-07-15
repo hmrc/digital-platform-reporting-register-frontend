@@ -16,28 +16,26 @@
 
 package models.registration.requests
 
+import cats.data.*
+import models.{SoleTraderName, UserAnswers}
+import org.scalatest.{EitherValues, OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import pages.{SoleTraderNamePage, UtrPage}
 import play.api.libs.json.Json
 
-class IndividualWithUtrSpec extends AnyFreeSpec with Matchers {
+class IndividualWithUtrSpec
+  extends AnyFreeSpec
+    with Matchers
+    with TryValues
+    with OptionValues
+    with EitherValues {
 
   "individual with UTR" - {
 
-    "must serialise with no details" in {
+    "must serialise" in {
 
-      val individual = IndividualWithUtr("123", None)
-      val json = Json.toJson(individual)
-
-      json mustEqual Json.obj(
-        "type" -> "individual",
-        "utr" -> "123"
-      )
-    }
-
-    "must serialise with details" in {
-
-      val individual = IndividualWithUtr("123", Some(IndividualDetails("first", "last")))
+      val individual = IndividualWithUtr("123", IndividualDetails("first", "last"))
       val json = Json.toJson(individual)
 
       json mustEqual Json.obj(
@@ -48,6 +46,25 @@ class IndividualWithUtrSpec extends AnyFreeSpec with Matchers {
           "lastName" -> "last"
         )
       )
+    }
+
+    "must build from user answers when UTR and sole trader name have been answered" in {
+
+      val answers =
+        UserAnswers("id", None)
+          .set(UtrPage, "1234567890").success.value
+          .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
+
+      val result = IndividualWithUtr.build(answers)
+      result.value mustEqual IndividualWithUtr("1234567890", IndividualDetails("first", "last"))
+    }
+
+    "must fail to build from user answers and report all errors when mandatory data is missing" in {
+
+      val answers = UserAnswers("id", None)
+
+      val result = IndividualWithUtr.build(answers)
+      result.left.value.toChain.toList must contain theSameElementsAs Seq(UtrPage, SoleTraderNamePage)
     }
   }
 }

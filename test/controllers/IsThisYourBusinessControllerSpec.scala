@@ -29,21 +29,17 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.ViewUtils
 import views.html.IsThisYourBusinessView
 
 import scala.concurrent.Future
 
 class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with UserAnswerHelper {
 
-  val formProvider = new IsThisYourBusinessFormProvider()
-  val form = formProvider()
-
-  lazy val isThisYourBusinessRoute = routes.IsThisYourBusinessController.onPageLoad(NormalMode).url
-
-  val businessName = "Coca-Cola"
-  
-  val businessAddress = Address(
+  private val formProvider = new IsThisYourBusinessFormProvider()
+  private val form = formProvider()
+  private lazy val isThisYourBusinessRoute = routes.IsThisYourBusinessController.onPageLoad(NormalMode).url
+  private val businessName = "Coca-Cola"
+  private val businessAddress = Address(
     "Manhattan",
     None,
     None,

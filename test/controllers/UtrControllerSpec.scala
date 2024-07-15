@@ -18,8 +18,8 @@ package controllers
 
 import base.SpecBase
 import forms.UtrFormProvider
-import models.BusinessType.{AssociationOrTrust, Individual, LimitedCompany, Llp, Partnership, SoleTrader}
-import models.{NormalMode, UserAnswers}
+import models.BusinessType.{AssociationOrTrust, LimitedCompany, Llp, Partnership, SoleTrader}
+import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -33,12 +33,10 @@ import views.html.{UtrCorporationTaxView, UtrPartnershipView, UtrSelfAssessmentV
 import scala.concurrent.Future
 
 class UtrControllerSpec extends SpecBase with MockitoSugar {
-  
-  val formProvider = new UtrFormProvider()
 
-  lazy val utrRoute = routes.UtrController.onPageLoad(NormalMode).url
-
-  val utr = "1234567890"
+  private val formProvider = new UtrFormProvider()
+  private lazy val utrRoute = routes.UtrController.onPageLoad(NormalMode).url
+  private val utr = "1234567890"
 
   "Utr Controller" - {
 

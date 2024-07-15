@@ -17,15 +17,19 @@
 package controllers
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.BusinessNameFormProvider
-import models.NormalMode
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import models.{BusinessType, NormalMode, UserAnswers}
+import models.registration.requests.{OrganisationDetails, OrganisationWithUtr}
+import models.registration.responses.NoMatchResponse
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.BusinessNamePage
+import pages.{BusinessNamePage, BusinessTypePage, UtrPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.BusinessNameView
 
@@ -33,10 +37,10 @@ import scala.concurrent.Future
 
 class BusinessNameControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new BusinessNameFormProvider()
-  val form = formProvider()
+  private val formProvider = new BusinessNameFormProvider()
+  private val form = formProvider()
 
-  lazy val businessNameRoute = routes.BusinessNameController.onPageLoad(NormalMode).url
+  private lazy val businessNameRoute = routes.BusinessNameController.onPageLoad(NormalMode).url
 
   "BusinessName Controller" - {
 
@@ -58,7 +62,7 @@ class BusinessNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = emptyUserAnswers.set(BusinessNamePage, "answer").success.value
+      val userAnswers = emptyUserAnswers.set(BusinessNamePage, "name").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -70,30 +74,54 @@ class BusinessNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("name"), NormalMode)(request, messages(application)).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page and store the registration result when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockConnector = mock[RegistrationConnector]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockConnector.register(any())(any())) thenReturn Future.successful(NoMatchResponse())
+
+      val baseAnswers =
+        emptyUserAnswers
+          .set(UtrPage, "123").success.value
+          .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        applicationBuilder(userAnswers = Some(baseAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[RegistrationConnector].toInstance(mockConnector)
+          )
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, businessNameRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "name"))
+
+        val expectedRegistrationRequest = OrganisationWithUtr("123", Some(OrganisationDetails("name", BusinessType.LimitedCompany)))
+
+        val expectedAnswers =
+          baseAnswers
+            .set(BusinessNamePage, "name").success.value
+            .copy(registrationResponse = Some(NoMatchResponse()))
+
+        val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual BusinessNamePage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual BusinessNamePage.nextPage(NormalMode, expectedAnswers).url
+        verify(mockConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
+        verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+
+        val savedAnswers = answersCaptor.getValue
+        savedAnswers.registrationResponse.value mustEqual NoMatchResponse()
       }
     }
 
@@ -138,7 +166,7 @@ class BusinessNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, businessNameRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "name"))
 
         val result = route(application, request).value
 

@@ -27,24 +27,22 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.ViewUtils
 import views.html.IsThisYourBusinessView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IsThisYourBusinessController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         formProvider: IsThisYourBusinessFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: IsThisYourBusinessView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class IsThisYourBusinessController @Inject()(override val messagesApi: MessagesApi,
+                                             sessionRepository: SessionRepository,
+                                             identify: IdentifierAction,
+                                             getData: DataRetrievalAction,
+                                             requireData: DataRequiredAction,
+                                             formProvider: IsThisYourBusinessFormProvider,
+                                             val controllerComponents: MessagesControllerComponents,
+                                             view: IsThisYourBusinessView)
+                                            (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -67,7 +65,7 @@ class IsThisYourBusinessController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourBusinessPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
+            _ <- sessionRepository.set(updatedAnswers)
           } yield Redirect(IsThisYourBusinessPage.nextPage(mode, updatedAnswers))
       )
   }
@@ -77,11 +75,11 @@ class IsThisYourBusinessController @Inject()(
       case Some(r) => r match {
         case r: MatchResponseWithId => r.organisationName match {
           case Some(name) => page(name, r.address)
-          case _          => error
+          case _ => error
         }
-        case _                      => error
+        case _ => error
       }
-      case _       => error
+      case _ => error
     }
   }
 

@@ -16,55 +16,61 @@
 
 package controllers
 
-import controllers.actions._
+import connectors.RegistrationConnector
+import controllers.actions.*
 import forms.SoleTraderNameFormProvider
+import models.registration.requests.IndividualWithUtr
+import models.registration.responses.RegistrationResponse
+
 import javax.inject.Inject
-import models.Mode
+import models.{Mode, UserAnswers}
 import pages.SoleTraderNamePage
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.SoleTraderNameView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class SoleTraderNameController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      sessionRepository: SessionRepository,
-                                      identify: IdentifierAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
-                                      formProvider: SoleTraderNameFormProvider,
-                                      val controllerComponents: MessagesControllerComponents,
-                                      view: SoleTraderNameView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class SoleTraderNameController @Inject()(sessionRepository: SessionRepository,
+                                         identify: IdentifierAction,
+                                         getData: DataRetrievalAction,
+                                         requireData: DataRequiredAction,
+                                         formProvider: SoleTraderNameFormProvider,
+                                         view: SoleTraderNameView,
+                                         registrationConnector: RegistrationConnector)
+                                        (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  extends FrontendController(mcc) with I18nSupport {
 
-  val form = formProvider()
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
+    val preparedForm = request.userAnswers.get(SoleTraderNamePage) match {
+      case None => formProvider()
+      case Some(value) => formProvider().fill(value)
+    }
 
-      val preparedForm = request.userAnswers.get(SoleTraderNamePage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+    formProvider().bindFromRequest().fold(
+      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+      value =>
+        for {
+          updatedAnswers   <- Future.fromTry(request.userAnswers.set(SoleTraderNamePage, value))
+          registerResponse <- register(updatedAnswers)
+          fullAnswers      = updatedAnswers.copy(registrationResponse = Some(registerResponse))
+          _                <- sessionRepository.set(fullAnswers)
+        } yield Redirect(SoleTraderNamePage.nextPage(mode, fullAnswers))
+    )
+  }
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SoleTraderNamePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(SoleTraderNamePage.nextPage(mode, updatedAnswers))
+  private def register(answers: UserAnswers)(implicit request: Request[_]): Future[RegistrationResponse] =
+    IndividualWithUtr.build(answers)
+      .fold(
+        errors => Future.failed(Exception(s"Unable to build registration request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
+        details => registrationConnector.register(details)
       )
-  }
 }

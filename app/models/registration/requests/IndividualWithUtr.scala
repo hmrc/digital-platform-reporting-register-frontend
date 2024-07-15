@@ -16,23 +16,30 @@
 
 package models.registration.requests
 
+import cats.data.*
+import cats.implicits.*
+import models.UserAnswers
+import pages.{SoleTraderNamePage, UtrPage}
 import play.api.libs.json.*
+import queries.Query
 
-final case class IndividualWithUtr(utr: String, details: Option[IndividualDetails]) extends RegistrationRequest
+final case class IndividualWithUtr(utr: String, details: IndividualDetails) extends RegistrationRequest
 
 object IndividualWithUtr {
   
+  def build(answers: UserAnswers): EitherNec[Query, IndividualWithUtr] =
+    (
+      answers.getEither(UtrPage),
+      answers.getEither(SoleTraderNamePage)
+        .map(name => IndividualDetails(name.firstName, name.lastName))
+    ).parMapN(IndividualWithUtr.apply)
+  
   implicit lazy val writes: OWrites[IndividualWithUtr] = new OWrites[IndividualWithUtr] {
-    override def writes(o: IndividualWithUtr): JsObject = {
-
-      val detailsJson = o.details.map { details =>
-        Json.obj("details" -> Json.toJson(details))
-      }.getOrElse(Json.obj())
-
+    override def writes(o: IndividualWithUtr): JsObject =
       Json.obj(
         "type" -> "individual",
-        "utr" -> o.utr
-      ) ++ detailsJson
-    }
+        "utr" -> o.utr,
+        "details" -> Json.toJson(o.details)
+      )
   }
 }
