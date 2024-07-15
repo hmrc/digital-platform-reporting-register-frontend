@@ -16,7 +16,7 @@
 
 package views
 
-import models.Country
+import models.{Country, InternationalAddress, UkAddress}
 import models.registration.Address
 import play.api.data.Form
 import play.api.i18n.Messages
@@ -37,13 +37,43 @@ object ViewUtils {
     if (form.hasErrors || form.hasGlobalErrors) messages("error.title.prefix") else ""
   }
 
+  def formatUkAddress(ukAddress: UkAddress) =
+    formatAddress(Address(
+      ukAddress.line1,
+      ukAddress.line2,
+      Some(ukAddress.town),
+      ukAddress.county,
+      Some(ukAddress.postCode),
+      Country.unitedKingdom.code
+    ))
+
+    def formatInternationalAddress(internationalAddress: InternationalAddress) =
+      formatAddress(Address(
+        internationalAddress.line1,
+        internationalAddress.line2,
+        Some(internationalAddress.city),
+        internationalAddress.region,
+        internationalAddress.postal,
+        internationalAddress.country.code
+      ))
+
   def formatAddress(address: Address): String = {
     val code = address.countryCode
-    HtmlFormat.escape(address.addressLine1).toString + "<br/>" +
-      address.addressLine2.map(HtmlFormat.escape(_).toString + "<br/>").getOrElse("") +
-      address.addressLine3.map(HtmlFormat.escape(_).toString + "<br/>").getOrElse("") +
-      address.addressLine4.map(HtmlFormat.escape(_).toString + "<br/>").getOrElse("") +
-      address.postalCode.map(HtmlFormat.escape(_).toString + "<br/>").getOrElse("") +
-      Country.allCountries.find(_.code == code).map(_.name).getOrElse(code)
+    val lines = Seq(
+      formatLine(address.addressLine1.trim),
+      formatLine(address.addressLine2),
+      formatLine(address.addressLine3),
+      formatLine(address.addressLine4),
+      formatLine(address.postalCode),
+      formatLine(Country.allCountries.find(_.code == code).map(_.name).getOrElse(code))
+    )
+
+    lines.flatten.map(HtmlFormat.escape(_)).mkString("<br/>")
   }
+
+  private def formatLine(line: Option[String]): Option[String] =
+    line.map(_.trim).filterNot(_.isEmpty)
+
+  private def formatLine(line: String): Option[String] =
+    formatLine(Some(line))
 }

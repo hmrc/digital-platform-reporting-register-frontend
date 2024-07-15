@@ -29,6 +29,8 @@ object Country {
 
   implicit val format: OFormat[Country] = Json.format[Country]
 
+  val unitedKingdom = Country("GB", "United Kingdom")
+  
   val allCountries: Seq[Country] = Seq(
     Country("AF", "Afghanistan"),
     Country("AL", "Albania"),
@@ -214,7 +216,7 @@ object Country {
     Country("UG", "Uganda"),
     Country("UA", "Ukraine"),
     Country("AE", "United Arab Emirates"),
-    Country("GB", "United Kingdom"),
+    unitedKingdom,
     Country("US", "United States"),
     Country("UY", "Uruguay"),
     Country("UZ", "Uzbekistan"),
@@ -228,7 +230,7 @@ object Country {
   )
 
   val internationalCountries: Seq[Country] =
-    allCountries.filterNot(_.code == "GB")
+    allCountries.filterNot(_ == unitedKingdom)
 
   def selectItems(countries: Seq[Country])(implicit messages: Messages): Seq[SelectItem] =
     SelectItem(value = None, text = messages("internationalAddress.country.selectCountry")) +:
