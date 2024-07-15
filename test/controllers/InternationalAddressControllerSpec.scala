@@ -18,14 +18,14 @@ package controllers
 
 import base.SpecBase
 import forms.InternationalAddressFormProvider
-import models.{NormalMode, InternationalAddress}
+import models.{Country, InternationalAddress, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.InternationalAddressPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.InternationalAddressView
 
@@ -38,7 +38,8 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val internationalAddressRoute = routes.InternationalAddressController.onPageLoad(NormalMode).url
 
-  val address = InternationalAddress("line 1", None, "city", None, None, "US")
+  val country = Country.internationalCountries.head
+  val address = InternationalAddress("Testing Lane", None, "New York", None, None, country)
   val userAnswers = emptyUserAnswers.set(InternationalAddressPage, address).success.value
 
   "InternationalAddress Controller" - {
@@ -71,7 +72,7 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(InternationalAddress("line 1", None, "city", None, None, "US")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(address), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -82,15 +83,14 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, internationalAddressRoute)
-            .withFormUrlEncodedBody(("line1", "Testing Lane"), ("line2", "Testing Road"), ("city", "New York"),
-              ("region", ""), ("postal", "AB1 A"), ("country", "United States"))
+            .withFormUrlEncodedBody(("line1", "Testing Lane"), ("city", "New York"),("country", country.code))
 
         val result = route(application, request).value
 
