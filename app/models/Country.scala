@@ -236,7 +236,7 @@ object Country {
         country =>
           SelectItemViewModel(
             value = country.code,
-            text  = country.message
+            text  = country.name
           )
       }
 }
