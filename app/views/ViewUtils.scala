@@ -26,7 +26,7 @@ object ViewUtils {
 
   def title(form: Form[_], title: String, section: Option[String] = None)(implicit messages: Messages): String =
     titleNoForm(
-      title   = s"${errorPrefix(form)} ${messages(title)}",
+      title = s"${errorPrefix(form)} ${messages(title)}",
       section = section
     )
 
@@ -37,7 +37,7 @@ object ViewUtils {
     if (form.hasErrors || form.hasGlobalErrors) messages("error.title.prefix") else ""
   }
 
-  def formatUkAddress(ukAddress: UkAddress) =
+  def formatUkAddress(ukAddress: UkAddress): String =
     formatAddress(Address(
       ukAddress.line1,
       ukAddress.line2,
@@ -46,16 +46,16 @@ object ViewUtils {
       Some(ukAddress.postCode),
       Country.unitedKingdom.code
     ))
-
-    def formatInternationalAddress(internationalAddress: InternationalAddress) =
-      formatAddress(Address(
-        internationalAddress.line1,
-        internationalAddress.line2,
-        Some(internationalAddress.city),
-        internationalAddress.region,
-        internationalAddress.postal,
-        internationalAddress.country.code
-      ))
+    
+  def formatInternationalAddress(internationalAddress: InternationalAddress): String =
+    formatAddress(Address(
+      internationalAddress.line1,
+      internationalAddress.line2,
+      Some(internationalAddress.city),
+      internationalAddress.region,
+      internationalAddress.postal,
+      internationalAddress.country.code
+    ))
 
   def formatAddress(address: Address): String = {
     val code = address.countryCode
