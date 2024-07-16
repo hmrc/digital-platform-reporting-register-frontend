@@ -31,7 +31,7 @@ case object SoleTraderNamePage extends QuestionPage[SoleTraderName] {
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
     answers.registrationResponse.map {
       case _: MatchResponseWithId => routes.DetailsMatchedController.onPageLoad()
-      case _: AlreadySubscribedResponse => routes.IndexController.onPageLoad() //TODO: update when REG-KO-3 content is confirmed
+      case _: AlreadySubscribedResponse => routes.IndexController.onPageLoad() //TODO: update when REG-KO-7 page created
       case _ => answers.get(BusinessTypePage).map {
         case BusinessType.SoleTrader => routes.SoleTraderDetailsNotMatchController.onPageLoad()
         case _ => routes.IndexController.onPageLoad() //TODO: update to kickout page when created

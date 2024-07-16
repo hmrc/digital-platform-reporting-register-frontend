@@ -194,4 +194,6 @@ POST       /registration/change-business-address            controllers.Business
 
 GET        /registration/business-details-not-match             controllers.BusinessDetailsDoNotMatchController.onPageLoad()
 
-GET        /registration/business-details-match-other               controllers.BusinessDetailsMatchOtherController.onPageLoad()
+GET        /registration/business-details-match-other           controllers.BusinessDetailsMatchOtherController.onPageLoad()
+
+GET        /registration/business-already-registered            controllers.BusinessAlreadyRegisteredController.onPageLoad()

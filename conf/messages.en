@@ -424,3 +424,10 @@ businessDetailsMatchOther.heading = You’re unable to use this service with the
 businessDetailsMatchOther.p1 = You have signed in with details that are linked to the following business details:
 businessDetailsMatchOther.p2 = If you want to register a different business for reporting, you must
 businessDetailsMatchOther.p2.link.text = use the HMRC sign in details for the business you wish to register.
+
+businessAlreadyRegistered.title = Your business is already registered to use this service
+businessAlreadyRegistered.heading = Your business is already registered to use this service
+businessAlreadyRegistered.p1 = You’ll need to sign in using the sign in details that were used when you registered for this service.
+businessAlreadyRegistered.p2 = If you need to request access to the service, you will need to contact your administrator to give you access via the ‘Manage account’ settings within their
+businessAlreadyRegistered.p2.link.text = business tax account.
+businessAlreadyRegistered.p3.link.text = Try signing in again

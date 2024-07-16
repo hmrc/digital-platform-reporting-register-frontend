@@ -32,25 +32,32 @@ class BusinessNamePageSpec extends AnyFreeSpec with Matchers with TryValues with
     val noResponseAnswer = emptyAnswers.copy(registrationResponse = Some(NoMatchResponse()))
 
     "in Normal Mode" - {
-      //TODO: update test when REG-KO-3 content is confirmed
-      "ETMP returns match & account already registered" in {
+      "ETMP returns match & account already registered leads to BusinessAlreadyRegistered" in {
         val alreadySubscribedAnswer = emptyAnswers.copy(registrationResponse = Some(AlreadySubscribedResponse()))
-        BusinessNamePage.nextPage(NormalMode, alreadySubscribedAnswer) mustEqual routes.IndexController.onPageLoad()
+        BusinessNamePage.nextPage(NormalMode, alreadySubscribedAnswer) mustEqual routes.BusinessAlreadyRegisteredController.onPageLoad()
       }
 
-      "ETMP returns match & account not already registered" in {
+      "ETMP returns match & account not already registered leads to DetailsMatched" in {
         val responseAnswer = emptyAnswers.copy(registrationResponse = Some(MatchResponseWithId("Id", address, Some("name"))))
         BusinessNamePage.nextPage(NormalMode, responseAnswer) mustEqual routes.DetailsMatchedController.onPageLoad()
       }
 
-      "ETMP returns no match & user Sole Trader" in {
+      "ETMP returns no match & user Sole Trader leads to SoleTraderDetailsNotMatch" in {
         val answers = noResponseAnswer.set(BusinessTypePage, BusinessType.SoleTrader).success.value
         BusinessNamePage.nextPage(NormalMode, answers) mustEqual routes.SoleTraderDetailsNotMatchController.onPageLoad()
       }
 
-      "ETMP returns no match & user not Sole Trader" in {
+      "ETMP returns no match & user not Sole Trader leads to BusinessDetailsDoNotMatch" in {
         val answers = noResponseAnswer.set(BusinessTypePage, BusinessType.Partnership).success.value
         BusinessNamePage.nextPage(NormalMode, answers) mustEqual routes.BusinessDetailsDoNotMatchController.onPageLoad()
+      }
+
+      "Response not matched & User has no businessType leads to JourneyRecovery" in {
+        BusinessNamePage.nextPage(NormalMode, noResponseAnswer) mustEqual routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "No response leads to JourneyRecovery" in {
+        BusinessNamePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
     }
 
