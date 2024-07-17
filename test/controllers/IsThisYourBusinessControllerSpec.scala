@@ -61,8 +61,6 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val address = ViewUtils.formatAddress(businessAddress)
-        
         val request = FakeRequest(GET, isThisYourBusinessRoute)
 
         val result = route(application, request).value
@@ -70,7 +68,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
         val view = application.injector.instanceOf[IsThisYourBusinessView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, businessName, address, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, businessName, businessAddress, NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -82,8 +80,6 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val address = ViewUtils.formatAddress(businessAddress)
-
         val request = FakeRequest(GET, isThisYourBusinessRoute)
 
         val view = application.injector.instanceOf[IsThisYourBusinessView]
@@ -91,7 +87,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), businessName, address, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), businessName, businessAddress, NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -127,8 +123,6 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val address = ViewUtils.formatAddress(businessAddress)
-
         val request =
           FakeRequest(POST, isThisYourBusinessRoute)
             .withFormUrlEncodedBody(("value", ""))
@@ -140,7 +134,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, businessName, address, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, businessName, businessAddress, NormalMode)(request, messages(application)).toString
       }
     }
 

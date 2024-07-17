@@ -29,7 +29,8 @@ object Country {
 
   implicit val format: OFormat[Country] = Json.format[Country]
 
-  val unitedKingdom = Country("GB", "United Kingdom")
+  val unitedKingdom: Country =
+    Country("GB", "United Kingdom")
   
   val allCountries: Seq[Country] = Seq(
     Country("AF", "Afghanistan"),

@@ -19,6 +19,7 @@ package controllers
 import controllers.actions.*
 import forms.IsThisYourBusinessFormProvider
 import models.Mode
+import models.registration.Address
 import models.registration.responses.MatchResponseWithId
 import models.requests.DataRequest
 import pages.IsThisYourBusinessPage
@@ -71,11 +72,11 @@ class IsThisYourBusinessController @Inject()(
       )
   }
 
-  private def showPage(page: (String, String) => Result)(implicit request: DataRequest[AnyContent]): Result = {
+  private def showPage(page: (String, Address) => Result)(implicit request: DataRequest[AnyContent]): Result = {
     request.userAnswers.registrationResponse match {
       case Some(r) => r match {
         case r: MatchResponseWithId => r.organisationName match {
-          case Some(name) => page(name, ViewUtils.formatAddress(r.address))
+          case Some(name) => page(name, r.address)
           case _          => error
         }
         case _                      => error
