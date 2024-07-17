@@ -33,7 +33,7 @@ object ViewUtils {
   def titleNoForm(title: String, section: Option[String] = None)(implicit messages: Messages): String =
     s"${messages(title)} - ${section.fold("")(messages(_) + " - ")}${messages("service.name")} - ${messages("site.govuk")}"
 
-  def errorPrefix(form: Form[_])(implicit messages: Messages): String = {
+  private def errorPrefix(form: Form[_])(implicit messages: Messages): String = {
     if (form.hasErrors || form.hasGlobalErrors) messages("error.title.prefix") else ""
   }
 
@@ -68,7 +68,7 @@ object ViewUtils {
       formatLine(Country.allCountries.find(_.code == code).map(_.name).getOrElse(code))
     )
 
-    lines.flatten.map(HtmlFormat.escape(_)).mkString("<br/>")
+    lines.flatten.map(HtmlFormat.escape).mkString("<br/>")
   }
 
   private def formatLine(line: Option[String]): Option[String] =
