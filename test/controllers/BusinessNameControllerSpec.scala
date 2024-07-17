@@ -90,6 +90,7 @@ class BusinessNameControllerSpec extends SpecBase with MockitoSugar {
         emptyUserAnswers
           .set(UtrPage, "123").success.value
           .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+          .copy(registrationResponse = Some(NoMatchResponse()))
 
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))

@@ -326,3 +326,15 @@ seocndaryContactPhoneNumber.checkYourAnswersLabel = seocndaryContactPhoneNumber
 seocndaryContactPhoneNumber.error.required = Enter seocndaryContactPhoneNumber
 seocndaryContactPhoneNumber.error.length = SeocndaryContactPhoneNumber must be 24 characters or less
 seocndaryContactPhoneNumber.change.hidden = SeocndaryContactPhoneNumber
+
+soleTraderDetailsNotMatch.title = The details you entered did not match our records
+soleTraderDetailsNotMatch.heading = The details you entered did not match our records
+soleTraderDetailsNotMatch.p1 = To help us find your business, check if you have entered the right details.
+soleTraderDetailsNotMatch.p2 = Try entering your UTR again
+soleTraderDetailsNotMatch.p3 = If entering your UTR again does not work, you can
+soleTraderDetailsNotMatch.p3.link.text = find a lost UTR.
+soleTraderDetailsNotMatch.p4 = Try entering your name again
+soleTraderDetailsNotMatch.p5 = Check if you have entered your first name and last name correctly.
+soleTraderDetailsNotMatch.p6 = Contact HMRC to help us find your business
+soleTraderDetailsNotMatch.p7.1 = If you have checked and entered your UTR and name again and we still cannot find your business, then email
+soleTraderDetailsNotMatch.p7.2 = for help.

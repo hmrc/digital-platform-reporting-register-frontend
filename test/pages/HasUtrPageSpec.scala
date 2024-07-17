@@ -48,7 +48,7 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
               .set(HasUtrPage, false).success.value
               .set(BusinessTypePage, businessType).success.value
 
-            HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.BusinessNameController.onPageLoad(NormalMode)
+            HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
           }
         }
 

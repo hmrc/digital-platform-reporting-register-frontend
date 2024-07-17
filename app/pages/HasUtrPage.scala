@@ -42,7 +42,7 @@ case object HasUtrPage extends QuestionPage[Boolean] {
             }.getOrElse(routes.HasNinoController.onPageLoad(NormalMode))
 
           case _ =>
-            routes.BusinessNameController.onPageLoad(NormalMode)
+            routes.IndexController.onPageLoad() //TODO: update navigation when page created
 
         }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
     }.getOrElse(routes.JourneyRecoveryController.onPageLoad())

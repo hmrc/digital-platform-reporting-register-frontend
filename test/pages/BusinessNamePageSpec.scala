@@ -17,26 +17,48 @@
 package pages
 
 import controllers.routes
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.registration.Address
+import models.registration.responses.{MatchResponseWithId, NoMatchResponse}
+import models.{BusinessType, CheckMode, NormalMode, UserAnswers}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{OptionValues, TryValues}
 
-class BusinessNamePageSpec extends AnyFreeSpec with Matchers {
+class BusinessNamePageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
-    
     val emptyAnswers = UserAnswers("id", None)
-    
-    "in Normal Mode" - {
-      
-      "must go to Index" in {
+    val address = Address("line 1", None, None, None, None, "GB")
+    val responseAnswer = emptyAnswers.copy(registrationResponse = Some(MatchResponseWithId("Id", address, Some("name"))))
+    val noResponseAnswer = emptyAnswers.copy(registrationResponse = Some(NoMatchResponse()))
 
-        BusinessNamePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.IndexController.onPageLoad()
+    "in Normal Mode" - {
+
+      //TODO: update test when navigation sorted
+      "ETMP returns match & account already registered" in {
+        val answers = responseAnswer.set(BusinessTypePage, BusinessType.Partnership).success.value
+        
+        BusinessNamePage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
+      }
+      //TODO: update test when navigation sorted
+      "ETMP returns match & account not already registered" in {
+        BusinessNamePage.nextPage(NormalMode, responseAnswer) mustEqual routes.IndexController.onPageLoad()
+      }
+      "ETMP returns no match & user Sole Trader" in {
+        val answers = noResponseAnswer.set(BusinessTypePage, BusinessType.SoleTrader).success.value
+
+        BusinessNamePage.nextPage(NormalMode, answers) mustEqual routes.SoleTraderDetailsNotMatchController.onPageLoad()
+      }
+      //TODO: update test when page created
+      "ETMP returns no match & user not Sole Trader" in {
+        val answers = noResponseAnswer.set(BusinessTypePage, BusinessType.Partnership).success.value
+
+        BusinessNamePage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
       }
     }
-    
+
     "in Check Mode" - {
-      
+
       "must go to Check Answers" in {
 
         BusinessNamePage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
