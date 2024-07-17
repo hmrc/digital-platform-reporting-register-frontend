@@ -37,11 +37,11 @@ class DateOfBirthPageSpec extends AnyFreeSpec with Matchers with TryValues {
         DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
       }
 
-      "must go to Is UK Address if NINO absent" in {
+      "must go to live-in-uk page if NINO absent" in {
 
         val answers = emptyAnswers.set(HasNinoPage, false).success.value
 
-        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.UkAddressController.onPageLoad(NormalMode)
+        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.AddressInUkController.onPageLoad(NormalMode)
       }
 
       "must go to error page if no data" in {

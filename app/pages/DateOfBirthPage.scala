@@ -32,7 +32,7 @@ case object DateOfBirthPage extends QuestionPage[LocalDate] {
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
     answers.get(HasNinoPage) match {
       case Some(true)  => routes.IndexController.onPageLoad()
-      case Some(false) => routes.UkAddressController.onPageLoad(NormalMode)
+      case Some(false) => routes.AddressInUkController.onPageLoad(NormalMode)
       case None        => routes.JourneyRecoveryController.onPageLoad()
     }
 }
