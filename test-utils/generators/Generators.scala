@@ -16,11 +16,12 @@
 
 package generators
 
-import java.time.{Instant, LocalDate, ZoneOffset}
-
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Gen._
+import org.scalacheck.Arbitrary.*
+import org.scalacheck.Gen.*
 import org.scalacheck.{Gen, Shrink}
+
+import java.time.{Instant, LocalDate, ZoneOffset}
+import scala.util.matching.Regex
 
 trait Generators extends ModelGenerators {
 
@@ -109,6 +110,11 @@ trait Generators extends ModelGenerators {
 
   def stringsExceptSpecificValues(excluded: Seq[String]): Gen[String] =
     nonEmptyString suchThat (!excluded.contains(_))
+
+  def stringsThatDoNotMatchRegex(regex: String): Gen[String] = {
+    val pattern = Regex(regex)
+    nonEmptyString suchThat (!pattern.matches(_))
+  }
 
   def oneOf[T](xs: Seq[Gen[T]]): Gen[T] =
     if (xs.isEmpty) {

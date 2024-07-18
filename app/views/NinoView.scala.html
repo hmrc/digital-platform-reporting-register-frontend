@@ -43,8 +43,9 @@
                 field = form("value"),
                 label = LabelViewModel(messages("nino.heading")).withCssClass("govuk-visually-hidden")
             )
-            .withWidth(Full)
+            .withWidth(Fixed10)
             .withHint(HintViewModel(messages("nino.hint")))
+            .withSpellcheck(false)
         )
 
         @govukButton(
