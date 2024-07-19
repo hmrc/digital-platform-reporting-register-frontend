@@ -19,8 +19,8 @@ object $className$ extends Enumerable.Implicits {
     case (value, index) =>
       RadioItem(
         content = Text(messages(s"$className;format="decap"$.\${value.toString}")),
-        value   = Some(value.toString),
-        id      = Some(s"value_\$index")
+        value = Some(value.toString),
+        id = Some(s"value_\$index")
       )
   }
 

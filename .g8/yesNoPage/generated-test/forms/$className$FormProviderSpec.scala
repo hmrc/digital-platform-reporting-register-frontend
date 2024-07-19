@@ -5,23 +5,22 @@ import play.api.data.FormError
 
 class $className$FormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "$className;format="decap"$.error.required"
-  val invalidKey = "error.boolean"
+  private val requiredKey = "$className;format="decap"$.error.required"
+  private val invalidKey = "error.boolean"
 
-  val form = new $className$FormProvider()()
+  private val underTest = new $className$FormProvider()()
 
   ".value" - {
-
     val fieldName = "value"
 
     behave like booleanField(
-      form,
+      underTest,
       fieldName,
       invalidError = FormError(fieldName, invalidKey)
     )
 
     behave like mandatoryField(
-      form,
+      underTest,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
