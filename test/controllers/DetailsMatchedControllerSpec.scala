@@ -18,20 +18,17 @@ package controllers
 
 import base.SpecBase
 import models.NormalMode
-import org.mockito.ArgumentMatchers.any
+import org.scalatestplus.mockito.MockitoSugar
 import pages.DetailsMatchedPage
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.DetailsMatchedView
 import repositories.SessionRepository
-import play.api.inject.bind
-import org.scalatestplus.mockito.MockitoSugar
-
-import scala.concurrent.Future
+import views.html.DetailsMatchedView
 
 class DetailsMatchedControllerSpec extends SpecBase with MockitoSugar {
 
-  lazy val detailsMatchedRoute = routes.DetailsMatchedController.onPageLoad().url
+  private lazy val detailsMatchedRoute = routes.DetailsMatchedController.onPageLoad().url
 
   "DetailsMatched Controller" - {
 

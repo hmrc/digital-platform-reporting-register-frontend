@@ -16,11 +16,31 @@
 
 package models.registration.requests
 
+import cats.data.*
+import cats.implicits.*
+import models.{UserAnswers, Utr}
+import pages.{BusinessNamePage, BusinessTypePage, UtrPage}
 import play.api.libs.json.{JsObject, Json, OWrites}
+import queries.Query
 
 final case class OrganisationWithUtr(utr: String, details: Option[OrganisationDetails]) extends RegistrationRequest
 
 object OrganisationWithUtr {
+
+  def build(answers: UserAnswers): EitherNec[Query, OrganisationWithUtr] =
+    answers.taxIdentifier.map {
+      case Utr(utr) => Right(OrganisationWithUtr(utr, None))
+      case _ => buildWithDetails(answers)
+    }.getOrElse(buildWithDetails(answers))
+
+  private def buildWithDetails(answers: UserAnswers): EitherNec[Query, OrganisationWithUtr] =
+    (
+      answers.getEither(UtrPage),
+      answers.getEither(BusinessTypePage),
+      answers.getEither(BusinessNamePage)
+    ).parMapN { (utr, businessType, name) =>
+      OrganisationWithUtr(utr, Some(OrganisationDetails(name, businessType)))
+    }
 
   implicit lazy val writes: OWrites[OrganisationWithUtr] = new OWrites[OrganisationWithUtr] {
     override def writes(o: OrganisationWithUtr): JsObject = {

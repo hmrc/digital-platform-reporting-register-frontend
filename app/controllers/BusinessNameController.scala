@@ -16,38 +16,38 @@
 
 package controllers
 
+import connectors.RegistrationConnector
 import controllers.actions._
 import forms.BusinessNameFormProvider
 import javax.inject.Inject
-import models.Mode
+import models.{Mode, UserAnswers}
+import models.registration.requests.OrganisationWithUtr
+import models.registration.responses.RegistrationResponse
 import pages.BusinessNamePage
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.BusinessNameView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessNameController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: BusinessNameFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: BusinessNameView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
-  val form = formProvider()
+class BusinessNameController @Inject()(sessionRepository: SessionRepository,
+                                       identify: IdentifierAction,
+                                       getData: DataRetrievalAction,
+                                       requireData: DataRequiredAction,
+                                       formProvider: BusinessNameFormProvider,
+                                       view: BusinessNameView,
+                                       registrationConnector: RegistrationConnector)
+                                      (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  extends FrontendController(mcc) with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(BusinessNamePage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+        case None => formProvider()
+        case Some(value) => formProvider().fill(value)
       }
 
       Ok(view(preparedForm, mode))
@@ -56,15 +56,22 @@ class BusinessNameController @Inject()(
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessNamePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
+            updatedAnswers   <- Future.fromTry(request.userAnswers.set(BusinessNamePage, value))
+            registerResponse <- register(updatedAnswers)
+            fullAnswers      = updatedAnswers.copy(registrationResponse = Some(registerResponse))
+            _                <- sessionRepository.set(fullAnswers)
           } yield Redirect(BusinessNamePage.nextPage(mode, updatedAnswers))
       )
   }
+
+  private def register(answers: UserAnswers)(implicit request: Request[_]): Future[RegistrationResponse] =
+    OrganisationWithUtr.build(answers)
+      .fold(
+        errors => Future.failed(Exception(s"Unable to build registration request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
+        details => registrationConnector.register(details)
+      )
 }

@@ -44,12 +44,16 @@ class RegistrationRequestSpec extends AnyFreeSpec with Matchers {
 
     "must write an individual with UTR request" in {
 
-      val request: RegistrationRequest = IndividualWithUtr("123", None)
+      val request: RegistrationRequest = IndividualWithUtr("123", IndividualDetails("first", "last"))
       val json = Json.toJson(request)
 
       json mustEqual Json.obj(
         "type" -> "individual",
-        "utr" -> "123"
+        "utr" -> "123",
+        "details" -> Json.obj(
+          "firstName" -> "first",
+          "lastName" -> "last"
+        )
       )
     }
 

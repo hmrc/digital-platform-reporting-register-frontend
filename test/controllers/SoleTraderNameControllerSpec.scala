@@ -17,15 +17,19 @@
 package controllers
 
 import base.SpecBase
+import connectors.RegistrationConnector
 import forms.SoleTraderNameFormProvider
-import models.{NormalMode, SoleTraderName}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import models.registration.requests.{IndividualDetails, IndividualWithUtr}
+import models.registration.responses.NoMatchResponse
+import models.{NormalMode, SoleTraderName, UserAnswers}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.SoleTraderNamePage
+import pages.{SoleTraderNamePage, UtrPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.SoleTraderNameView
 
@@ -33,12 +37,12 @@ import scala.concurrent.Future
 
 class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new SoleTraderNameFormProvider()
-  val form = formProvider()
+  private val formProvider = new SoleTraderNameFormProvider()
+  private val form = formProvider()
 
-  lazy val soleTraderNameRoute = routes.SoleTraderNameController.onPageLoad(NormalMode).url
+  private lazy val soleTraderNameRoute = routes.SoleTraderNameController.onPageLoad(NormalMode).url
 
-  val userAnswers = emptyUserAnswers.set(SoleTraderNamePage, SoleTraderName("value 1", "value 2")).success.value
+  private val userAnswers = emptyUserAnswers.set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
 
   "SoleTraderName Controller" - {
 
@@ -70,30 +74,51 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(SoleTraderName("value 1", "value 2")), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(SoleTraderName("first", "last")), NormalMode)(request, messages(application)).toString
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page and store the registration result when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockConnector = mock[RegistrationConnector]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockConnector.register(any())(any())) thenReturn Future.successful(NoMatchResponse())
 
+      val baseAnswers = emptyUserAnswers.set(UtrPage, "123").success.value
+      
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        applicationBuilder(userAnswers = Some(baseAnswers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[RegistrationConnector].toInstance(mockConnector)
+          )
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, soleTraderNameRoute)
-            .withFormUrlEncodedBody(("firstName", "value 1"), ("lastName", "value 2"))
+            .withFormUrlEncodedBody(("firstName", "first"), ("lastName", "last"))
 
+        val expectedRegistrationRequest = IndividualWithUtr("123", IndividualDetails("first", "last"))
+        
+        val expectedAnswers =
+          baseAnswers
+            .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
+            .copy(registrationResponse = Some(NoMatchResponse()))
+
+        val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual SoleTraderNamePage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual SoleTraderNamePage.nextPage(NormalMode, expectedAnswers).url
+        verify(mockConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
+        verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+
+        val savedAnswers = answersCaptor.getValue
+        savedAnswers.registrationResponse.value mustEqual NoMatchResponse()
       }
     }
 
@@ -138,7 +163,7 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, soleTraderNameRoute)
-            .withFormUrlEncodedBody(("firstName", "value 1"), ("lastName", "value 2"))
+            .withFormUrlEncodedBody(("firstName", "first"), ("lastName", "last"))
 
         val result = route(application, request).value
 

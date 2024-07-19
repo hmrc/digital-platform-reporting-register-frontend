@@ -18,15 +18,14 @@ package controllers
 
 import base.SpecBase
 import forms.UkAddressFormProvider
-import models.{NormalMode, UkAddress, UserAnswers}
+import models.{NormalMode, UkAddress}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.UkAddressPage
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.UkAddressView
 
@@ -34,20 +33,17 @@ import scala.concurrent.Future
 
 class UkAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new UkAddressFormProvider()
-  val form = formProvider()
-
-  lazy val ukAddressRoute = routes.UkAddressController.onPageLoad(NormalMode).url
-
-  val validUkAddress = UkAddress(
+  private val formProvider = new UkAddressFormProvider()
+  private val form = formProvider()
+  private lazy val ukAddressRoute = routes.UkAddressController.onPageLoad(NormalMode).url
+  private val validUkAddress = UkAddress(
     "## Some Street",
     None,
     "Miasto",
     Some("Narnia"),
     "??## #??"
   )
-
-  val userAnswers = emptyUserAnswers.set(UkAddressPage, validUkAddress).success.value
+  private val userAnswers = emptyUserAnswers.set(UkAddressPage, validUkAddress).success.value
 
   private def getParam(key: String, value: Option[String]) =
     Seq(value.map(key -> _))
@@ -100,10 +96,10 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val params =
           getParam("line1", Some(validUkAddress.line1)) ++
-          getParam("line2", validUkAddress.line2) ++
-          getParam("town", Some(validUkAddress.town)) ++
-          getParam("county", validUkAddress.county) ++
-          getParam("postCode", Some(validUkAddress.postCode))
+            getParam("line2", validUkAddress.line2) ++
+            getParam("town", Some(validUkAddress.town)) ++
+            getParam("county", validUkAddress.county) ++
+            getParam("postCode", Some(validUkAddress.postCode))
 
         val request =
           FakeRequest(POST, ukAddressRoute)
