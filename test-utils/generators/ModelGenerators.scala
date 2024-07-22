@@ -63,11 +63,11 @@ trait ModelGenerators {
 
   implicit lazy val arbitraryBusinessType: Arbitrary[BusinessType] =
     Arbitrary {
-      Gen.oneOf(BusinessType.values.toSeq)
+      Gen.oneOf(BusinessType.values)
     }
 
   implicit lazy val arbitraryRegistrationType: Arbitrary[RegistrationType] =
     Arbitrary {
-      Gen.oneOf(RegistrationType.values.toSeq)
+      Gen.oneOf(RegistrationType.values)
     }
 }

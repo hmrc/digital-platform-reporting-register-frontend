@@ -6,22 +6,21 @@ import play.api.data.FormError
 
 class $className$FormProviderSpec extends OptionFieldBehaviours {
 
-  val form = new $className$FormProvider()()
+  private val underTest = new $className$FormProvider()()
 
   ".value" - {
-
     val fieldName = "value"
     val requiredKey = "$className;format="decap"$.error.required"
 
     behave like optionsField[$className$](
-      form,
+      underTest,
       fieldName,
-      validValues  = $className$.values,
+      validValues = $className$.values,
       invalidError = FormError(fieldName, "error.invalid")
     )
 
     behave like mandatoryField(
-      form,
+      underTest,
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )

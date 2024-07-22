@@ -9,13 +9,12 @@ import javax.inject.Inject
 
 class $className$FormProvider @Inject() extends Mappings {
 
-  def apply()(implicit messages: Messages): Form[LocalDate] =
-    Form(
-      "value" -> localDate(
-        invalidKey     = "$className;format="decap"$.error.invalid",
-        allRequiredKey = "$className;format="decap"$.error.required.all",
-        twoRequiredKey = "$className;format="decap"$.error.required.two",
-        requiredKey    = "$className;format="decap"$.error.required"
-      )
+  def apply()(implicit messages: Messages): Form[LocalDate] = Form(
+    "value" -> localDate(
+      invalidKey = "$className;format="decap"$.error.invalid",
+      allRequiredKey = "$className;format="decap"$.error.required.all",
+      twoRequiredKey = "$className;format="decap"$.error.required.two",
+      requiredKey = "$className;format="decap"$.error.required"
     )
+  )
 }

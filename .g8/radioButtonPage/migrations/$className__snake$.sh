@@ -28,7 +28,7 @@ awk '/trait ModelGenerators/ {\
     print "";\
     print "  implicit lazy val arbitrary$className$: Arbitrary[$className$] =";\
     print "    Arbitrary {";\
-    print "      Gen.oneOf($className$.values.toSeq)";\
+    print "      Gen.oneOf($className$.values)";\
     print "    }";\
     next }1' ../test-utils/generators/ModelGenerators.scala > tmp && mv tmp ../test-utils/generators/ModelGenerators.scala
 

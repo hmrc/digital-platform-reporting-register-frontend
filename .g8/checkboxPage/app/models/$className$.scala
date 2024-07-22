@@ -3,7 +3,7 @@ package models
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import viewmodels.govuk.checkbox._
+import viewmodels.govuk.checkbox.*
 
 sealed trait $className$
 
@@ -17,16 +17,15 @@ object $className$ extends Enumerable.Implicits {
     $option2key;format="Camel"$
   )
 
-  def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =
-    values.zipWithIndex.map {
-      case (value, index) =>
-        CheckboxItemViewModel(
-          content = Text(messages(s"$className;format="decap"$.\${value.toString}")),
-          fieldId = "value",
-          index   = index,
-          value   = value.toString
-        )
-    }
+  def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] = values.zipWithIndex.map {
+    case (value, index) =>
+      CheckboxItemViewModel(
+        content = Text(messages(s"$className;format="decap"$.\${value.toString}")),
+        fieldId = "value",
+        index = index,
+        value = value.toString
+      )
+  }
 
   implicit val enumerable: Enumerable[$className$] =
     Enumerable(values.map(v => v.toString -> v): _*)

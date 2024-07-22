@@ -1,3 +1,5 @@
+@import models.pageviews.$className$ViewModel
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -6,19 +8,19 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(viewModel: $className$ViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("$className;format="decap"$.title"))) {
+@layout(pageTitle = title(viewModel.form, messages("$className;format="decap"$.title"))) {
 
-    @formHelper(action = routes.$className$Controller.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.$className$Controller.onSubmit(viewModel.mode), Symbol("autoComplete") -> "off") {
 
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value.day")))
+        @if(viewModel.form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(viewModel.form, errorLinkOverrides = Map("value" -> "value.day")))
         }
 
         @govukDateInput(
             DateViewModel(
-                field  = form("value"),
+                field  = viewModel.form("value"),
                 legend = LegendViewModel(messages("$className;format="decap"$.heading")).asPageHeading()
             )
             .withHint(HintViewModel(messages("$className;format="decap"$.hint")))
