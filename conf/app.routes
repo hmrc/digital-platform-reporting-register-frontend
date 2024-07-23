@@ -22,7 +22,7 @@ GET         /unauthorised                                controllers.Unauthorise
 
 GET        /registration/agent                           controllers.CannotUseServiceAgentController.onPageLoad()
 
-GET        /registration/non-administrator               controllers.CannotUseServiceAssistantController.onPageLoad()
+GET        /registration/non-admin-sign-in               controllers.CannotUseServiceAssistantController.onPageLoad()
 
 GET        /registration/eligibility                     controllers.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode)
 POST       /registration/eligibility                     controllers.RegistrationTypeController.onSubmit(mode: Mode = NormalMode)
