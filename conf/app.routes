@@ -24,10 +24,10 @@ GET        /registration/agent-sign-in                   controllers.CannotUseSe
 
 GET        /registration/non-admin-sign-in               controllers.CannotUseServiceAssistantController.onPageLoad()
 
-GET        /registration/eligibility                     controllers.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode)
-POST       /registration/eligibility                     controllers.RegistrationTypeController.onSubmit(mode: Mode = NormalMode)
-GET        /registration/change-eligibility              controllers.RegistrationTypeController.onPageLoad(mode: Mode = CheckMode)
-POST       /registration/change-eligibility              controllers.RegistrationTypeController.onSubmit(mode: Mode = CheckMode)
+GET        /registration/user-type                       controllers.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/user-type                       controllers.RegistrationTypeController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-user-type                controllers.RegistrationTypeController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-user-type                controllers.RegistrationTypeController.onSubmit(mode: Mode = CheckMode)
 
 GET        /registration/reporting-user-type             controllers.BusinessTypeController.onPageLoad(mode: Mode = NormalMode)
 POST       /registration/reporting-user-type             controllers.BusinessTypeController.onSubmit(mode: Mode = NormalMode)

@@ -70,7 +70,7 @@ registrationType.platformOperator.hint = You manage or work within a website or 
 registrationType.thirdParty = A third party reporting on behalf of a digital platform
 registrationType.thirdParty.hint = You could be an agent, accountant, solicitor, or other third party reporting for a Digital Platform Operator.
 registrationType.checkYourAnswersLabel = What are you registering for this service as?
-registrationType.error.required = Select what you are registering for this service as
+registrationType.error.required = Select if you are a Digital Platform Operator or a third party
 registrationType.change.hidden = what you are registering for this service as
 
 businessType.title.platformOperator = What type of business are you?
