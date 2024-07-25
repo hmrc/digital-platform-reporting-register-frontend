@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.aUserAnswers
 import forms.SecondaryContactNameFormProvider
 import models.NormalMode
 import models.RegistrationType.ThirdParty

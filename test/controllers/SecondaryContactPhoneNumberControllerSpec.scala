@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.aUserAnswers
 import forms.SecondaryContactPhoneNumberFormProvider
 import models.NormalMode
 import models.pageviews.SecondaryContactPhoneNumberViewModel

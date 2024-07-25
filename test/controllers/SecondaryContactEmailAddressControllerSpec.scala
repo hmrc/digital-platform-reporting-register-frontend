@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.aUserAnswers
 import forms.SecondaryContactEmailAddressFormProvider
 import models.NormalMode
 import models.pageviews.SecondaryContactEmailAddressViewModel
@@ -56,14 +55,14 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = baseAnswers.set(SecondaryContactEmailAddressPage, "answer").success.value
+      val userAnswers = baseAnswers.set(SecondaryContactEmailAddressPage, "foo@example.com").success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, secondaryContactEmailAddressRoute)
         val view = application.injector.instanceOf[SecondaryContactEmailAddressView]
         val result = route(application, request).value
-        val viewModel = SecondaryContactEmailAddressViewModel(NormalMode, baseAnswers, form.fill("answer"), anyName)
+        val viewModel = SecondaryContactEmailAddressViewModel(NormalMode, baseAnswers, form.fill("foo@example.com"), anyName)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -81,7 +80,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
 
       running(application) {
         val request = FakeRequest(POST, secondaryContactEmailAddressRoute)
-          .withFormUrlEncodedBody(("value", "answer"))
+          .withFormUrlEncodedBody(("value", "foo@example.com"))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -122,7 +121,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
 
       running(application) {
         val request = FakeRequest(POST, secondaryContactEmailAddressRoute)
-          .withFormUrlEncodedBody(("value", "answer"))
+          .withFormUrlEncodedBody(("value", "foo@example.com"))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
