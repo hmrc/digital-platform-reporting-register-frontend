@@ -16,15 +16,19 @@
 
 package forms
 
-import forms.mappings.Mappings
+import forms.common.PhoneNumberMapping
 import play.api.data.Form
+import play.api.i18n.Messages
 
 import javax.inject.Inject
 
-class SecondaryContactPhoneNumberFormProvider @Inject() extends Mappings {
+class SecondaryContactPhoneNumberFormProvider @Inject() extends PhoneNumberMapping {
 
-  def apply(contactName: String): Form[String] = Form(
-    "value" -> text("secondaryContactPhoneNumber.error.required", Seq(contactName))
-      .verifying(maxLength(24, "secondaryContactPhoneNumber.error.length", Seq(contactName)))
+  def apply(contactName: String)(implicit messages: Messages): Form[String] = Form(
+    "value" -> phoneNumber(
+      requiredKey = "secondaryContactPhoneNumber.error.required",
+      formatKey = "secondaryContactPhoneNumber.error.format",
+      args = Seq(contactName)
+    )
   )
 }

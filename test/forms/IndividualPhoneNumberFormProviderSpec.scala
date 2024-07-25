@@ -17,13 +17,16 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import org.scalacheck.Gen
 import play.api.data.FormError
+import play.api.i18n.Messages
+import play.api.test.Helpers.stubMessages
 
 class IndividualPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
+  private implicit val msgs: Messages = stubMessages()
   private val requiredKey = "individualPhoneNumber.error.required"
-  private val lengthKey = "individualPhoneNumber.error.length"
-  private val maxLength = 24
+  private val formatKey = "individualPhoneNumber.error.format"
 
   private val underTest = new IndividualPhoneNumberFormProvider()()
 
@@ -33,14 +36,7 @@ class IndividualPhoneNumberFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       underTest,
       fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
-      underTest,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      Gen.oneOf("07777777777", "+1 (555) 000 0000", "07777 777777   ")
     )
 
     behave like mandatoryField(
@@ -48,5 +44,9 @@ class IndividualPhoneNumberFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "must fail to bind an invalid phone number" in {
+      underTest.bind(Map(fieldName -> "invalid")).error("value").value.message mustEqual formatKey
+    }
   }
 }

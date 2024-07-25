@@ -315,7 +315,6 @@ primaryContactPhoneNumber.heading = What is the telephone number for {0}?
 primaryContactPhoneNumber.hint = For international numbers, include the country code.
 primaryContactPhoneNumber.checkYourAnswersLabel = Telephone number
 primaryContactPhoneNumber.error.required = Enter the telephone number for {0}
-primaryContactPhoneNumber.error.length = Telephone number must be {0} characters or less
 primaryContactPhoneNumber.error.format = Enter a telephone number in the correct format, like 01632 960 001, 07700 900 982 or +44 808 157 0192.
 primaryContactPhoneNumber.change.hidden = the telephone number for {0}
 

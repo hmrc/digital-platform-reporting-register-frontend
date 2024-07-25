@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package forms
+package forms.common
 
-import forms.common.PhoneNumberMapping
-import play.api.data.Form
+import com.google.i18n.phonenumbers.PhoneNumberUtil
+import forms.mappings.Mappings
+import play.api.data.Mapping
 import play.api.i18n.Messages
 
-import javax.inject.Inject
+import scala.util.Try
 
-class IndividualPhoneNumberFormProvider @Inject() extends PhoneNumberMapping {
-
-  def apply()(implicit messages: Messages): Form[String] = Form(
-    "value" -> phoneNumber(
-      requiredKey = "individualPhoneNumber.error.required",
-      formatKey = "individualPhoneNumber.error.format"
-    )
-  )
+class PhoneNumberMapping extends Mappings {
+  def phoneNumber(requiredKey: String, formatKey: String, args: Seq[String] = Seq.empty)
+                 (implicit messages: Messages): Mapping[String] =
+    text(requiredKey, args = args)
+      .verifying(messages(formatKey, args: _*), isValid)
+      
+  private val util = PhoneNumberUtil.getInstance
+  
+  private def isValid(string: String): Boolean =
+    Try(util.isPossibleNumber(util.parse(string, "GB")))
+      .getOrElse(false)
 }
