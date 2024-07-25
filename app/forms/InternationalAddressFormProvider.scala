@@ -28,15 +28,15 @@ class InternationalAddressFormProvider @Inject() extends Mappings {
    def apply(): Form[InternationalAddress] = Form(
      mapping(
       "line1" -> text("internationalAddress.error.line1.required")
-        .verifying(maxLength(100, "internationalAddress.error.line1.length")),
+        .verifying(maxLength(35, "internationalAddress.error.line1.length")),
       "line2" -> optional(text("")
-        .verifying(maxLength(100, "internationalAddress.error.line2.length"))),
+        .verifying(maxLength(35, "internationalAddress.error.line2.length"))),
       "city" -> text("internationalAddress.error.city.required")
-        .verifying(maxLength(100, "internationalAddress.error.city.length")),
+        .verifying(maxLength(35, "internationalAddress.error.city.length")),
        "region" -> optional(text("")
-         .verifying(maxLength(100, "internationalAddress.error.region.length"))),
+         .verifying(maxLength(35, "internationalAddress.error.region.length"))),
        "postal" -> optional(text("")
-         .verifying(maxLength(100, "internationalAddress.error.postal.length"))),
+         .verifying(maxLength(10, "internationalAddress.error.postal.length"))),
        "country" -> text("internationalAddress.error.country.required")
          .verifying("internationalAddress.error.country.required", value => Country.internationalCountries.exists(_.code == value))
          .transform[Country](value => Country.internationalCountries.find(_.code == value).get, _.code)
