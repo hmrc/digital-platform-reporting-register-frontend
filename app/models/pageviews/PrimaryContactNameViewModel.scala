@@ -20,16 +20,17 @@ import models.{Mode, UserAnswers}
 import pages.PrimaryContactNamePage
 import play.api.data.Form
 
-case class PrimaryContactNameViewModel(mode: Mode, form: Form[String])
+case class PrimaryContactNameViewModel(mode: Mode, form: Form[String], showThirdPartyContent: Boolean)
 
 object PrimaryContactNameViewModel {
 
-  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[String]): PrimaryContactNameViewModel = {
+  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[String], showThirdPartyContent: Boolean): PrimaryContactNameViewModel = {
     val optAnswerValue = userAnswers.get(PrimaryContactNamePage)
 
     PrimaryContactNameViewModel(
       mode = mode,
-      form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue))
+      form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue)),
+      showThirdPartyContent = showThirdPartyContent
     )
   }
 }

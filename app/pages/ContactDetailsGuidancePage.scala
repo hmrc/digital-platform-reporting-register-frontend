@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import forms.mappings.Mappings
-import javax.inject.Inject
+import controllers.routes
+import models.{NormalMode, UserAnswers}
+import play.api.mvc.Call
 
-import play.api.data.Form
+case object ContactDetailsGuidancePage extends Page {
 
-class CanPhonePrimaryContactFormProvider @Inject() extends Mappings {
-
-  def apply(contactName: String): Form[Boolean] = Form(
-    "value" -> boolean("canPhonePrimaryContact.error.required", args = Seq(contactName))
-  )
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
+    routes.PrimaryContactNameController.onPageLoad(NormalMode)
 }

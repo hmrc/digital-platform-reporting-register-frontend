@@ -40,7 +40,8 @@
                 field = viewModel.form("value"),
                 label = LabelViewModel(messages("primaryContactPhoneNumber.heading")).asPageHeading()
             )
-            .withWidth(Full)
+            .withWidth(Fixed20)
+            .withHint(HintViewModel(content = messages("primaryContactPhoneNumber.hint")))
         )
 
         @govukButton(

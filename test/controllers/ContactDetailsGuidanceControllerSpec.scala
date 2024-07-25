@@ -17,8 +17,10 @@
 package controllers
 
 import base.SpecBase
+import models.NormalMode
+import pages.ContactDetailsGuidancePage
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import views.html.ContactDetailsGuidanceView
 
 class ContactDetailsGuidanceControllerSpec extends SpecBase {
@@ -34,6 +36,18 @@ class ContactDetailsGuidanceControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
+      }
+    }
+    
+    "must redirect to the next page for a POST" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.ContactDetailsGuidanceController.onSubmit().url)
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual ContactDetailsGuidancePage.nextPage(NormalMode, emptyUserAnswers).url
       }
     }
   }

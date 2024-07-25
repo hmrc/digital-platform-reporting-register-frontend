@@ -35,12 +35,19 @@
             @govukErrorSummary(ErrorSummaryViewModel(viewModel.form))
         }
 
+        <h1 class="govuk-heading-xl">@messages("primaryContactName.heading")</h1>
+
+        @if(viewModel.showThirdPartyContent) {
+            <p class="govuk-body">@messages("primaryContactName.p1.thirdParty")</p>
+        }
+
         @govukInput(
             InputViewModel(
                 field = viewModel.form("value"),
-                label = LabelViewModel(messages("primaryContactName.heading")).asPageHeading()
+                label = LabelViewModel(messages("primaryContactName.heading")).withCssClass("govuk-visually-hidden")
             )
             .withWidth(Full)
+            .withHint(HintViewModel(content = messages("primaryContactName.hint")))
         )
 
         @govukButton(

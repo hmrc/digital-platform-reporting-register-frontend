@@ -23,8 +23,8 @@ import javax.inject.Inject
 
 class PrimaryContactPhoneNumberFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] = Form(
-    "value" -> text("primaryContactPhoneNumber.error.required")
-      .verifying(maxLength(24, "primaryContactPhoneNumber.error.length"))
+  def apply(contactName: String): Form[String] = Form(
+    "value" -> text("primaryContactPhoneNumber.error.required", Seq(contactName))
+      .verifying(maxLength(24, "primaryContactPhoneNumber.error.length", Seq(contactName)))
   )
 }

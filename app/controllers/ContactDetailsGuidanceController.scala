@@ -17,6 +17,8 @@
 package controllers
 
 import controllers.actions.*
+import models.NormalMode
+import pages.ContactDetailsGuidancePage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -25,13 +27,17 @@ import views.html.ContactDetailsGuidanceView
 import javax.inject.Inject
 
 class ContactDetailsGuidanceController @Inject()(identify: IdentifierAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
-                                      view: ContactDetailsGuidanceView)
-                                     (implicit mcc: MessagesControllerComponents)
+                                                 getData: DataRetrievalAction,
+                                                 requireData: DataRequiredAction,
+                                                 view: ContactDetailsGuidanceView)
+                                                (implicit mcc: MessagesControllerComponents)
   extends FrontendController(mcc) with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     Ok(view())
+  }
+
+  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    Redirect(ContactDetailsGuidancePage.nextPage(NormalMode, request.userAnswers))
   }
 }

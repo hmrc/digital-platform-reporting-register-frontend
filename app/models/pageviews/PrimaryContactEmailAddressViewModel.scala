@@ -20,16 +20,17 @@ import models.{Mode, UserAnswers}
 import pages.PrimaryContactEmailAddressPage
 import play.api.data.Form
 
-case class PrimaryContactEmailAddressViewModel(mode: Mode, form: Form[String])
+case class PrimaryContactEmailAddressViewModel(mode: Mode, form: Form[String], contactName: String)
 
 object PrimaryContactEmailAddressViewModel {
 
-  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[String]): PrimaryContactEmailAddressViewModel = {
+  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[String], contactName: String): PrimaryContactEmailAddressViewModel = {
     val optAnswerValue = userAnswers.get(PrimaryContactEmailAddressPage)
 
     PrimaryContactEmailAddressViewModel(
       mode = mode,
-      form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue))
+      form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue)),
+      contactName = contactName
     )
   }
 }

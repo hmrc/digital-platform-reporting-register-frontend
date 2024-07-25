@@ -123,6 +123,7 @@ GET        /registration/change-organisation-second-can-we-telephone            
 POST       /registration/change-organisation-second-can-we-telephone                  controllers.CanPhoneSecondaryContactController.onSubmit(mode: Mode = CheckMode)
 
 GET        /registration/set-up-contact-details                       controllers.ContactDetailsGuidanceController.onPageLoad()
+POST       /registration/set-up-contact-details                       controllers.ContactDetailsGuidanceController.onSubmit()
 
 GET        /registration/organisation-second-contact                        controllers.HasSecondaryContactController.onPageLoad(mode: Mode = NormalMode)
 POST       /registration/organisation-second-contact                        controllers.HasSecondaryContactController.onSubmit(mode: Mode = NormalMode)

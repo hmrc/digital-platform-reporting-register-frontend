@@ -19,8 +19,9 @@ package controllers
 import controllers.actions.*
 import forms.PrimaryContactNameFormProvider
 import models.Mode
+import models.RegistrationType.ThirdParty
 import models.pageviews.PrimaryContactNameViewModel
-import pages.PrimaryContactNamePage
+import pages.{PrimaryContactNamePage, RegistrationTypePage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -31,27 +32,31 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class PrimaryContactNameController @Inject()(sessionRepository: SessionRepository,
-                                      identify: IdentifierAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
-                                      formProvider: PrimaryContactNameFormProvider,
-                                      view: PrimaryContactNameView)
-                                     (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
-  extends FrontendController(mcc) with I18nSupport {
+                                             identify: IdentifierAction,
+                                             getData: DataRetrievalAction,
+                                             requireData: DataRequiredAction,
+                                             formProvider: PrimaryContactNameFormProvider,
+                                             view: PrimaryContactNameView)
+                                            (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val userAnswers = request.userAnswers
-    Ok(view(PrimaryContactNameViewModel(mode, userAnswers, formProvider())))
+    getAnswer(RegistrationTypePage) { registrationType =>
+      val userAnswers = request.userAnswers
+      Ok(view(PrimaryContactNameViewModel(mode, userAnswers, formProvider(), registrationType == ThirdParty)))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(PrimaryContactNameViewModel(mode, request.userAnswers, formWithErrors)))),
-      value =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactNamePage, value))
-          _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(PrimaryContactNamePage.nextPage(mode, updatedAnswers))
-    )
+    getAnswerAsync(RegistrationTypePage) { registrationType =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(PrimaryContactNameViewModel(mode, request.userAnswers, formWithErrors, registrationType == ThirdParty)))),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactNamePage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(PrimaryContactNamePage.nextPage(mode, updatedAnswers))
+      )
+    }
   }
 }

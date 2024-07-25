@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.PrimaryContactEmailAddressFormProvider
 import models.Mode
 import models.pageviews.PrimaryContactEmailAddressViewModel
-import pages.PrimaryContactEmailAddressPage
+import pages.{PrimaryContactEmailAddressPage, PrimaryContactNamePage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -31,27 +31,31 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class PrimaryContactEmailAddressController @Inject()(sessionRepository: SessionRepository,
-                                      identify: IdentifierAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
-                                      formProvider: PrimaryContactEmailAddressFormProvider,
-                                      view: PrimaryContactEmailAddressView)
-                                     (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
-  extends FrontendController(mcc) with I18nSupport {
+                                                     identify: IdentifierAction,
+                                                     getData: DataRetrievalAction,
+                                                     requireData: DataRequiredAction,
+                                                     formProvider: PrimaryContactEmailAddressFormProvider,
+                                                     view: PrimaryContactEmailAddressView)
+                                                    (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val userAnswers = request.userAnswers
-    Ok(view(PrimaryContactEmailAddressViewModel(mode, userAnswers, formProvider())))
+    getAnswer(PrimaryContactNamePage) { name =>
+      val userAnswers = request.userAnswers
+      Ok(view(PrimaryContactEmailAddressViewModel(mode, userAnswers, formProvider(name), name)))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(PrimaryContactEmailAddressViewModel(mode, request.userAnswers, formWithErrors)))),
-      value =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactEmailAddressPage, value))
-          _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(PrimaryContactEmailAddressPage.nextPage(mode, updatedAnswers))
-    )
+    getAnswerAsync(PrimaryContactNamePage) { name =>
+      formProvider(name).bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(PrimaryContactEmailAddressViewModel(mode, request.userAnswers, formWithErrors, name)))),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactEmailAddressPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(PrimaryContactEmailAddressPage.nextPage(mode, updatedAnswers))
+      )
+    }
   }
 }
