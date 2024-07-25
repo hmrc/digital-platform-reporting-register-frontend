@@ -17,43 +17,43 @@
 package models.pageviews
 
 import builders.UserAnswersBuilder.aUserAnswers
-import forms.SeocndaryContactPhoneNumberFormProvider
+import forms.SecondaryContactPhoneNumberFormProvider
 import models.NormalMode
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import pages.SeocndaryContactPhoneNumberPage
+import pages.SecondaryContactPhoneNumberPage
 
-class SeocndaryContactPhoneNumberViewModelSpec extends AnyFreeSpec with Matchers {
+class SecondaryContactPhoneNumberViewModelSpec extends AnyFreeSpec with Matchers {
 
   private val anyMode = NormalMode
-  private val formProvider = new SeocndaryContactPhoneNumberFormProvider()
+  private val formProvider = new SecondaryContactPhoneNumberFormProvider()
 
-  private val underTest = SeocndaryContactPhoneNumberViewModel
+  private val underTest = SecondaryContactPhoneNumberViewModel
 
   ".apply(...)" - {
-    "must return ViewModel with pre-filled form when SeocndaryContactPhoneNumberPage answer available" in {
+    "must return ViewModel with pre-filled form when SecondaryContactPhoneNumberPage answer available" in {
       val form = formProvider()
       val anyString = "some-string"
-      val userAnswers = aUserAnswers.set(SeocndaryContactPhoneNumberPage, anyString).get
+      val userAnswers = aUserAnswers.set(SecondaryContactPhoneNumberPage, anyString).get
 
       underTest.apply(anyMode, userAnswers, form) mustBe
-        SeocndaryContactPhoneNumberViewModel(mode = anyMode, form = form.fill(anyString))
+        SecondaryContactPhoneNumberViewModel(mode = anyMode, form = form.fill(anyString))
     }
 
-    "must return ViewModel without pre-filled form when SeocndaryContactPhoneNumberPage answer not available" in {
+    "must return ViewModel without pre-filled form when SecondaryContactPhoneNumberPage answer not available" in {
       val emptyForm = formProvider()
-      val userAnswers = aUserAnswers.remove(SeocndaryContactPhoneNumberPage).get
+      val userAnswers = aUserAnswers.remove(SecondaryContactPhoneNumberPage).get
 
       underTest.apply(anyMode, userAnswers, emptyForm) mustBe
-        SeocndaryContactPhoneNumberViewModel(mode = anyMode, form = emptyForm)
+        SecondaryContactPhoneNumberViewModel(mode = anyMode, form = emptyForm)
     }
 
     "must return ViewModel with pre-filled form with errors, when the form has errors" in {
-      val formWithErrors = formProvider().bind(Map(SeocndaryContactPhoneNumberPage.toString -> "unknown-value"))
-      val userAnswers = aUserAnswers.remove(SeocndaryContactPhoneNumberPage).get
+      val formWithErrors = formProvider().bind(Map(SecondaryContactPhoneNumberPage.toString -> "unknown-value"))
+      val userAnswers = aUserAnswers.remove(SecondaryContactPhoneNumberPage).get
 
       underTest.apply(anyMode, userAnswers, formWithErrors) mustBe
-        SeocndaryContactPhoneNumberViewModel(mode = anyMode, form = formWithErrors)
+        SecondaryContactPhoneNumberViewModel(mode = anyMode, form = formWithErrors)
     }
   }
 }

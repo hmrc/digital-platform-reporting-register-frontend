@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import controllers.routes
+import models.UserAnswers
+import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
-import javax.inject.Inject
+case object SecondaryContactPhoneNumberPage extends QuestionPage[String] {
 
-class SeocndaryContactPhoneNumberFormProvider @Inject() extends Mappings {
+  override def path: JsPath = JsPath \ toString
 
-  def apply(): Form[String] = Form(
-    "value" -> text("seocndaryContactPhoneNumber.error.required")
-      .verifying(maxLength(24, "seocndaryContactPhoneNumber.error.length"))
-  )
+  override def toString: String = "secondaryContactPhoneNumber"
+
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
+    routes.IndexController.onPageLoad()
 }

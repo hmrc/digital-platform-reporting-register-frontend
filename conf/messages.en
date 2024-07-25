@@ -320,12 +320,12 @@ secondaryContactName.error.required = Enter secondaryContactName
 secondaryContactName.error.length = SecondaryContactName must be 105 characters or less
 secondaryContactName.change.hidden = SecondaryContactName
 
-seocndaryContactPhoneNumber.title = seocndaryContactPhoneNumber
-seocndaryContactPhoneNumber.heading = seocndaryContactPhoneNumber
-seocndaryContactPhoneNumber.checkYourAnswersLabel = seocndaryContactPhoneNumber
-seocndaryContactPhoneNumber.error.required = Enter seocndaryContactPhoneNumber
-seocndaryContactPhoneNumber.error.length = SeocndaryContactPhoneNumber must be 24 characters or less
-seocndaryContactPhoneNumber.change.hidden = SeocndaryContactPhoneNumber
+secondaryContactPhoneNumber.title = secondaryContactPhoneNumber
+secondaryContactPhoneNumber.heading = secondaryContactPhoneNumber
+secondaryContactPhoneNumber.checkYourAnswersLabel = secondaryContactPhoneNumber
+secondaryContactPhoneNumber.error.required = Enter secondaryContactPhoneNumber
+secondaryContactPhoneNumber.error.length = SecondaryContactPhoneNumber must be 24 characters or less
+secondaryContactPhoneNumber.change.hidden = SecondaryContactPhoneNumber
 
 soleTraderDetailsNotMatch.title = The details you entered did not match our records
 soleTraderDetailsNotMatch.heading = The details you entered did not match our records

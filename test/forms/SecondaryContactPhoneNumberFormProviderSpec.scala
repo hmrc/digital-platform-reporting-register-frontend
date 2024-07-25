@@ -19,13 +19,13 @@ package forms
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
-class SeocndaryContactPhoneNumberFormProviderSpec extends StringFieldBehaviours {
+class SecondaryContactPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
-  private val requiredKey = "seocndaryContactPhoneNumber.error.required"
-  private val lengthKey = "seocndaryContactPhoneNumber.error.length"
+  private val requiredKey = "secondaryContactPhoneNumber.error.required"
+  private val lengthKey = "secondaryContactPhoneNumber.error.length"
   private val maxLength = 24
 
-  private val underTest = new SeocndaryContactPhoneNumberFormProvider()()
+  private val underTest = new SecondaryContactPhoneNumberFormProvider()()
 
   ".value" - {
     val fieldName = "value"
