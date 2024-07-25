@@ -14,8 +14,9 @@
  * limitations under the License.
  *@
 
-@import viewmodels.InputWidth._
 @import models.Country._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import viewmodels.InputWidth._
 
 @this(
     layout: templates.Layout,
@@ -84,8 +85,7 @@
                 items = selectItems(internationalCountries),
                 label = LabelViewModel(messages("internationalAddress.country"))
             )
-            .withCssClass(Fixed20.toString)
-            .withCssClass("autocomplete")
+            .asAccessibleAutocomplete()
         )
 
         @govukButton(
