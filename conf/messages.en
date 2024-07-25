@@ -268,11 +268,11 @@ contactDetailsGuidance.heading = Set up contact details for reporting with this 
 contactDetailsGuidance.p1 = Provide the name and contact details for one or two people or teams within your business who could answer questions about your reports.
 contactDetailsGuidance.p2 = You can change your contact details at any time after registering.
 
-hasSecondaryContact.title = hasSecondaryContact
-hasSecondaryContact.heading = hasSecondaryContact
-hasSecondaryContact.checkYourAnswersLabel = hasSecondaryContact
-hasSecondaryContact.error.required = Select yes if hasSecondaryContact
-hasSecondaryContact.change.hidden = HasSecondaryContact
+hasSecondaryContact.title = Is there someone else we can contact if the person or team we can contact is not available?
+hasSecondaryContact.heading = Is there someone else we can contact if {0} is not available?
+hasSecondaryContact.checkYourAnswersLabel = Is there a second contact?
+hasSecondaryContact.error.required = Select yes if there is someone else we can contact if {0} is not available
+hasSecondaryContact.change.hidden = if there is someone else we can contact if {0} is not available
 
 individualEmailAddress.title = individualEmailAddress
 individualEmailAddress.heading = individualEmailAddress
@@ -290,10 +290,11 @@ individualPhoneNumber.change.hidden = IndividualPhoneNumber
 
 primaryContactEmailAddress.title = What is the email address for the person or team we can contact?
 primaryContactEmailAddress.heading = What is the email address for {0}?
-primaryContactEmailAddress.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
+primaryContactEmailAddress.hint = We will use this email address to send confirmation of your reports or if we have any questions about them.
 primaryContactEmailAddress.checkYourAnswersLabel = Email address
 primaryContactEmailAddress.error.required = Enter the email address for {0}
-primaryContactEmailAddress.error.length = The email address for {1} must be {0} characters or less
+primaryContactEmailAddress.error.length = Email must be {0} characters or less
+primaryContactEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
 primaryContactEmailAddress.change.hidden = the email address for {0}
 
 primaryContactName.title = What is the name of the person or team we should contact?
@@ -301,8 +302,8 @@ primaryContactName.heading = What is the name of the person or team we should co
 primaryContactName.p1.thirdParty = This should be the name of a person or team in your organisation, not the Digital Platform Operator you are reporting on behalf of.
 primaryContactName.hint = For example, ‘Ashley Smith’ or ‘Tax team’.
 primaryContactName.checkYourAnswersLabel = Contact name
-primaryContactName.error.required = Enter the name of the person or team we should contact
-primaryContactName.error.length = The name of the person or team we should contact must be {0} characters or less
+primaryContactName.error.required = Enter the name of a person or team we can contact
+primaryContactName.error.length = Name must be {0} characters or less
 primaryContactName.change.hidden = the name of the person or team we should contact
 
 primaryContactPhoneNumber.title = What is the telephone number for the person or team we can contact?
@@ -310,22 +311,27 @@ primaryContactPhoneNumber.heading = What is the telephone number for {0}?
 primaryContactPhoneNumber.hint = For international numbers, include the country code.
 primaryContactPhoneNumber.checkYourAnswersLabel = Telephone number
 primaryContactPhoneNumber.error.required = Enter the telephone number for {0}
-primaryContactPhoneNumber.error.length = The telephone number for {1} must be {0} characters or less
+primaryContactPhoneNumber.error.length = Telephone number must be {0} characters or less
+primaryContactPhoneNumber.error.format = Enter a telephone number in the correct format, like 01632 960 001, 07700 900 982 or +44 808 157 0192.
 primaryContactPhoneNumber.change.hidden = the telephone number for {0}
 
-secondaryContactEmailAddress.title = secondaryContactEmailAddress
-secondaryContactEmailAddress.heading = secondaryContactEmailAddress
-secondaryContactEmailAddress.checkYourAnswersLabel = secondaryContactEmailAddress
-secondaryContactEmailAddress.error.required = Enter secondaryContactEmailAddress
-secondaryContactEmailAddress.error.length = SecondaryContactEmailAddress must be 132 characters or less
-secondaryContactEmailAddress.change.hidden = SecondaryContactEmailAddress
+secondaryContactEmailAddress.title = What is the email address for the second person or team we should contact?
+secondaryContactEmailAddress.heading = What is the email address for {0}?
+secondaryContactEmailAddress.hint = We will use this email address to send confirmation of your reports or if we have any questions about them.
+secondaryContactEmailAddress.checkYourAnswersLabel = Email address
+secondaryContactEmailAddress.error.required = Enter the email address of a second person or team we can contact
+secondaryContactEmailAddress.error.length = Email must be 132 characters or less
+secondaryContactEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
+secondaryContactEmailAddress.change.hidden = the email address for {0}
 
-secondaryContactName.title = secondaryContactName
-secondaryContactName.heading = secondaryContactName
-secondaryContactName.checkYourAnswersLabel = secondaryContactName
-secondaryContactName.error.required = Enter secondaryContactName
-secondaryContactName.error.length = SecondaryContactName must be 105 characters or less
-secondaryContactName.change.hidden = SecondaryContactName
+secondaryContactName.title = What is the name of the second person or team we should contact?
+secondaryContactName.heading = What is the name of the second person or team we should contact?
+secondaryContactName.p1.thirdParty = This should be the name of a person or team in your organisation, not the Digital Platform Operator you are reporting on behalf of.
+secondaryContactName.hint = For example, ‘Ashley Smith’ or ‘Tax Team’.
+secondaryContactName.checkYourAnswersLabel = Contact name
+secondaryContactName.error.required = Enter the name of a second person or team we can contact
+secondaryContactName.error.length = name must be {0} characters or less
+secondaryContactName.change.hidden = the name of the second person or team we should contact
 
 secondaryContactPhoneNumber.title = secondaryContactPhoneNumber
 secondaryContactPhoneNumber.heading = secondaryContactPhoneNumber

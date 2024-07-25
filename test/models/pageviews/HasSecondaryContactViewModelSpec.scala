@@ -26,34 +26,35 @@ import pages.HasSecondaryContactPage
 class HasSecondaryContactViewModelSpec extends AnyFreeSpec with Matchers {
 
   private val anyMode = NormalMode
+  private val anyName = "name"
   private val formProvider = new HasSecondaryContactFormProvider()
 
   private val underTest = HasSecondaryContactViewModel
 
   ".apply(...)" - {
     "must return ViewModel with pre-filled form when HasSecondaryContactPage answer available" in {
-      val form = formProvider()
+      val form = formProvider(anyName)
       val anyBoolean = true
       val userAnswers = aUserAnswers.set(HasSecondaryContactPage, anyBoolean).get
 
-      underTest.apply(anyMode, userAnswers, form) mustBe
-        HasSecondaryContactViewModel(mode = anyMode, form = form.fill(anyBoolean))
+      underTest.apply(anyMode, userAnswers, form, anyName) mustBe
+        HasSecondaryContactViewModel(mode = anyMode, form = form.fill(anyBoolean), anyName)
     }
 
     "must return ViewModel without pre-filled form when HasSecondaryContactPage answer not available" in {
-      val emptyForm = formProvider()
+      val emptyForm = formProvider(anyName)
       val userAnswers = aUserAnswers.remove(HasSecondaryContactPage).get
 
-      underTest.apply(anyMode, userAnswers, emptyForm) mustBe
-        HasSecondaryContactViewModel(mode = anyMode, form = emptyForm)
+      underTest.apply(anyMode, userAnswers, emptyForm, anyName) mustBe
+        HasSecondaryContactViewModel(mode = anyMode, form = emptyForm, anyName)
     }
 
     "must return ViewModel with pre-filled form with errors, when the form has errors" in {
-      val formWithErrors = formProvider().bind(Map(HasSecondaryContactPage.toString -> "unknown-value"))
+      val formWithErrors = formProvider(anyName).bind(Map(HasSecondaryContactPage.toString -> "unknown-value"))
       val userAnswers = aUserAnswers.remove(HasSecondaryContactPage).get
 
-      underTest.apply(anyMode, userAnswers, formWithErrors) mustBe
-        HasSecondaryContactViewModel(mode = anyMode, form = formWithErrors)
+      underTest.apply(anyMode, userAnswers, formWithErrors, anyName) mustBe
+        HasSecondaryContactViewModel(mode = anyMode, form = formWithErrors, anyName)
     }
   }
 }

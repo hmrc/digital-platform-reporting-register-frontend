@@ -23,8 +23,8 @@ import javax.inject.Inject
 
 class SecondaryContactEmailAddressFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[String] = Form(
-    "value" -> text("secondaryContactEmailAddress.error.required")
-      .verifying(maxLength(132, "secondaryContactEmailAddress.error.length"))
+  def apply(contactName: String): Form[String] = Form(
+    "value" -> text("secondaryContactEmailAddress.error.required", args = Seq(contactName))
+      .verifying(maxLength(132, "secondaryContactEmailAddress.error.length", Seq(contactName)))
   )
 }
