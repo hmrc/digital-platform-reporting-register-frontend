@@ -16,48 +16,55 @@
 
 package forms
 
+import forms.UtrFormProvider.{UtrFormKey, UtrRegex}
 import forms.behaviours.StringFieldBehaviours
+import org.scalatest.matchers.should.Matchers.should
 import play.api.data.FormError
 
 class UtrFormProviderSpec extends StringFieldBehaviours {
 
-  val base = "utr"
-  
-  val requiredKey = s"$base.error.required"
-  val formatKey = s"$base.error.format"
-  val minLength = 10
-  val maxLength = 13
+  private val base = "utr"
 
-  val form = new UtrFormProvider()(base)
+  private val requiredKey = s"$base.error.required"
+  private val formatKey = s"$base.error.format"
 
-  ".value" - {
+  private val underTest = new UtrFormProvider()(base)
 
-    val fieldName = "value"
+  "UtrFormProvider must provide a form" - {
+    "which passes validation for a string as UTR number when" - {
+      "string has 10 numbers" in {
+        val formInput = Map(UtrFormKey -> "1234567890")
+        underTest.bind(formInput).value mustBe Some("1234567890")
+      }
 
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      stringsWithMinMaxLength(minLength, maxLength)
-    )
+      "string has 10 numbers and 'k' with spaces" in {
+        val formInput = Map(UtrFormKey -> "k 12 34 5678 90 ")
+        val value1 = underTest.bind(formInput)
+        value1.value mustBe Some("k1234567890")
+      }
 
-    behave like fieldWithMaxLength(
-      form,
-      fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, formatKey, Seq(maxLength))
-    )
+      "string has 13 digits" in {
+        val formInput = Map(UtrFormKey -> "1234567890123")
+        underTest.bind(formInput).value mustBe Some("1234567890123")
+      }
 
-    behave like fieldWithMinLength(
-      form,
-      fieldName,
-      minLength = minLength,
-      lengthError = FormError(fieldName, formatKey, Seq(minLength))
-    )
+      "when string has 13 numbers and 'K' with spaces" in {
+        val formInput = Map(UtrFormKey -> "K 12 34 5678 90 123 ")
+        val value1 = underTest.bind(formInput)
+        value1.value mustBe Some("K1234567890123")
+      }
+    }
 
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
+    "which fails validation for a string when" - {
+      "is empty string" in {
+        val formInput = Map(UtrFormKey -> "")
+        underTest.bind(formInput).errors mustBe Seq(FormError(UtrFormKey, requiredKey))
+      }
+
+      "string has numbers different than 10 or 13" in {
+        val formInput = Map(UtrFormKey -> "123456789012")
+        underTest.bind(formInput).errors mustBe Seq(FormError(UtrFormKey, formatKey, Seq(UtrRegex)))
+      }
+    }
   }
 }

@@ -16,17 +16,23 @@
 
 package forms
 
-import javax.inject.Inject
-
+import forms.UtrFormProvider.{UtrFormKey, UtrRegex}
 import forms.mappings.Mappings
 import play.api.data.Form
 
+import javax.inject.Inject
+
 class UtrFormProvider @Inject() extends Mappings {
 
-  def apply(key: String): Form[String] =
-    Form(
-      "value" -> text(s"$key.error.required")
-        .verifying(minLength(10, s"$key.error.format"))
-        .verifying(maxLength(13, s"$key.error.format"))
-    )
+  def apply(key: String): Form[String] = Form(
+    UtrFormKey -> text(s"$key.error.required")
+      .transform(_.replace(" ", ""), identity)
+      .verifying(regexp(UtrRegex, s"$key.error.format"))
+  )
+}
+
+object UtrFormProvider {
+
+  val UtrFormKey: String = "value"
+  val UtrRegex: String = """^([kK]{0,1}\d{10})$|^(\d{10}[kK]{0,1})$|^([kK]{0,1}\d{13})$|^(\d{13}[kK]{0,1})$"""
 }
