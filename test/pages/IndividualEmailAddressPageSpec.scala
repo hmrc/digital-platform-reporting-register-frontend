@@ -26,8 +26,8 @@ class IndividualEmailAddressPageSpec extends AnyFreeSpec with Matchers {
 
   ".nextPage" - {
     "in Normal Mode" - {
-      "must go to Index" in {
-        IndividualEmailAddressPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndexController.onPageLoad()
+      "must go to Can Phone Individual" in {
+        IndividualEmailAddressPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.CanPhoneIndividualController.onPageLoad(NormalMode)
       }
     }
 

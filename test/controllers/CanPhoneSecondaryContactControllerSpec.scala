@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.aUserAnswers
 import forms.CanPhoneSecondaryContactFormProvider
 import models.NormalMode
 import models.pageviews.CanPhoneSecondaryContactViewModel
@@ -37,7 +36,11 @@ class CanPhoneSecondaryContactControllerSpec extends SpecBase with MockitoSugar 
 
   private lazy val canPhoneSecondaryContactRoute = routes.CanPhoneSecondaryContactController.onPageLoad(NormalMode).url
   private val anyName = "name"
-  private val baseAnswers = emptyUserAnswers.set(SecondaryContactNamePage, anyName).success.value
+  private val anyBoolean = true
+  private val baseAnswers =
+    emptyUserAnswers
+      .set(SecondaryContactNamePage, anyName).success.value
+      .set(CanPhoneSecondaryContactPage, anyBoolean).success.value
   private val form = new CanPhoneSecondaryContactFormProvider()(anyName)
 
   "CanPhoneSecondaryContact Controller" - {

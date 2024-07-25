@@ -26,8 +26,8 @@ class PrimaryContactNamePageSpec extends AnyFreeSpec with Matchers {
 
   ".nextPage" - {
     "in Normal Mode" - {
-      "must go to Index" in {
-        PrimaryContactNamePage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndexController.onPageLoad()
+      "must go to Primary Contact Email Address" in {
+        PrimaryContactNamePage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.PrimaryContactEmailAddressController.onPageLoad(NormalMode)
       }
     }
 

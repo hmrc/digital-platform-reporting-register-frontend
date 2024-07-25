@@ -27,7 +27,7 @@ class IndividualPhoneNumberPageSpec extends AnyFreeSpec with Matchers {
   ".nextPage" - {
     "in Normal Mode" - {
       "must go to Index" in {
-        IndividualPhoneNumberPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndexController.onPageLoad()
+        IndividualPhoneNumberPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
 

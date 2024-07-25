@@ -16,6 +16,7 @@
 
 package models.pageviews
 
+import builders.UserAnswersBuilder.aUserAnswers
 import forms.CanPhoneSecondaryContactFormProvider
 import models.NormalMode
 import org.scalatest.freespec.AnyFreeSpec

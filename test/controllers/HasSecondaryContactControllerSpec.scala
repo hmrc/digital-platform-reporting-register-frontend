@@ -33,11 +33,14 @@ import views.html.HasSecondaryContactView
 import scala.concurrent.Future
 
 class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
-
-
+  
   private lazy val hasSecondaryContactRoute = routes.HasSecondaryContactController.onPageLoad(NormalMode).url
   private val anyName = "name"
-  private val baseAnswers = emptyUserAnswers.set(PrimaryContactNamePage, anyName).success.value
+  private val anyBoolean = true
+  private val baseAnswers =
+    emptyUserAnswers
+      .set(PrimaryContactNamePage, anyName).success.value
+      .set(HasSecondaryContactPage, anyBoolean).success.value
   private val form = new HasSecondaryContactFormProvider()(anyName)
 
   "HasSecondaryContact Controller" - {
@@ -85,7 +88,7 @@ class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual HasSecondaryContactPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual HasSecondaryContactPage.nextPage(NormalMode, baseAnswers).url
       }
     }
 

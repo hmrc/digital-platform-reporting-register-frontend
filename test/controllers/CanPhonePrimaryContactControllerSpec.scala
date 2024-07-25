@@ -36,7 +36,11 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
   
   private lazy val canPhonePrimaryContactRoute = routes.CanPhonePrimaryContactController.onPageLoad(NormalMode).url
   private val anyName = "name"
-  private val baseAnswers = emptyUserAnswers.set(PrimaryContactNamePage, anyName).success.value
+  private val anyBoolean = true
+  private val baseAnswers =
+    emptyUserAnswers
+      .set(PrimaryContactNamePage, anyName).success.value
+      .set(CanPhonePrimaryContactPage, anyBoolean).success.value
   private val form = new CanPhonePrimaryContactFormProvider()(anyName)
 
   "CanPhonePrimaryContact Controller" - {

@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -28,5 +28,5 @@ case object PrimaryContactPhoneNumberPage extends QuestionPage[String] {
   override def toString: String = "primaryContactPhoneNumber"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.IndexController.onPageLoad()
+    routes.HasSecondaryContactController.onPageLoad(NormalMode)
 }

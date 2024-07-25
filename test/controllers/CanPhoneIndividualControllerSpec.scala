@@ -36,7 +36,6 @@ import scala.concurrent.Future
 class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
 
   private val form = new CanPhoneIndividualFormProvider()()
-
   private lazy val canPhoneIndividualRoute = routes.CanPhoneIndividualController.onPageLoad(NormalMode).url
 
   "CanPhoneIndividual Controller" - {
@@ -83,8 +82,9 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
           .withFormUrlEncodedBody(("value", "true"))
         val result = route(application, request).value
 
+        val expectedAnswers = emptyUserAnswers.set(CanPhoneIndividualPage, true).success.value
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual CanPhoneIndividualPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual CanPhoneIndividualPage.nextPage(NormalMode, expectedAnswers).url
       }
     }
 

@@ -19,15 +19,22 @@ package pages
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.{CheckMode, NormalMode}
+import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class CanPhonePrimaryContactPageSpec extends AnyFreeSpec with Matchers {
+class CanPhonePrimaryContactPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
     "in Normal Mode" - {
-      "must go to Index" in {
-        CanPhonePrimaryContactPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndexController.onPageLoad()
+      "must go to Primary Contact Phone Number when the answer is yes" in {
+        val answers = anEmptyAnswer.set(CanPhonePrimaryContactPage, true).success.value
+        CanPhonePrimaryContactPage.nextPage(NormalMode, answers) mustEqual routes.PrimaryContactPhoneNumberController.onPageLoad(NormalMode)
+      }
+
+      "must go to Has Secondary Contact when the answer is no" in {
+        val answers = anEmptyAnswer.set(CanPhonePrimaryContactPage, false).success.value
+        CanPhonePrimaryContactPage.nextPage(NormalMode, answers) mustEqual routes.HasSecondaryContactController.onPageLoad(NormalMode)
       }
     }
 
