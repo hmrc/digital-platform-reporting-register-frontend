@@ -244,24 +244,26 @@ isThisYourBusiness.error.required = Select yes if this is your business
 detailsMatched.title = We have matched your details
 detailsMatched.heading = We have matched your details
 
-canPhoneIndividual.title = canPhoneIndividual
-canPhoneIndividual.heading = canPhoneIndividual
-canPhoneIndividual.checkYourAnswersLabel = canPhoneIndividual
-canPhoneIndividual.error.required = Select yes if canPhoneIndividual
-canPhoneIndividual.change.hidden = CanPhoneIndividual
+canPhoneIndividual.title = Can we contact you by telephone?
+canPhoneIndividual.heading = Can we contact you by telephone?
+canPhoneIndividual.hint = We may call if we have any questions about your reports.
+canPhoneIndividual.checkYourAnswersLabel = Can we contact you by telephone?
+canPhoneIndividual.error.required = Select yes if we can contact you by telephone
+canPhoneIndividual.change.hidden = if we can contact you by telephone
 
 canPhonePrimaryContact.title = Can we contact the person or team by telephone?
 canPhonePrimaryContact.heading = Can we contact {0} by telephone?
-canPhonePrimaryContact.p1 = We may use this phone number if we have any questions about your reports.
+canPhonePrimaryContact.hint = We may use this phone number if we have any questions about your reports.
 canPhonePrimaryContact.checkYourAnswersLabel = Can we contact {0} by telephone?
 canPhonePrimaryContact.error.required = Select yes if we can contact {0} by telephone
 canPhonePrimaryContact.change.hidden = if we can contact {0} by telephone
 
-canPhoneSecondaryContact.title = canPhoneSecondaryContact
-canPhoneSecondaryContact.heading = canPhoneSecondaryContact
-canPhoneSecondaryContact.checkYourAnswersLabel = canPhoneSecondaryContact
-canPhoneSecondaryContact.error.required = Select yes if canPhoneSecondaryContact
-canPhoneSecondaryContact.change.hidden = CanPhoneSecondaryContact
+canPhoneSecondaryContact.title = Can we contact the second person or team by telephone?
+canPhoneSecondaryContact.heading = Can we contact {0} by telephone?
+canPhoneSecondaryContact.hint = We may use this phone number if we have any questions about your reports.
+canPhoneSecondaryContact.checkYourAnswersLabel = Can we contact {0} by telephone?
+canPhoneSecondaryContact.error.required = Select yes if we can contact {0} by telephone?
+canPhoneSecondaryContact.change.hidden = if we can contact {0} by telephone
 
 contactDetailsGuidance.title = Set up contact details for reporting with this service
 contactDetailsGuidance.heading = Set up contact details for reporting with this service
@@ -274,19 +276,21 @@ hasSecondaryContact.checkYourAnswersLabel = Is there a second contact?
 hasSecondaryContact.error.required = Select yes if there is someone else we can contact if {0} is not available
 hasSecondaryContact.change.hidden = if there is someone else we can contact if {0} is not available
 
-individualEmailAddress.title = individualEmailAddress
-individualEmailAddress.heading = individualEmailAddress
-individualEmailAddress.checkYourAnswersLabel = individualEmailAddress
-individualEmailAddress.error.required = Enter individualEmailAddress
-individualEmailAddress.error.length = IndividualEmailAddress must be 132 characters or less
-individualEmailAddress.change.hidden = IndividualEmailAddress
+individualEmailAddress.title = What is your email address?
+individualEmailAddress.heading = What is your email address?
+individualEmailAddress.checkYourAnswersLabel = Email address
+individualEmailAddress.error.required = Enter your email address
+individualEmailAddress.error.length = Email address must be 132 characters or less
+individualEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
+individualEmailAddress.change.hidden = your email address
 
-individualPhoneNumber.title = individualPhoneNumber
-individualPhoneNumber.heading = individualPhoneNumber
-individualPhoneNumber.checkYourAnswersLabel = individualPhoneNumber
-individualPhoneNumber.error.required = Enter individualPhoneNumber
-individualPhoneNumber.error.length = IndividualPhoneNumber must be 24 characters or less
-individualPhoneNumber.change.hidden = IndividualPhoneNumber
+individualPhoneNumber.title = What is your telephone number?
+individualPhoneNumber.heading = What is your telephone number?
+individualPhoneNumber.checkYourAnswersLabel = Telephone number
+individualPhoneNumber.error.required = Enter your telephone number
+individualPhoneNumber.error.length = Telephone number must be 24 characters or less
+individualPhoneNumber.error.format = Enter a telephone number in the correct format, like 01632 960 001, 07700 900 982 or +44 808 157 0192.
+individualPhoneNumber.change.hidden = your telephone number
 
 primaryContactEmailAddress.title = What is the email address for the person or team we can contact?
 primaryContactEmailAddress.heading = What is the email address for {0}?
@@ -333,13 +337,6 @@ secondaryContactName.error.required = Enter the name of a second person or team 
 secondaryContactName.error.length = name must be {0} characters or less
 secondaryContactName.change.hidden = the name of the second person or team we should contact
 
-secondaryContactPhoneNumber.title = secondaryContactPhoneNumber
-secondaryContactPhoneNumber.heading = secondaryContactPhoneNumber
-secondaryContactPhoneNumber.checkYourAnswersLabel = secondaryContactPhoneNumber
-secondaryContactPhoneNumber.error.required = Enter secondaryContactPhoneNumber
-secondaryContactPhoneNumber.error.length = SecondaryContactPhoneNumber must be 24 characters or less
-secondaryContactPhoneNumber.change.hidden = SecondaryContactPhoneNumber
-
 soleTraderDetailsNotMatch.title = The details you entered did not match our records
 soleTraderDetailsNotMatch.heading = The details you entered did not match our records
 soleTraderDetailsNotMatch.p1 = To help us find your business, check if you have entered the right details.
@@ -351,3 +348,11 @@ soleTraderDetailsNotMatch.p5 = Check if you have entered your first name and las
 soleTraderDetailsNotMatch.p6 = Contact HMRC to help us find your business
 soleTraderDetailsNotMatch.p7.1 = If you have checked and entered your UTR and name again and we still cannot find your business, then email
 soleTraderDetailsNotMatch.p7.2 = for help.
+
+secondaryContactPhoneNumber.title = What is the telephone number for the second person or team we should contact?
+secondaryContactPhoneNumber.heading = What is the telephone number for {0}?
+secondaryContactPhoneNumber.hint = For international numbers include the country code.
+secondaryContactPhoneNumber.checkYourAnswersLabel = Telephone number
+secondaryContactPhoneNumber.error.required = Enter the telephone number for {0}
+secondaryContactPhoneNumber.error.length = Telephone number must be {0} characters or less
+secondaryContactPhoneNumber.change.hidden = the telephone number for {0}

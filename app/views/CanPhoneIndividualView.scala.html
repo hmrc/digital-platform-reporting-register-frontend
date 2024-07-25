@@ -39,6 +39,7 @@
                 field = viewModel.form("value"),
                 legend = LegendViewModel(messages("canPhoneIndividual.heading")).asPageHeading()
             )
+            .withHint(HintViewModel(messages("canPhoneIndividual.hint")))
         )
 
         @govukButton(

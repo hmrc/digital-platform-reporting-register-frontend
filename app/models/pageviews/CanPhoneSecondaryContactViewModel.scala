@@ -20,16 +20,17 @@ import models.{Mode, UserAnswers}
 import pages.CanPhoneSecondaryContactPage
 import play.api.data.Form
 
-case class CanPhoneSecondaryContactViewModel(mode: Mode, form: Form[Boolean])
+case class CanPhoneSecondaryContactViewModel(mode: Mode, form: Form[Boolean], contactName: String)
 
 object CanPhoneSecondaryContactViewModel {
 
-  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[Boolean]): CanPhoneSecondaryContactViewModel = {
+  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[Boolean], contactName: String): CanPhoneSecondaryContactViewModel = {
     val optAnswerValue = userAnswers.get(CanPhoneSecondaryContactPage)
 
     CanPhoneSecondaryContactViewModel(
       mode = mode,
-      form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue))
+      form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue)),
+      contactName = contactName
     )
   }
 }

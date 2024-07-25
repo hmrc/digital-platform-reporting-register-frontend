@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.CanPhoneSecondaryContactPage
+import pages.{CanPhoneSecondaryContactPage, SecondaryContactNamePage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -27,16 +27,20 @@ import viewmodels.implicits.*
 object CanPhoneSecondaryContactSummary  {
 
   def row(answers: UserAnswers)
-         (implicit messages: Messages): Option[SummaryListRow] = answers.get(CanPhoneSecondaryContactPage).map { answer =>
-    val value = if (answer) "site.yes" else "site.no"
+         (implicit messages: Messages): Option[SummaryListRow] =
+    for {
+      answer <- answers.get(CanPhoneSecondaryContactPage)
+      contactName <- answers.get(SecondaryContactNamePage)
+    } yield {
+      val value = if (answer) "site.yes" else "site.no"
 
-    SummaryListRowViewModel(
-      key = "canPhoneSecondaryContact.checkYourAnswersLabel",
-      value = ValueViewModel(value),
-      actions = Seq(
-        ActionItemViewModel("site.change", routes.CanPhoneSecondaryContactController.onPageLoad(CheckMode).url)
-          .withVisuallyHiddenText(messages("canPhoneSecondaryContact.change.hidden"))
+      SummaryListRowViewModel(
+        key = "canPhoneSecondaryContact.checkYourAnswersLabel",
+        value = ValueViewModel(value),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.CanPhoneSecondaryContactController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("canPhoneSecondaryContact.change.hidden", contactName))
+        )
       )
-    )
-  }
+    }
 }

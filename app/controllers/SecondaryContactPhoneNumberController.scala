@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.SecondaryContactPhoneNumberFormProvider
 import models.Mode
 import models.pageviews.SecondaryContactPhoneNumberViewModel
-import pages.SecondaryContactPhoneNumberPage
+import pages.{SecondaryContactNamePage, SecondaryContactPhoneNumberPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -40,18 +40,22 @@ class SecondaryContactPhoneNumberController @Inject()(sessionRepository: Session
   extends FrontendController(mcc) with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val userAnswers = request.userAnswers
-    Ok(view(SecondaryContactPhoneNumberViewModel(mode, userAnswers, formProvider())))
+    getAnswer(SecondaryContactNamePage) { contactName =>
+      val userAnswers = request.userAnswers
+      Ok(view(SecondaryContactPhoneNumberViewModel(mode, userAnswers, formProvider(contactName), contactName)))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(SecondaryContactPhoneNumberViewModel(mode, request.userAnswers, formWithErrors)))),
-      value =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactPhoneNumberPage, value))
-          _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(SecondaryContactPhoneNumberPage.nextPage(mode, updatedAnswers))
-    )
+    getAnswerAsync(SecondaryContactNamePage) { contactName =>
+      formProvider(contactName).bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(SecondaryContactPhoneNumberViewModel(mode, request.userAnswers, formWithErrors, contactName)))),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactPhoneNumberPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(SecondaryContactPhoneNumberPage.nextPage(mode, updatedAnswers))
+      )
+    }
   }
 }

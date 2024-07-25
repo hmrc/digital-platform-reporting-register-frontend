@@ -162,18 +162,12 @@ POST       /registration/change-organisation-second-email-address               
 
 GET        /registration/sole-trader-details-not-match         controllers.SoleTraderDetailsNotMatchController.onPageLoad()
 
-GET        /secondaryContactPhoneNumber                        controllers.SecondaryContactPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /secondaryContactPhoneNumber                        controllers.SecondaryContactPhoneNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /changeSecondaryContactPhoneNumber                  controllers.SecondaryContactPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeSecondaryContactPhoneNumber                  controllers.SecondaryContactPhoneNumberController.onSubmit(mode: Mode = CheckMode)
-
 GET        /registration/organisation-second-contact-name                        controllers.SecondaryContactNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /registration/organisation-second-contact-name                        controllers.SecondaryContactNameController.onSubmit(mode: Mode = NormalMode)
 GET        /registration/change-organisation-second-contact-name                  controllers.SecondaryContactNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-organisation-second-contact-name                  controllers.SecondaryContactNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /registration/organisation-second-telephone-number                        controllers.SeocndaryContactPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /registration/organisation-second-telephone-number                        controllers.SeocndaryContactPhoneNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /registration/change-organisation-second-telephone-number                  controllers.SeocndaryContactPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /registration/change-organisation-second-telephone-number                  controllers.SeocndaryContactPhoneNumberController.onSubmit(mode: Mode = CheckMode)
-
+GET        /registration/organisation-second-telephone-number                        controllers.SecondaryContactPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/organisation-second-telephone-number                        controllers.SecondaryContactPhoneNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-organisation-second-telephone-number                  controllers.SecondaryContactPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-organisation-second-telephone-number                  controllers.SecondaryContactPhoneNumberController.onSubmit(mode: Mode = CheckMode)

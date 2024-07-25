@@ -24,7 +24,7 @@ import models.pageviews.SecondaryContactPhoneNumberViewModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.SecondaryContactPhoneNumberPage
+import pages.{SecondaryContactNamePage, SecondaryContactPhoneNumberPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -34,20 +34,21 @@ import views.html.SecondaryContactPhoneNumberView
 import scala.concurrent.Future
 
 class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
-
-  private val form = new SecondaryContactPhoneNumberFormProvider()()
-
+  
   private lazy val secondaryContactPhoneNumberRoute = routes.SecondaryContactPhoneNumberController.onPageLoad(NormalMode).url
+  private val anyName = "name"
+  private val baseAnswers = emptyUserAnswers.set(SecondaryContactNamePage, anyName).success.value
+  private val form = new SecondaryContactPhoneNumberFormProvider()(anyName)
 
   "SecondaryContactPhoneNumber Controller" - {
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, secondaryContactPhoneNumberRoute)
         val result = route(application, request).value
         val view = application.injector.instanceOf[SecondaryContactPhoneNumberView]
-        val viewModel = SecondaryContactPhoneNumberViewModel(NormalMode, aUserAnswers, form)
+        val viewModel = SecondaryContactPhoneNumberViewModel(NormalMode, baseAnswers, form, anyName)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -55,14 +56,14 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = emptyUserAnswers.set(SecondaryContactPhoneNumberPage, "answer").success.value
+      val userAnswers = baseAnswers.set(SecondaryContactPhoneNumberPage, "answer").success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, secondaryContactPhoneNumberRoute)
         val view = application.injector.instanceOf[SecondaryContactPhoneNumberView]
         val result = route(application, request).value
-        val viewModel = SecondaryContactPhoneNumberViewModel(NormalMode, aUserAnswers, form.fill("answer"))
+        val viewModel = SecondaryContactPhoneNumberViewModel(NormalMode, baseAnswers, form.fill("answer"), anyName)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -74,7 +75,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(baseAnswers))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
         .build()
 
@@ -84,12 +85,12 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual SecondaryContactPhoneNumberPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual SecondaryContactPhoneNumberPage.nextPage(NormalMode, baseAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, secondaryContactPhoneNumberRoute)
@@ -97,7 +98,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
         val boundForm = form.bind(Map("value" -> ""))
         val view = application.injector.instanceOf[SecondaryContactPhoneNumberView]
         val result = route(application, request).value
-        val viewModel = SecondaryContactPhoneNumberViewModel(NormalMode, aUserAnswers, boundForm)
+        val viewModel = SecondaryContactPhoneNumberViewModel(NormalMode, baseAnswers, boundForm, anyName)
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString

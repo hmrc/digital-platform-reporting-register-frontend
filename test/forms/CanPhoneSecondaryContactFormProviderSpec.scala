@@ -23,8 +23,8 @@ class CanPhoneSecondaryContactFormProviderSpec extends BooleanFieldBehaviours {
 
   private val requiredKey = "canPhoneSecondaryContact.error.required"
   private val invalidKey = "error.boolean"
-
-  private val underTest = new CanPhoneSecondaryContactFormProvider()()
+  private val anyName = "name"
+  private val underTest = new CanPhoneSecondaryContactFormProvider()(anyName)
 
   ".value" - {
     val fieldName = "value"
@@ -32,13 +32,13 @@ class CanPhoneSecondaryContactFormProviderSpec extends BooleanFieldBehaviours {
     behave like booleanField(
       underTest,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+      invalidError = FormError(fieldName, invalidKey, Seq(anyName))
     )
 
     behave like mandatoryField(
       underTest,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(anyName))
     )
   }
 }
