@@ -17,17 +17,17 @@
 package models.pageviews
 
 import models.{Mode, UserAnswers}
-import pages.SeocndaryContactPhoneNumberPage
+import pages.SecondaryContactPhoneNumberPage
 import play.api.data.Form
 
-case class SeocndaryContactPhoneNumberViewModel(mode: Mode, form: Form[String])
+case class SecondaryContactPhoneNumberViewModel(mode: Mode, form: Form[String])
 
-object SeocndaryContactPhoneNumberViewModel {
+object SecondaryContactPhoneNumberViewModel {
 
-  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[String]): SeocndaryContactPhoneNumberViewModel = {
-    val optAnswerValue = userAnswers.get(SeocndaryContactPhoneNumberPage)
+  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[String]): SecondaryContactPhoneNumberViewModel = {
+    val optAnswerValue = userAnswers.get(SecondaryContactPhoneNumberPage)
 
-    SeocndaryContactPhoneNumberViewModel(
+    SecondaryContactPhoneNumberViewModel(
       mode = mode,
       form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue))
     )

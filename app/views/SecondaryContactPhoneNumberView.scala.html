@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.pageviews.SeocndaryContactPhoneNumberViewModel
+@import models.pageviews.SecondaryContactPhoneNumberViewModel
 @import viewmodels.InputWidth.*
 
 @this(
@@ -25,11 +25,11 @@
     govukButton: GovukButton
 )
 
-@(viewModel: SeocndaryContactPhoneNumberViewModel)(implicit request: Request[_], messages: Messages)
+@(viewModel: SecondaryContactPhoneNumberViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(viewModel.form, messages("seocndaryContactPhoneNumber.title"))) {
+@layout(pageTitle = title(viewModel.form, messages("secondaryContactPhoneNumber.title"))) {
 
-    @formHelper(action = routes.SeocndaryContactPhoneNumberController.onSubmit(viewModel.mode)) {
+    @formHelper(action = routes.SecondaryContactPhoneNumberController.onSubmit(viewModel.mode)) {
 
         @if(viewModel.form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(viewModel.form))
@@ -38,7 +38,7 @@
         @govukInput(
             InputViewModel(
                 field = viewModel.form("value"),
-                label = LabelViewModel(messages("seocndaryContactPhoneNumber.heading")).asPageHeading()
+                label = LabelViewModel(messages("secondaryContactPhoneNumber.heading")).asPageHeading()
             )
             .withWidth(Full)
         )

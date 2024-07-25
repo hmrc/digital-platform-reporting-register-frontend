@@ -29,8 +29,8 @@ POST       /registration/user-type                       controllers.Registratio
 GET        /registration/change-user-type                controllers.RegistrationTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-user-type                controllers.RegistrationTypeController.onSubmit(mode: Mode = CheckMode)
 
-GET        /registration/reporting-user-type             controllers.BusinessTypeController.onPageLoad(mode: Mode = NormalMode)
-POST       /registration/reporting-user-type             controllers.BusinessTypeController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/business-type                   controllers.BusinessTypeController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/business-type                   controllers.BusinessTypeController.onSubmit(mode: Mode = NormalMode)
 GET        /registration/change-reporting-user-type      controllers.BusinessTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-reporting-user-type      controllers.BusinessTypeController.onSubmit(mode: Mode = CheckMode)
 
@@ -163,9 +163,9 @@ POST       /secondaryContactName                        controllers.SecondaryCon
 GET        /changeSecondaryContactName                  controllers.SecondaryContactNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeSecondaryContactName                  controllers.SecondaryContactNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /seocndaryContactPhoneNumber                        controllers.SeocndaryContactPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /seocndaryContactPhoneNumber                        controllers.SeocndaryContactPhoneNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /changeSeocndaryContactPhoneNumber                  controllers.SeocndaryContactPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeSeocndaryContactPhoneNumber                  controllers.SeocndaryContactPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+GET        /secondaryContactPhoneNumber                        controllers.SecondaryContactPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /secondaryContactPhoneNumber                        controllers.SecondaryContactPhoneNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /changeSecondaryContactPhoneNumber                  controllers.SecondaryContactPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeSecondaryContactPhoneNumber                  controllers.SecondaryContactPhoneNumberController.onSubmit(mode: Mode = CheckMode)
 
 GET        /registration/sole-trader-details-not-match         controllers.SoleTraderDetailsNotMatchController.onPageLoad()

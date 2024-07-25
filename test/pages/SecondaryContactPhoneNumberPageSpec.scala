@@ -22,18 +22,18 @@ import models.{CheckMode, NormalMode}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class SeocndaryContactPhoneNumberPageSpec extends AnyFreeSpec with Matchers {
+class SecondaryContactPhoneNumberPageSpec extends AnyFreeSpec with Matchers {
 
   ".nextPage" - {
     "in Normal Mode" - {
       "must go to Index" in {
-        SeocndaryContactPhoneNumberPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndexController.onPageLoad()
+        SecondaryContactPhoneNumberPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndexController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
       "must go to Check Answers" in {
-        SeocndaryContactPhoneNumberPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        SecondaryContactPhoneNumberPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

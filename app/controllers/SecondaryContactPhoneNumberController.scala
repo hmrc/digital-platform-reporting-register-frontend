@@ -17,41 +17,41 @@
 package controllers
 
 import controllers.actions.*
-import forms.SeocndaryContactPhoneNumberFormProvider
+import forms.SecondaryContactPhoneNumberFormProvider
 import models.Mode
-import models.pageviews.SeocndaryContactPhoneNumberViewModel
-import pages.SeocndaryContactPhoneNumberPage
+import models.pageviews.SecondaryContactPhoneNumberViewModel
+import pages.SecondaryContactPhoneNumberPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.SeocndaryContactPhoneNumberView
+import views.html.SecondaryContactPhoneNumberView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SeocndaryContactPhoneNumberController @Inject()(sessionRepository: SessionRepository,
-                                      identify: IdentifierAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
-                                      formProvider: SeocndaryContactPhoneNumberFormProvider,
-                                      view: SeocndaryContactPhoneNumberView)
-                                     (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+class SecondaryContactPhoneNumberController @Inject()(sessionRepository: SessionRepository,
+                                                      identify: IdentifierAction,
+                                                      getData: DataRetrievalAction,
+                                                      requireData: DataRequiredAction,
+                                                      formProvider: SecondaryContactPhoneNumberFormProvider,
+                                                      view: SecondaryContactPhoneNumberView)
+                                                     (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val userAnswers = request.userAnswers
-    Ok(view(SeocndaryContactPhoneNumberViewModel(mode, userAnswers, formProvider())))
+    Ok(view(SecondaryContactPhoneNumberViewModel(mode, userAnswers, formProvider())))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(SeocndaryContactPhoneNumberViewModel(mode, request.userAnswers, formWithErrors)))),
+      formWithErrors => Future.successful(BadRequest(view(SecondaryContactPhoneNumberViewModel(mode, request.userAnswers, formWithErrors)))),
       value =>
         for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(SeocndaryContactPhoneNumberPage, value))
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactPhoneNumberPage, value))
           _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(SeocndaryContactPhoneNumberPage.nextPage(mode, updatedAnswers))
+        } yield Redirect(SecondaryContactPhoneNumberPage.nextPage(mode, updatedAnswers))
     )
   }
 }

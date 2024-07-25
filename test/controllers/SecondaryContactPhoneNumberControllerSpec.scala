@@ -18,36 +18,36 @@ package controllers
 
 import base.SpecBase
 import builders.UserAnswersBuilder.aUserAnswers
-import forms.SeocndaryContactPhoneNumberFormProvider
+import forms.SecondaryContactPhoneNumberFormProvider
 import models.NormalMode
-import models.pageviews.SeocndaryContactPhoneNumberViewModel
+import models.pageviews.SecondaryContactPhoneNumberViewModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.SeocndaryContactPhoneNumberPage
+import pages.SecondaryContactPhoneNumberPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.SeocndaryContactPhoneNumberView
+import views.html.SecondaryContactPhoneNumberView
 
 import scala.concurrent.Future
 
-class SeocndaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
+class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  private val form = new SeocndaryContactPhoneNumberFormProvider()()
+  private val form = new SecondaryContactPhoneNumberFormProvider()()
 
-  private lazy val seocndaryContactPhoneNumberRoute = routes.SeocndaryContactPhoneNumberController.onPageLoad(NormalMode).url
+  private lazy val secondaryContactPhoneNumberRoute = routes.SecondaryContactPhoneNumberController.onPageLoad(NormalMode).url
 
-  "SeocndaryContactPhoneNumber Controller" - {
+  "SecondaryContactPhoneNumber Controller" - {
     "must return OK and the correct view for a GET" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, seocndaryContactPhoneNumberRoute)
+        val request = FakeRequest(GET, secondaryContactPhoneNumberRoute)
         val result = route(application, request).value
-        val view = application.injector.instanceOf[SeocndaryContactPhoneNumberView]
-        val viewModel = SeocndaryContactPhoneNumberViewModel(NormalMode, aUserAnswers, form)
+        val view = application.injector.instanceOf[SecondaryContactPhoneNumberView]
+        val viewModel = SecondaryContactPhoneNumberViewModel(NormalMode, aUserAnswers, form)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -55,14 +55,14 @@ class SeocndaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = emptyUserAnswers.set(SeocndaryContactPhoneNumberPage, "answer").success.value
+      val userAnswers = emptyUserAnswers.set(SecondaryContactPhoneNumberPage, "answer").success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, seocndaryContactPhoneNumberRoute)
-        val view = application.injector.instanceOf[SeocndaryContactPhoneNumberView]
+        val request = FakeRequest(GET, secondaryContactPhoneNumberRoute)
+        val view = application.injector.instanceOf[SecondaryContactPhoneNumberView]
         val result = route(application, request).value
-        val viewModel = SeocndaryContactPhoneNumberViewModel(NormalMode, aUserAnswers, form.fill("answer"))
+        val viewModel = SecondaryContactPhoneNumberViewModel(NormalMode, aUserAnswers, form.fill("answer"))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -79,12 +79,12 @@ class SeocndaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
         .build()
 
       running(application) {
-        val request = FakeRequest(POST, seocndaryContactPhoneNumberRoute)
+        val request = FakeRequest(POST, secondaryContactPhoneNumberRoute)
           .withFormUrlEncodedBody(("value", "answer"))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual SeocndaryContactPhoneNumberPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual SecondaryContactPhoneNumberPage.nextPage(NormalMode, emptyUserAnswers).url
       }
     }
 
@@ -92,12 +92,12 @@ class SeocndaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(POST, seocndaryContactPhoneNumberRoute)
+        val request = FakeRequest(POST, secondaryContactPhoneNumberRoute)
           .withFormUrlEncodedBody(("value", ""))
         val boundForm = form.bind(Map("value" -> ""))
-        val view = application.injector.instanceOf[SeocndaryContactPhoneNumberView]
+        val view = application.injector.instanceOf[SecondaryContactPhoneNumberView]
         val result = route(application, request).value
-        val viewModel = SeocndaryContactPhoneNumberViewModel(NormalMode, aUserAnswers, boundForm)
+        val viewModel = SecondaryContactPhoneNumberViewModel(NormalMode, aUserAnswers, boundForm)
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -108,7 +108,7 @@ class SeocndaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, seocndaryContactPhoneNumberRoute)
+        val request = FakeRequest(GET, secondaryContactPhoneNumberRoute)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -120,7 +120,7 @@ class SeocndaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(POST, seocndaryContactPhoneNumberRoute)
+        val request = FakeRequest(POST, secondaryContactPhoneNumberRoute)
           .withFormUrlEncodedBody(("value", "answer"))
         val result = route(application, request).value
 
