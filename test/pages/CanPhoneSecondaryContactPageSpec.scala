@@ -39,9 +39,41 @@ class CanPhoneSecondaryContactPageSpec extends AnyFreeSpec with Matchers with Tr
     }
 
     "in Check Mode" - {
-      "must go to Check Answers" in {
-        CanPhoneSecondaryContactPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
+      "must go to Secondary Contact Phone Number when the answer is yes and answers do not contain a phone number" in {
+        val answers = anEmptyAnswer.set(CanPhoneSecondaryContactPage, true).success.value
+        CanPhoneSecondaryContactPage.nextPage(CheckMode, answers) mustEqual routes.SecondaryContactPhoneNumberController.onPageLoad(CheckMode)
       }
+
+      "must go to Check Answers" - {
+
+        "when the answer is yes and answers contains a phone number" in {
+          val answers =
+            anEmptyAnswer
+              .set(CanPhoneSecondaryContactPage, true).success.value
+              .set(SecondaryContactPhoneNumberPage, "phone").success.value
+          CanPhoneSecondaryContactPage.nextPage(CheckMode, answers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "when the answer is no" in {
+          val answers = anEmptyAnswer.set(CanPhoneSecondaryContactPage, false).success.value
+          CanPhoneSecondaryContactPage.nextPage(CheckMode, answers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        }
+      }
+    }
+  }
+
+  ".cleanup" - {
+
+    "must remove Secondary Contact Phone Number when the answer is no" in {
+      val initialAnswers = anEmptyAnswer.set(SecondaryContactPhoneNumberPage, "phone").success.value
+      val result = initialAnswers.set(CanPhoneSecondaryContactPage, false).success.value
+      result.get(SecondaryContactPhoneNumberPage) must not be defined
+    }
+
+    "must not remove data when the answer is yes" in {
+      val initialAnswers = anEmptyAnswer.set(SecondaryContactPhoneNumberPage, "phone").success.value
+      val result = initialAnswers.set(CanPhoneSecondaryContactPage, true).success.value
+      result.get(SecondaryContactPhoneNumberPage) mustBe defined
     }
   }
 }

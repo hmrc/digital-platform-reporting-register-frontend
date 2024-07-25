@@ -39,9 +39,41 @@ class CanPhoneIndividualPageSpec extends AnyFreeSpec with Matchers with TryValue
     }
 
     "in Check Mode" - {
-      "must go to Check Answers" in {
-        CanPhoneIndividualPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
+      "must go to Individual Phone Number when the answer is yes and answers do not contain a phone number" in {
+        val answers = anEmptyAnswer.set(CanPhoneIndividualPage, true).success.value
+        CanPhoneIndividualPage.nextPage(CheckMode, answers) mustEqual routes.IndividualPhoneNumberController.onPageLoad(CheckMode)
       }
+      
+      "must go to Check Answers" - {
+        
+        "when the answer is yes and answers contains a phone number" in {
+          val answers =
+            anEmptyAnswer
+              .set(CanPhoneIndividualPage, true).success.value
+              .set(IndividualPhoneNumberPage, "phone").success.value
+          CanPhoneIndividualPage.nextPage(CheckMode, answers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        }
+        
+        "when the answer is no" in {
+          val answers = anEmptyAnswer.set(CanPhoneIndividualPage, false).success.value
+          CanPhoneIndividualPage.nextPage(CheckMode, answers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        }
+      }
+    }
+  }
+  
+  ".cleanup" - {
+    
+    "must remove Individual Phone Number when the answer is no" in {
+      val initialAnswers = anEmptyAnswer.set(IndividualPhoneNumberPage, "phone").success.value
+      val result = initialAnswers.set(CanPhoneIndividualPage, false).success.value
+      result.get(IndividualPhoneNumberPage) must not be defined
+    }
+    
+    "must not remove data when the answer is yes" in {
+      val initialAnswers = anEmptyAnswer.set(IndividualPhoneNumberPage, "phone").success.value
+      val result = initialAnswers.set(CanPhoneIndividualPage, true).success.value
+      result.get(IndividualPhoneNumberPage) mustBe defined
     }
   }
 }

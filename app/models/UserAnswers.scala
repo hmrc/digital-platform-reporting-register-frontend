@@ -40,6 +40,11 @@ final case class UserAnswers(
   def getEither[A](page: Gettable[A])(implicit rds: Reads[A]): EitherNec[Query, A] =
     get(page).toRight(NonEmptyChain.one(page))
 
+  def isDefined(gettable: Gettable[_]): Boolean =
+    Reads.optionNoError(Reads.at[JsValue](gettable.path)).reads(data)
+      .map(_.isDefined)
+      .getOrElse(false)
+    
   def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
 
     val updatedData = data.setObject(page.path, Json.toJson(value)) match {
