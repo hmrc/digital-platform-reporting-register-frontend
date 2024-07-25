@@ -128,4 +128,68 @@ trait Generators extends ModelGenerators {
         Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate
     }
   }
+
+  def safeNameInputs: Gen[Char] = Gen.oneOf(
+    Gen.alphaChar,
+    Gen.const('-'),
+    Gen.const(' '),
+    Gen.const('’'),
+    Gen.const('\''),
+    Gen.oneOf('À' to 'Å'),
+    Gen.oneOf('Ç' to 'Ö'),
+    Gen.oneOf('Ø' to 'Ý'),
+    Gen.oneOf('à' to 'å'),
+    Gen.oneOf('ç' to 'ö'),
+    Gen.oneOf('ø' to 'ý'),
+    Gen.oneOf('Ā' to 'ľ'),
+    Gen.oneOf('Ł' to 'ň'),
+    Gen.oneOf('Ŋ' to 'ő'),
+    Gen.oneOf('Ŕ' to 'ſ'),
+    Gen.const('ÿ')
+  )
+
+  def safeAddressInputs: Gen[Char] = Gen.oneOf(
+    Gen.alphaNumChar,
+    Gen.const('-'),
+    Gen.const(' '),
+    Gen.const('’'),
+    Gen.const('\''),
+    Gen.oneOf('À' to 'Å'),
+    Gen.oneOf('Ç' to 'Ö'),
+    Gen.oneOf('Ø' to 'Ý'),
+    Gen.oneOf('à' to 'å'),
+    Gen.oneOf('ç' to 'ö'),
+    Gen.oneOf('ø' to 'ý'),
+    Gen.oneOf('Ā' to 'ľ'),
+    Gen.oneOf('Ł' to 'ň'),
+    Gen.oneOf('Ŋ' to 'ő'),
+    Gen.oneOf('Ŕ' to 'ſ'),
+    Gen.const('ÿ')
+  )
+
+  def unsafeInputs: Gen[Char] = Gen.oneOf(
+    Gen.const('<'),
+    Gen.const('>'),
+    Gen.const('='),
+    Gen.const('|')
+  )
+
+  def safeNameInputsWithMaxLength(length: Int): Gen[String] =
+    (for {
+      length <- Gen.choose(1, length)
+      chars <- Gen.listOfN(length, safeNameInputs)
+    } yield chars.mkString).suchThat(_.trim.nonEmpty)
+
+  def safeAddressInputsWithMaxLength(length: Int): Gen[String] =
+    (for {
+      length <- Gen.choose(1, length)
+      chars <- Gen.listOfN(length, safeAddressInputs)
+    } yield chars.mkString).suchThat(_.trim.nonEmpty)
+
+  def unsafeInputsWithMaxLength(maxLength: Int): Gen[String] = (for {
+    length <- choose(2, maxLength)
+    invalidChar <- unsafeInputs
+    validChars <- listOfN(length - 1, unsafeInputs)
+  } yield (validChars :+ invalidChar).mkString).suchThat(_.trim.nonEmpty)
+
 }

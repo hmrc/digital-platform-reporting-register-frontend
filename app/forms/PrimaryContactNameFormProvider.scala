@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.common.Validation
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -25,6 +26,9 @@ class PrimaryContactNameFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] = Form(
     "value" -> text("primaryContactName.error.required")
-      .verifying(maxLength(105, "primaryContactName.error.length"))
+      .verifying(firstError(
+        maxLength(105, "primaryContactName.error.length"),
+        regexp(Validation.nameInputPattern.toString, "primaryContactName.error.format")
+      ))
   )
 }
