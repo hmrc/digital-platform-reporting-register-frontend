@@ -167,3 +167,5 @@ GET        /seocndaryContactPhoneNumber                        controllers.Seocn
 POST       /seocndaryContactPhoneNumber                        controllers.SeocndaryContactPhoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /changeSeocndaryContactPhoneNumber                  controllers.SeocndaryContactPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /changeSeocndaryContactPhoneNumber                  controllers.SeocndaryContactPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /registration/sole-trader-details-not-match         controllers.SoleTraderDetailsNotMatchController.onPageLoad()

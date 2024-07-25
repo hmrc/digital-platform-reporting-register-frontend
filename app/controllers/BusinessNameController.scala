@@ -64,7 +64,7 @@ class BusinessNameController @Inject()(sessionRepository: SessionRepository,
             registerResponse <- register(updatedAnswers)
             fullAnswers      = updatedAnswers.copy(registrationResponse = Some(registerResponse))
             _                <- sessionRepository.set(fullAnswers)
-          } yield Redirect(BusinessNamePage.nextPage(mode, updatedAnswers))
+          } yield Redirect(BusinessNamePage.nextPage(mode, fullAnswers))
       )
   }
 

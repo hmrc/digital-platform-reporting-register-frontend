@@ -17,7 +17,8 @@
 package pages
 
 import controllers.routes
-import models.{SoleTraderName, UserAnswers}
+import models.registration.responses.MatchResponseWithId
+import models.{BusinessType, SoleTraderName, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -28,5 +29,12 @@ case object SoleTraderNamePage extends QuestionPage[SoleTraderName] {
   override def toString: String = "soleTraderName"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.IndexController.onPageLoad()
+    answers.registrationResponse.map {
+      case _: MatchResponseWithId => routes.IndexController.onPageLoad() //TODO: update when subscription backend call implemented
+      case _ => answers.get(BusinessTypePage).map {
+        case BusinessType.SoleTrader => routes.SoleTraderDetailsNotMatchController.onPageLoad()
+        case _ => routes.IndexController.onPageLoad() //TODO: update to kickout page when created
+      }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }
+
