@@ -42,10 +42,18 @@ class RegistrationResponseSpec extends AnyFreeSpec with Matchers {
         val result = json.as[RegistrationResponse]
         result mustEqual response
       }
-      
+
       "a `no match`" in {
 
         val response = NoMatchResponse()
+        val json = Json.toJson(response)
+        val result = json.as[RegistrationResponse]
+        result mustEqual response
+      }
+
+      "an `already subscribed`" in {
+
+        val response = AlreadySubscribedResponse()
         val json = Json.toJson(response)
         val result = json.as[RegistrationResponse]
         result mustEqual response

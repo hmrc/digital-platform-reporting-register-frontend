@@ -18,13 +18,13 @@ package connectors
 
 import config.Service
 import models.registration.requests.RegistrationRequest
-import models.registration.responses.{NoMatchResponse, RegistrationResponse}
+import models.registration.responses.{AlreadySubscribedResponse, NoMatchResponse, RegistrationResponse}
 import play.api.Configuration
-import play.api.http.Status.{NOT_FOUND, OK}
+import play.api.http.Status.{CONFLICT, NOT_FOUND, OK}
 import play.api.libs.json.Json
 import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,11 +43,9 @@ class RegistrationConnector @Inject()(
       .execute[HttpResponse]
       .map { response =>
         response.status match {
-          case OK =>
-            response.json.as[RegistrationResponse]
-
-          case NOT_FOUND =>
-            NoMatchResponse()
+          case OK => response.json.as[RegistrationResponse]
+          case NOT_FOUND => NoMatchResponse()
+          case CONFLICT => AlreadySubscribedResponse()
         }
       }
 }
