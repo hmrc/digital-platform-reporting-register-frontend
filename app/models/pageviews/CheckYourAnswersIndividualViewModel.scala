@@ -17,7 +17,6 @@
 package models.pageviews
 
 import models.UserAnswers
-import pages.{IndividualNamePage, SoleTraderNamePage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import viewmodels.checkAnswers.*
@@ -25,7 +24,7 @@ import viewmodels.checkAnswers.*
 final case class CheckYourAnswersIndividualViewModel(list: SummaryList)
 
 object CheckYourAnswersIndividualViewModel {
-  
+
   def apply(answers: UserAnswers)(implicit messages: Messages): CheckYourAnswersIndividualViewModel = {
     CheckYourAnswersIndividualViewModel(
       SummaryList(rows = Seq(
