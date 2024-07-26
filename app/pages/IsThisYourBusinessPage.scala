@@ -28,5 +28,8 @@ case object IsThisYourBusinessPage extends QuestionPage[Boolean] {
   override def toString: String = "isThisYourBusiness"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.IndexController.onPageLoad()
+    answers.get(this).map {
+      case true => routes.ContactDetailsGuidanceController.onPageLoad()
+      case false => routes.IndexController.onPageLoad()
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }

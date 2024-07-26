@@ -18,10 +18,11 @@ package pages
 
 import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
+import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class IsThisYourBusinessPageSpec extends AnyFreeSpec with Matchers {
+class IsThisYourBusinessPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
 
@@ -29,9 +30,16 @@ class IsThisYourBusinessPageSpec extends AnyFreeSpec with Matchers {
 
     "in Normal Mode" - {
 
-      "must go to Index" in {
+      "must go to Contact Details Guidance when the answer is yes" in {
 
-        IsThisYourBusinessPage.nextPage(NormalMode, emptyAnswers) mustEqual routes.IndexController.onPageLoad()
+        val answers = emptyAnswers.set(IsThisYourBusinessPage, true).success.value
+        IsThisYourBusinessPage.nextPage(NormalMode, answers) mustEqual routes.ContactDetailsGuidanceController.onPageLoad()
+      }
+
+      "must go to Index when the answer is no" in {
+
+        val answers = emptyAnswers.set(IsThisYourBusinessPage, false).success.value
+        IsThisYourBusinessPage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
       }
     }
 
