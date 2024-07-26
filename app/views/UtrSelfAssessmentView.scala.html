@@ -51,7 +51,7 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("utrSelfAssessment.heading"))
+                label = LabelViewModel(messages("utrSelfAssessment.heading")).withCssClass("govuk-visually-hidden")
             )
             .withWidth(Full)
         )
