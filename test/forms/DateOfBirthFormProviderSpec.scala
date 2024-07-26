@@ -39,6 +39,6 @@ class DateOfBirthFormProviderSpec extends DateBehaviours {
 
     behave like dateFieldWithMax(form, "value", LocalDate.now(), "dateOfBirth.error.future")
 
-    behave like dateFieldWithMin(form, "value", LocalDate.of(1900, 1, 1), "dateOfBirth.error.mustBeAfter")
+    behave like dateFieldWithMin(form, "value", LocalDate.of(1900, 1, 1), "dateOfBirth.error.mustBeOnOrAfter")
   }
 }
