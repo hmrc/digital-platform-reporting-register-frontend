@@ -104,12 +104,12 @@ businessName.hint = Enter the name in full as it appears on the certificate or C
 businessName.error.required = Enter your business name
 businessName.error.length = Business name must be 35 characters or less
 
-hasUtr.error.required = Select yes if you have a Unique Taxpayer Reference
 hasUtrCorporationTax.title = Do you have a Corporation Tax Unique Taxpayer Reference (UTR)?
 hasUtrCorporationTax.heading = Do you have a Corporation Tax Unique Taxpayer Reference (UTR)?
 hasUtrCorporationTax.p1 = Your UTR can be 10 or 13 digits long. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’.
 hasUtrCorporationTax.link.text = Ask for a copy of your Corporation Tax UTR
 hasUtrCorporationTax.link.href = https://www.tax.service.gov.uk/ask-for-copy-of-your-corporation-tax-utr
+hasUtrCorporationTax.error.required = Select yes if you have a Unique Taxpayer Reference
 
 hasUtrPartnership.title = Do you have a Partnership Unique Taxpayer Reference (UTR)?
 hasUtrPartnership.heading = Do you have a Partnership Unique Taxpayer Reference (UTR)?
@@ -180,12 +180,12 @@ hasNino.link.href = https://www.gov.uk/find-national-insurance-number
 
 individualName.title = What is your name?
 individualName.heading = What is your name?
-individualName.firstName = First Name or given name
-individualName.lastName = Last Name or family name
-individualName.error.firstName.required = Enter your first name or given name
+individualName.firstName = First name or given names
+individualName.lastName = Last name or family name
+individualName.error.firstName.required = Enter your first name or given names
 individualName.error.lastName.required = Enter your last name or family name
-individualName.error.firstName.length = First name or given name must be 20 characters or less
-individualName.error.lastName.length = Last name or family name must be 20 characters or less
+individualName.error.firstName.length = First name or given name must be 35 characters or less
+individualName.error.lastName.length = Last name or family name must be 35 characters or less
 
 nino.title = What is your National Insurance number?
 nino.heading = What is your National Insurance number?

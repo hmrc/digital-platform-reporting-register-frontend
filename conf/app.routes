@@ -39,8 +39,8 @@ POST       /registration/registered-business-name                        control
 GET        /registration/change-registered-business-name                 controllers.BusinessNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-registered-business-name                 controllers.BusinessNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /registration/have-utr                        controllers.HasUtrController.onPageLoad(mode: Mode = NormalMode)
-POST       /registration/have-utr                        controllers.HasUtrController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/have-utr                         controllers.HasUtrController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/have-utr                         controllers.HasUtrController.onSubmit(mode: Mode = NormalMode)
 GET        /registration/change-have-utr                  controllers.HasUtrController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-have-utr                  controllers.HasUtrController.onSubmit(mode: Mode = CheckMode)
 
