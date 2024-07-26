@@ -166,11 +166,11 @@ dateOfBirth.title = What is your date of birth?
 dateOfBirth.heading = What is your date of birth?
 dateOfBirth.hint = For example, 31 3 1980.
 dateOfBirth.error.required.all = Enter your date of birth
-dateOfBirth.error.required.two = Enter the {0} and {1}
-dateOfBirth.error.required.one = Enter the {0}
+dateOfBirth.error.required.two = Date of birth must include a {0} and {1}
+dateOfBirth.error.required.one = Date of birth must include a {0}
 dateOfBirth.error.invalid = Date of birth must be a real date
 dateOfBirth.error.future = Date of birth must be in the past
-dateOfBirth.error.mustBeAfter = Date of birth must be after 1 January 1900
+dateOfBirth.error.mustBeOnOrAfter = Date of birth must be the same as or after 1 January 1900
 
 hasNino.title = Do you have a National Insurance number?
 hasNino.heading = Do you have a National Insurance number?
