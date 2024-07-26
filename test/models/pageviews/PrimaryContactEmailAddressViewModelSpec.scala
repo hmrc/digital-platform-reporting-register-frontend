@@ -26,34 +26,35 @@ import pages.PrimaryContactEmailAddressPage
 class PrimaryContactEmailAddressViewModelSpec extends AnyFreeSpec with Matchers {
 
   private val anyMode = NormalMode
+  private val anyName = "name"
   private val formProvider = new PrimaryContactEmailAddressFormProvider()
 
   private val underTest = PrimaryContactEmailAddressViewModel
 
   ".apply(...)" - {
     "must return ViewModel with pre-filled form when PrimaryContactEmailAddressPage answer available" in {
-      val form = formProvider()
+      val form = formProvider(anyName)
       val anyString = "some-string"
       val userAnswers = aUserAnswers.set(PrimaryContactEmailAddressPage, anyString).get
 
-      underTest.apply(anyMode, userAnswers, form) mustBe
-        PrimaryContactEmailAddressViewModel(mode = anyMode, form = form.fill(anyString))
+      underTest.apply(anyMode, userAnswers, form, anyName) mustBe
+        PrimaryContactEmailAddressViewModel(mode = anyMode, form = form.fill(anyString), anyName)
     }
 
     "must return ViewModel without pre-filled form when PrimaryContactEmailAddressPage answer not available" in {
-      val emptyForm = formProvider()
+      val emptyForm = formProvider(anyName)
       val userAnswers = aUserAnswers.remove(PrimaryContactEmailAddressPage).get
 
-      underTest.apply(anyMode, userAnswers, emptyForm) mustBe
-        PrimaryContactEmailAddressViewModel(mode = anyMode, form = emptyForm)
+      underTest.apply(anyMode, userAnswers, emptyForm, anyName) mustBe
+        PrimaryContactEmailAddressViewModel(mode = anyMode, form = emptyForm, anyName)
     }
 
     "must return ViewModel with pre-filled form with errors, when the form has errors" in {
-      val formWithErrors = formProvider().bind(Map(PrimaryContactEmailAddressPage.toString -> "unknown-value"))
+      val formWithErrors = formProvider(anyName).bind(Map(PrimaryContactEmailAddressPage.toString -> "unknown-value"))
       val userAnswers = aUserAnswers.remove(PrimaryContactEmailAddressPage).get
 
-      underTest.apply(anyMode, userAnswers, formWithErrors) mustBe
-        PrimaryContactEmailAddressViewModel(mode = anyMode, form = formWithErrors)
+      underTest.apply(anyMode, userAnswers, formWithErrors, anyName) mustBe
+        PrimaryContactEmailAddressViewModel(mode = anyMode, form = formWithErrors, anyName)
     }
   }
 }

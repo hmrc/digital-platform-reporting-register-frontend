@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.HasSecondaryContactFormProvider
 import models.Mode
 import models.pageviews.HasSecondaryContactViewModel
-import pages.HasSecondaryContactPage
+import pages.{HasSecondaryContactPage, PrimaryContactNamePage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -37,21 +37,25 @@ class HasSecondaryContactController @Inject()(sessionRepository: SessionReposito
                                         formProvider: HasSecondaryContactFormProvider,
                                         view: HasSecondaryContactView)
                                         (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
-  extends FrontendController(mcc) with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val userAnswers = request.userAnswers
-    Ok(view(HasSecondaryContactViewModel(mode, userAnswers, formProvider())))
+    getAnswer(PrimaryContactNamePage) { contactName =>
+      val userAnswers = request.userAnswers
+      Ok(view(HasSecondaryContactViewModel(mode, userAnswers, formProvider(contactName), contactName)))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(HasSecondaryContactViewModel(mode, request.userAnswers, formWithErrors)))),
-      value =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(HasSecondaryContactPage, value))
-          _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(HasSecondaryContactPage.nextPage(mode, updatedAnswers))
-    )
+    getAnswerAsync(PrimaryContactNamePage) { contactName =>
+      formProvider(contactName).bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(HasSecondaryContactViewModel(mode, request.userAnswers, formWithErrors, contactName)))),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(HasSecondaryContactPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(HasSecondaryContactPage.nextPage(mode, updatedAnswers))
+      )
+    }
   }
 }

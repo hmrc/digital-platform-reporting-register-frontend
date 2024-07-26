@@ -17,13 +17,19 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import forms.common.Validation
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class IndividualEmailAddressFormProviderSpec extends StringFieldBehaviours {
 
   private val requiredKey = "individualEmailAddress.error.required"
   private val lengthKey = "individualEmailAddress.error.length"
+  private val formatKey = "individualEmailAddress.error.format"
   private val maxLength = 132
+  private val basicEmail = Gen.const("foo@example.com")
+  private val emailWithSpecialChars = Gen.const("!#$%&'*-+/=?^_`{}~123@foo-bar.example.com")
+  private val validData = Gen.oneOf(basicEmail, emailWithSpecialChars)
 
   private val underTest = new IndividualEmailAddressFormProvider()()
 
@@ -33,7 +39,7 @@ class IndividualEmailAddressFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       underTest,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
 
     behave like fieldWithMaxLength(
@@ -48,5 +54,16 @@ class IndividualEmailAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       requiredError = FormError(fieldName, requiredKey)
     )
+
+    "not allow invalid email addreses" in {
+
+      val noAt = "fooexample.com"
+      val noUserName = "@example.com"
+      val noDomain = "foo@example"
+      val invalidData = Gen.oneOf(noAt, noUserName, noDomain).sample.value
+
+      val result = underTest.bind(Map("value" -> invalidData)).apply(fieldName)
+      result.errors mustEqual Seq(FormError(fieldName, formatKey, Seq(Validation.emailPattern.toString)))
+    }
   }
 }

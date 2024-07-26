@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.HasSecondaryContactPage
+import pages.{HasSecondaryContactPage, PrimaryContactNamePage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -27,16 +27,21 @@ import viewmodels.implicits.*
 object HasSecondaryContactSummary  {
 
   def row(answers: UserAnswers)
-         (implicit messages: Messages): Option[SummaryListRow] = answers.get(HasSecondaryContactPage).map { answer =>
-    val value = if (answer) "site.yes" else "site.no"
+         (implicit messages: Messages): Option[SummaryListRow] =
+    for {
+      answer <- answers.get(HasSecondaryContactPage)
+      contactName <- answers.get(PrimaryContactNamePage)
+    } yield {
 
-    SummaryListRowViewModel(
-      key = "hasSecondaryContact.checkYourAnswersLabel",
-      value = ValueViewModel(value),
-      actions = Seq(
-        ActionItemViewModel("site.change", routes.HasSecondaryContactController.onPageLoad(CheckMode).url)
-          .withVisuallyHiddenText(messages("hasSecondaryContact.change.hidden"))
+      val value = if (answer) "site.yes" else "site.no"
+
+      SummaryListRowViewModel(
+        key = messages("hasSecondaryContact.checkYourAnswersLabel", contactName),
+        value = ValueViewModel(value),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.HasSecondaryContactController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("hasSecondaryContact.change.hidden", contactName))
+        )
       )
-    )
   }
 }

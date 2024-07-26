@@ -22,38 +22,42 @@ import models.NormalMode
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.PrimaryContactPhoneNumberPage
+import play.api.i18n.Messages
+import play.api.test.Helpers.stubMessages
 
 class PrimaryContactPhoneNumberViewModelSpec extends AnyFreeSpec with Matchers {
 
+  private implicit val msgs: Messages = stubMessages()
   private val anyMode = NormalMode
+  private val anyName = "name"
   private val formProvider = new PrimaryContactPhoneNumberFormProvider()
 
   private val underTest = PrimaryContactPhoneNumberViewModel
 
   ".apply(...)" - {
     "must return ViewModel with pre-filled form when PrimaryContactPhoneNumberPage answer available" in {
-      val form = formProvider()
+      val form = formProvider(anyName)
       val anyString = "some-string"
       val userAnswers = aUserAnswers.set(PrimaryContactPhoneNumberPage, anyString).get
 
-      underTest.apply(anyMode, userAnswers, form) mustBe
-        PrimaryContactPhoneNumberViewModel(mode = anyMode, form = form.fill(anyString))
+      underTest.apply(anyMode, userAnswers, form, anyName) mustBe
+        PrimaryContactPhoneNumberViewModel(mode = anyMode, form = form.fill(anyString), anyName)
     }
 
     "must return ViewModel without pre-filled form when PrimaryContactPhoneNumberPage answer not available" in {
-      val emptyForm = formProvider()
+      val emptyForm = formProvider(anyName)
       val userAnswers = aUserAnswers.remove(PrimaryContactPhoneNumberPage).get
 
-      underTest.apply(anyMode, userAnswers, emptyForm) mustBe
-        PrimaryContactPhoneNumberViewModel(mode = anyMode, form = emptyForm)
+      underTest.apply(anyMode, userAnswers, emptyForm, anyName) mustBe
+        PrimaryContactPhoneNumberViewModel(mode = anyMode, form = emptyForm, anyName)
     }
 
     "must return ViewModel with pre-filled form with errors, when the form has errors" in {
-      val formWithErrors = formProvider().bind(Map(PrimaryContactPhoneNumberPage.toString -> "unknown-value"))
+      val formWithErrors = formProvider(anyName).bind(Map(PrimaryContactPhoneNumberPage.toString -> "unknown-value"))
       val userAnswers = aUserAnswers.remove(PrimaryContactPhoneNumberPage).get
 
-      underTest.apply(anyMode, userAnswers, formWithErrors) mustBe
-        PrimaryContactPhoneNumberViewModel(mode = anyMode, form = formWithErrors)
+      underTest.apply(anyMode, userAnswers, formWithErrors, anyName) mustBe
+        PrimaryContactPhoneNumberViewModel(mode = anyMode, form = formWithErrors, anyName)
     }
   }
 }

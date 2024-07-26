@@ -36,24 +36,24 @@ class PrimaryContactNameViewModelSpec extends AnyFreeSpec with Matchers {
       val anyString = "some-string"
       val userAnswers = aUserAnswers.set(PrimaryContactNamePage, anyString).get
 
-      underTest.apply(anyMode, userAnswers, form) mustBe
-        PrimaryContactNameViewModel(mode = anyMode, form = form.fill(anyString))
+      underTest.apply(anyMode, userAnswers, form, true) mustBe
+        PrimaryContactNameViewModel(mode = anyMode, form = form.fill(anyString), true)
     }
 
     "must return ViewModel without pre-filled form when PrimaryContactNamePage answer not available" in {
       val emptyForm = formProvider()
       val userAnswers = aUserAnswers.remove(PrimaryContactNamePage).get
 
-      underTest.apply(anyMode, userAnswers, emptyForm) mustBe
-        PrimaryContactNameViewModel(mode = anyMode, form = emptyForm)
+      underTest.apply(anyMode, userAnswers, emptyForm, false) mustBe
+        PrimaryContactNameViewModel(mode = anyMode, form = emptyForm, false)
     }
 
     "must return ViewModel with pre-filled form with errors, when the form has errors" in {
       val formWithErrors = formProvider().bind(Map(PrimaryContactNamePage.toString -> "unknown-value"))
       val userAnswers = aUserAnswers.remove(PrimaryContactNamePage).get
 
-      underTest.apply(anyMode, userAnswers, formWithErrors) mustBe
-        PrimaryContactNameViewModel(mode = anyMode, form = formWithErrors)
+      underTest.apply(anyMode, userAnswers, formWithErrors, true) mustBe
+        PrimaryContactNameViewModel(mode = anyMode, form = formWithErrors, true)
     }
   }
 }

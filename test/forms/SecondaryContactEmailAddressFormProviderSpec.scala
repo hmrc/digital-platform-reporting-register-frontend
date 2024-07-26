@@ -17,15 +17,22 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import forms.common.Validation
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class SecondaryContactEmailAddressFormProviderSpec extends StringFieldBehaviours {
 
   private val requiredKey = "secondaryContactEmailAddress.error.required"
   private val lengthKey = "secondaryContactEmailAddress.error.length"
+  private val formatKey = "secondaryContactEmailAddress.error.format"
   private val maxLength = 132
+  private val anyName = "name"
+  private val underTest = new SecondaryContactEmailAddressFormProvider()(anyName)
 
-  private val underTest = new SecondaryContactEmailAddressFormProvider()()
+  private val basicEmail = Gen.const("foo@example.com")
+  private val emailWithSpecialChars = Gen.const("!#$%&'*-+/=?^_`{}~123@foo-bar.example.com")
+  private val validData = Gen.oneOf(basicEmail, emailWithSpecialChars)
 
   ".value" - {
     val fieldName = "value"
@@ -33,20 +40,31 @@ class SecondaryContactEmailAddressFormProviderSpec extends StringFieldBehaviours
     behave like fieldThatBindsValidData(
       underTest,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
 
     behave like fieldWithMaxLength(
       underTest,
       fieldName,
       maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength, anyName))
     )
 
     behave like mandatoryField(
       underTest,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(anyName))
     )
+
+    "not allow invalid email addreses" in {
+
+      val noAt = "fooexample.com"
+      val noUserName = "@example.com"
+      val noDomain = "foo@example"
+      val invalidData = Gen.oneOf(noAt, noUserName, noDomain).sample.value
+
+      val result = underTest.bind(Map("value" -> invalidData)).apply(fieldName)
+      result.errors mustEqual Seq(FormError(fieldName, formatKey, Seq(Validation.emailPattern.toString)))
+    }
   }
 }

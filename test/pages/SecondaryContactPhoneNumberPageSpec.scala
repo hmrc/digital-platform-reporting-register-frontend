@@ -26,8 +26,8 @@ class SecondaryContactPhoneNumberPageSpec extends AnyFreeSpec with Matchers {
 
   ".nextPage" - {
     "in Normal Mode" - {
-      "must go to Index" in {
-        SecondaryContactPhoneNumberPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndexController.onPageLoad()
+      "must go to Check Answers" in {
+        SecondaryContactPhoneNumberPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
 

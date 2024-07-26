@@ -17,11 +17,13 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import forms.common.Validation
 import play.api.data.FormError
 
 class PrimaryContactNameFormProviderSpec extends StringFieldBehaviours {
 
   private val requiredKey = "primaryContactName.error.required"
+  private val formatKey = "primaryContactName.error.format"
   private val lengthKey = "primaryContactName.error.length"
   private val maxLength = 105
 
@@ -33,9 +35,16 @@ class PrimaryContactNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       underTest,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeNameInputsWithMaxLength(maxLength)
     )
 
+    behave like fieldThatDoesNotBindInvalidData(
+      underTest,
+      fieldName,
+      unsafeInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.nameInputPattern.toString))
+    )
+    
     behave like fieldWithMaxLength(
       underTest,
       fieldName,

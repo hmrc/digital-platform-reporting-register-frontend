@@ -17,15 +17,23 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import forms.common.Validation
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class PrimaryContactEmailAddressFormProviderSpec extends StringFieldBehaviours {
 
   private val requiredKey = "primaryContactEmailAddress.error.required"
   private val lengthKey = "primaryContactEmailAddress.error.length"
+  private val formatKey = "primaryContactEmailAddress.error.format"
   private val maxLength = 132
+  private val anyName = "name"
+  
+  private val basicEmail = Gen.const("foo@example.com")
+  private val emailWithSpecialChars = Gen.const("!#$%&'*-+/=?^_`{}~123@foo-bar.example.com")
+  private val validData = Gen.oneOf(basicEmail, emailWithSpecialChars)
 
-  private val underTest = new PrimaryContactEmailAddressFormProvider()()
+  private val underTest = new PrimaryContactEmailAddressFormProvider()(anyName)
 
   ".value" - {
     val fieldName = "value"
@@ -33,20 +41,31 @@ class PrimaryContactEmailAddressFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       underTest,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validData
     )
 
     behave like fieldWithMaxLength(
       underTest,
       fieldName,
       maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength, anyName))
     )
 
     behave like mandatoryField(
       underTest,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(anyName))
     )
+
+    "not allow invalid email addreses" in {
+
+      val noAt = "fooexample.com"
+      val noUserName = "@example.com"
+      val noDomain = "foo@example"
+      val invalidData = Gen.oneOf(noAt, noUserName, noDomain).sample.value
+
+      val result = underTest.bind(Map("value" -> invalidData)).apply(fieldName)
+      result.errors mustEqual Seq(FormError(fieldName, formatKey, Seq(Validation.emailPattern.toString)))
+    }
   }
 }

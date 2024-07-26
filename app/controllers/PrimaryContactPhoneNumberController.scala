@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.PrimaryContactPhoneNumberFormProvider
 import models.Mode
 import models.pageviews.PrimaryContactPhoneNumberViewModel
-import pages.PrimaryContactPhoneNumberPage
+import pages.{PrimaryContactNamePage, PrimaryContactPhoneNumberPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -37,21 +37,25 @@ class PrimaryContactPhoneNumberController @Inject()(sessionRepository: SessionRe
                                       formProvider: PrimaryContactPhoneNumberFormProvider,
                                       view: PrimaryContactPhoneNumberView)
                                      (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
-  extends FrontendController(mcc) with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val userAnswers = request.userAnswers
-    Ok(view(PrimaryContactPhoneNumberViewModel(mode, userAnswers, formProvider())))
+    getAnswer(PrimaryContactNamePage) { contactName =>
+      val userAnswers = request.userAnswers
+      Ok(view(PrimaryContactPhoneNumberViewModel(mode, userAnswers, formProvider(contactName), contactName)))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(PrimaryContactPhoneNumberViewModel(mode, request.userAnswers, formWithErrors)))),
-      value =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactPhoneNumberPage, value))
-          _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(PrimaryContactPhoneNumberPage.nextPage(mode, updatedAnswers))
-    )
+    getAnswerAsync(PrimaryContactNamePage) { contactName =>
+      formProvider(contactName).bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(PrimaryContactPhoneNumberViewModel(mode, request.userAnswers, formWithErrors, contactName)))),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactPhoneNumberPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(PrimaryContactPhoneNumberPage.nextPage(mode, updatedAnswers))
+      )
+    }
   }
 }

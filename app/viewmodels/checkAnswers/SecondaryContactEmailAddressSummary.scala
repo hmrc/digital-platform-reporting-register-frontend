@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.SecondaryContactEmailAddressPage
+import pages.{SecondaryContactEmailAddressPage, SecondaryContactNamePage}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -28,15 +28,18 @@ import viewmodels.implicits.*
 object SecondaryContactEmailAddressSummary  {
 
   def row(answers: UserAnswers)
-         (implicit messages: Messages): Option[SummaryListRow] = answers.get(SecondaryContactEmailAddressPage).map { answer =>
+         (implicit messages: Messages): Option[SummaryListRow] =
+    for {
+      answer <- answers.get(SecondaryContactEmailAddressPage)
+      contactName <- answers.get(SecondaryContactNamePage)
+    } yield
 
     SummaryListRowViewModel(
       key = "secondaryContactEmailAddress.checkYourAnswersLabel",
       value = ValueViewModel(HtmlFormat.escape(answer).toString),
       actions = Seq(
         ActionItemViewModel("site.change", routes.SecondaryContactEmailAddressController.onPageLoad(CheckMode).url)
-          .withVisuallyHiddenText(messages("secondaryContactEmailAddress.change.hidden"))
+          .withVisuallyHiddenText(messages("secondaryContactEmailAddress.change.hidden", contactName))
       )
     )
-  }
 }

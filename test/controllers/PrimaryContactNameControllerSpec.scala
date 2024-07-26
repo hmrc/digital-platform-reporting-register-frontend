@@ -17,14 +17,14 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.aUserAnswers
 import forms.PrimaryContactNameFormProvider
 import models.NormalMode
+import models.RegistrationType.ThirdParty
 import models.pageviews.PrimaryContactNameViewModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.PrimaryContactNamePage
+import pages.{PrimaryContactNamePage, RegistrationTypePage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -38,16 +38,17 @@ class PrimaryContactNameControllerSpec extends SpecBase with MockitoSugar {
   private val form = new PrimaryContactNameFormProvider()()
 
   private lazy val primaryContactNameRoute = routes.PrimaryContactNameController.onPageLoad(NormalMode).url
+  private val baseAnswers = emptyUserAnswers.set(RegistrationTypePage, ThirdParty).success.value
 
   "PrimaryContactName Controller" - {
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, primaryContactNameRoute)
         val result = route(application, request).value
         val view = application.injector.instanceOf[PrimaryContactNameView]
-        val viewModel = PrimaryContactNameViewModel(NormalMode, aUserAnswers, form)
+        val viewModel = PrimaryContactNameViewModel(NormalMode, baseAnswers, form, true)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -55,14 +56,14 @@ class PrimaryContactNameControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = emptyUserAnswers.set(PrimaryContactNamePage, "answer").success.value
+      val userAnswers = baseAnswers.set(PrimaryContactNamePage, "answer").success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, primaryContactNameRoute)
         val view = application.injector.instanceOf[PrimaryContactNameView]
         val result = route(application, request).value
-        val viewModel = PrimaryContactNameViewModel(NormalMode, aUserAnswers, form.fill("answer"))
+        val viewModel = PrimaryContactNameViewModel(NormalMode, baseAnswers, form.fill("answer"), true)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -74,7 +75,7 @@ class PrimaryContactNameControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(baseAnswers))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
         .build()
 
@@ -84,12 +85,12 @@ class PrimaryContactNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual PrimaryContactNamePage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual PrimaryContactNamePage.nextPage(NormalMode, baseAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, primaryContactNameRoute)
@@ -97,7 +98,7 @@ class PrimaryContactNameControllerSpec extends SpecBase with MockitoSugar {
         val boundForm = form.bind(Map("value" -> ""))
         val view = application.injector.instanceOf[PrimaryContactNameView]
         val result = route(application, request).value
-        val viewModel = PrimaryContactNameViewModel(NormalMode, aUserAnswers, boundForm)
+        val viewModel = PrimaryContactNameViewModel(NormalMode, baseAnswers, boundForm, true)
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString

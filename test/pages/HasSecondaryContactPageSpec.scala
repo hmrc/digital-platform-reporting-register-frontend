@@ -19,22 +19,81 @@ package pages
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.{CheckMode, NormalMode}
+import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class HasSecondaryContactPageSpec extends AnyFreeSpec with Matchers {
+class HasSecondaryContactPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
     "in Normal Mode" - {
-      "must go to Index" in {
-        HasSecondaryContactPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndexController.onPageLoad()
+      "must go to Secondary Contact Name when the answer is yes" in {
+        val answers = anEmptyAnswer.set(HasSecondaryContactPage, true).success.value
+        HasSecondaryContactPage.nextPage(NormalMode, answers) mustEqual routes.SecondaryContactNameController.onPageLoad(NormalMode)
+      }
+
+      "must go to Check Answers when the answer is no" in {
+        val answers = anEmptyAnswer.set(HasSecondaryContactPage, false).success.value
+        HasSecondaryContactPage.nextPage(NormalMode, answers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
-      "must go to Check Answers" in {
-        HasSecondaryContactPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
+      "must go to Secondary Contact Name when the answer is yes and answers do not contain a secondary contact name" in {
+        val answers = anEmptyAnswer.set(HasSecondaryContactPage, true).success.value
+        HasSecondaryContactPage.nextPage(CheckMode, answers) mustEqual routes.SecondaryContactNameController.onPageLoad(CheckMode)
       }
+
+      "must go to Check Answers" - {
+
+        "when the answer is yes and answers contains a secondary contact name" in {
+          val answers =
+            anEmptyAnswer
+              .set(HasSecondaryContactPage, true).success.value
+              .set(SecondaryContactNamePage, "name").success.value
+          HasSecondaryContactPage.nextPage(CheckMode, answers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "when the answer is no" in {
+          val answers = anEmptyAnswer.set(HasSecondaryContactPage, false).success.value
+          HasSecondaryContactPage.nextPage(CheckMode, answers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        }
+      }
+    }
+  }
+
+  ".cleanup" - {
+
+    "must remove all secondary contact data when the answer is no" in {
+      val initialAnswers =
+        anEmptyAnswer
+          .set(SecondaryContactNamePage, "name").success.value
+          .set(SecondaryContactEmailAddressPage, "email").success.value
+          .set(CanPhoneSecondaryContactPage, true).success.value
+          .set(SecondaryContactPhoneNumberPage, "phone").success.value
+
+      val result = initialAnswers.set(HasSecondaryContactPage, false).success.value
+
+      result.get(SecondaryContactNamePage) must not be defined
+      result.get(SecondaryContactEmailAddressPage) must not be defined
+      result.get(CanPhoneSecondaryContactPage) must not be defined
+      result.get(SecondaryContactPhoneNumberPage) must not be defined
+    }
+
+    "must not remove data when the answer is yes" in {
+      val initialAnswers =
+        anEmptyAnswer
+          .set(SecondaryContactNamePage, "name").success.value
+          .set(SecondaryContactEmailAddressPage, "email").success.value
+          .set(CanPhoneSecondaryContactPage, true).success.value
+          .set(SecondaryContactPhoneNumberPage, "phone").success.value
+
+      val result = initialAnswers.set(HasSecondaryContactPage, true).success.value
+
+      result.get(SecondaryContactNamePage) mustBe defined
+      result.get(SecondaryContactEmailAddressPage) mustBe defined
+      result.get(CanPhoneSecondaryContactPage) mustBe defined
+      result.get(SecondaryContactPhoneNumberPage) mustBe defined
     }
   }
 }

@@ -37,7 +37,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = viewModel.form("value"),
-                legend = LegendViewModel(messages("hasSecondaryContact.heading")).asPageHeading()
+                legend = LegendViewModel(messages("hasSecondaryContact.heading", viewModel.contactName)).asPageHeading()
             )
         )
 

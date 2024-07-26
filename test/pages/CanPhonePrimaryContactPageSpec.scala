@@ -19,22 +19,61 @@ package pages
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.{CheckMode, NormalMode}
+import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class CanPhonePrimaryContactPageSpec extends AnyFreeSpec with Matchers {
+class CanPhonePrimaryContactPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
     "in Normal Mode" - {
-      "must go to Index" in {
-        CanPhonePrimaryContactPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndexController.onPageLoad()
+      "must go to Primary Contact Phone Number when the answer is yes" in {
+        val answers = anEmptyAnswer.set(CanPhonePrimaryContactPage, true).success.value
+        CanPhonePrimaryContactPage.nextPage(NormalMode, answers) mustEqual routes.PrimaryContactPhoneNumberController.onPageLoad(NormalMode)
+      }
+
+      "must go to Has Secondary Contact when the answer is no" in {
+        val answers = anEmptyAnswer.set(CanPhonePrimaryContactPage, false).success.value
+        CanPhonePrimaryContactPage.nextPage(NormalMode, answers) mustEqual routes.HasSecondaryContactController.onPageLoad(NormalMode)
       }
     }
 
     "in Check Mode" - {
-      "must go to Check Answers" in {
-        CanPhonePrimaryContactPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
+      "must go to Primary Contact Phone Number when the answer is yes and answers do not contain a phone number" in {
+        val answers = anEmptyAnswer.set(CanPhonePrimaryContactPage, true).success.value
+        CanPhonePrimaryContactPage.nextPage(CheckMode, answers) mustEqual routes.PrimaryContactPhoneNumberController.onPageLoad(CheckMode)
       }
+
+      "must go to Check Answers" - {
+
+        "when the answer is yes and answers contains a phone number" in {
+          val answers =
+            anEmptyAnswer
+              .set(CanPhonePrimaryContactPage, true).success.value
+              .set(PrimaryContactPhoneNumberPage, "phone").success.value
+          CanPhonePrimaryContactPage.nextPage(CheckMode, answers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "when the answer is no" in {
+          val answers = anEmptyAnswer.set(CanPhonePrimaryContactPage, false).success.value
+          CanPhonePrimaryContactPage.nextPage(CheckMode, answers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        }
+      }
+    }
+  }
+
+  ".cleanup" - {
+
+    "must remove Primary Contact Phone Number when the answer is no" in {
+      val initialAnswers = anEmptyAnswer.set(PrimaryContactPhoneNumberPage, "phone").success.value
+      val result = initialAnswers.set(CanPhonePrimaryContactPage, false).success.value
+      result.get(PrimaryContactPhoneNumberPage) must not be defined
+    }
+
+    "must not remove data when the answer is yes" in {
+      val initialAnswers = anEmptyAnswer.set(PrimaryContactPhoneNumberPage, "phone").success.value
+      val result = initialAnswers.set(CanPhonePrimaryContactPage, true).success.value
+      result.get(PrimaryContactPhoneNumberPage) mustBe defined
     }
   }
 }

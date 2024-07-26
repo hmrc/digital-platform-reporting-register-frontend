@@ -20,16 +20,17 @@ import models.{Mode, UserAnswers}
 import pages.HasSecondaryContactPage
 import play.api.data.Form
 
-case class HasSecondaryContactViewModel(mode: Mode, form: Form[Boolean])
+case class HasSecondaryContactViewModel(mode: Mode, form: Form[Boolean], contactName: String)
 
 object HasSecondaryContactViewModel {
 
-  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[Boolean]): HasSecondaryContactViewModel = {
+  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[Boolean], contactName: String): HasSecondaryContactViewModel = {
     val optAnswerValue = userAnswers.get(HasSecondaryContactPage)
 
     HasSecondaryContactViewModel(
       mode = mode,
-      form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue))
+      form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue)),
+      contactName = contactName
     )
   }
 }

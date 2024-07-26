@@ -26,6 +26,7 @@ import pages.SecondaryContactNamePage
 class SecondaryContactNameViewModelSpec extends AnyFreeSpec with Matchers {
 
   private val anyMode = NormalMode
+  private val anyBoolean = true
   private val formProvider = new SecondaryContactNameFormProvider()
 
   private val underTest = SecondaryContactNameViewModel
@@ -36,24 +37,24 @@ class SecondaryContactNameViewModelSpec extends AnyFreeSpec with Matchers {
       val anyString = "some-string"
       val userAnswers = aUserAnswers.set(SecondaryContactNamePage, anyString).get
 
-      underTest.apply(anyMode, userAnswers, form) mustBe
-        SecondaryContactNameViewModel(mode = anyMode, form = form.fill(anyString))
+      underTest.apply(anyMode, userAnswers, form, anyBoolean) mustBe
+        SecondaryContactNameViewModel(mode = anyMode, form = form.fill(anyString), anyBoolean)
     }
 
     "must return ViewModel without pre-filled form when SecondaryContactNamePage answer not available" in {
       val emptyForm = formProvider()
       val userAnswers = aUserAnswers.remove(SecondaryContactNamePage).get
 
-      underTest.apply(anyMode, userAnswers, emptyForm) mustBe
-        SecondaryContactNameViewModel(mode = anyMode, form = emptyForm)
+      underTest.apply(anyMode, userAnswers, emptyForm, anyBoolean) mustBe
+        SecondaryContactNameViewModel(mode = anyMode, form = emptyForm, anyBoolean)
     }
 
     "must return ViewModel with pre-filled form with errors, when the form has errors" in {
       val formWithErrors = formProvider().bind(Map(SecondaryContactNamePage.toString -> "unknown-value"))
       val userAnswers = aUserAnswers.remove(SecondaryContactNamePage).get
 
-      underTest.apply(anyMode, userAnswers, formWithErrors) mustBe
-        SecondaryContactNameViewModel(mode = anyMode, form = formWithErrors)
+      underTest.apply(anyMode, userAnswers, formWithErrors, anyBoolean) mustBe
+        SecondaryContactNameViewModel(mode = anyMode, form = formWithErrors, anyBoolean)
     }
   }
 }

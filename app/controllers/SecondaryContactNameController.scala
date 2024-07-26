@@ -19,8 +19,9 @@ package controllers
 import controllers.actions.*
 import forms.SecondaryContactNameFormProvider
 import models.Mode
+import models.RegistrationType.ThirdParty
 import models.pageviews.SecondaryContactNameViewModel
-import pages.SecondaryContactNamePage
+import pages.{RegistrationTypePage, SecondaryContactNamePage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -37,21 +38,25 @@ class SecondaryContactNameController @Inject()(sessionRepository: SessionReposit
                                       formProvider: SecondaryContactNameFormProvider,
                                       view: SecondaryContactNameView)
                                      (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
-  extends FrontendController(mcc) with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val userAnswers = request.userAnswers
-    Ok(view(SecondaryContactNameViewModel(mode, userAnswers, formProvider())))
+    getAnswer(RegistrationTypePage) { registrationType =>
+      val userAnswers = request.userAnswers
+      Ok(view(SecondaryContactNameViewModel(mode, userAnswers, formProvider(), registrationType == ThirdParty)))
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(SecondaryContactNameViewModel(mode, request.userAnswers, formWithErrors)))),
-      value =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactNamePage, value))
-          _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(SecondaryContactNamePage.nextPage(mode, updatedAnswers))
-    )
+    getAnswerAsync(RegistrationTypePage) { registrationType =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(SecondaryContactNameViewModel(mode, request.userAnswers, formWithErrors, registrationType == ThirdParty)))),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactNamePage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(SecondaryContactNamePage.nextPage(mode, updatedAnswers))
+      )
+    }
   }
 }

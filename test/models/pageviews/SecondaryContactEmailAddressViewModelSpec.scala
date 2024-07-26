@@ -25,6 +25,7 @@ import pages.SecondaryContactEmailAddressPage
 
 class SecondaryContactEmailAddressViewModelSpec extends AnyFreeSpec with Matchers {
 
+  private val anyName = "name"
   private val anyMode = NormalMode
   private val formProvider = new SecondaryContactEmailAddressFormProvider()
 
@@ -32,28 +33,28 @@ class SecondaryContactEmailAddressViewModelSpec extends AnyFreeSpec with Matcher
 
   ".apply(...)" - {
     "must return ViewModel with pre-filled form when SecondaryContactEmailAddressPage answer available" in {
-      val form = formProvider()
+      val form = formProvider(anyName)
       val anyString = "some-string"
       val userAnswers = aUserAnswers.set(SecondaryContactEmailAddressPage, anyString).get
 
-      underTest.apply(anyMode, userAnswers, form) mustBe
-        SecondaryContactEmailAddressViewModel(mode = anyMode, form = form.fill(anyString))
+      underTest.apply(anyMode, userAnswers, form, anyName) mustBe
+        SecondaryContactEmailAddressViewModel(mode = anyMode, form = form.fill(anyString), anyName)
     }
 
     "must return ViewModel without pre-filled form when SecondaryContactEmailAddressPage answer not available" in {
-      val emptyForm = formProvider()
+      val emptyForm = formProvider(anyName)
       val userAnswers = aUserAnswers.remove(SecondaryContactEmailAddressPage).get
 
-      underTest.apply(anyMode, userAnswers, emptyForm) mustBe
-        SecondaryContactEmailAddressViewModel(mode = anyMode, form = emptyForm)
+      underTest.apply(anyMode, userAnswers, emptyForm, anyName) mustBe
+        SecondaryContactEmailAddressViewModel(mode = anyMode, form = emptyForm, anyName)
     }
 
     "must return ViewModel with pre-filled form with errors, when the form has errors" in {
-      val formWithErrors = formProvider().bind(Map(SecondaryContactEmailAddressPage.toString -> "unknown-value"))
+      val formWithErrors = formProvider(anyName).bind(Map(SecondaryContactEmailAddressPage.toString -> "unknown-value"))
       val userAnswers = aUserAnswers.remove(SecondaryContactEmailAddressPage).get
 
-      underTest.apply(anyMode, userAnswers, formWithErrors) mustBe
-        SecondaryContactEmailAddressViewModel(mode = anyMode, form = formWithErrors)
+      underTest.apply(anyMode, userAnswers, formWithErrors, anyName) mustBe
+        SecondaryContactEmailAddressViewModel(mode = anyMode, form = formWithErrors, anyName)
     }
   }
 }

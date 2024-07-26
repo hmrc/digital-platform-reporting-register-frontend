@@ -25,6 +25,7 @@ import pages.CanPhoneSecondaryContactPage
 
 class CanPhoneSecondaryContactViewModelSpec extends AnyFreeSpec with Matchers {
 
+  private val anyName = "name"
   private val anyMode = NormalMode
   private val formProvider = new CanPhoneSecondaryContactFormProvider()
 
@@ -32,28 +33,28 @@ class CanPhoneSecondaryContactViewModelSpec extends AnyFreeSpec with Matchers {
 
   ".apply(...)" - {
     "must return ViewModel with pre-filled form when CanPhoneSecondaryContactPage answer available" in {
-      val form = formProvider()
+      val form = formProvider(anyName)
       val anyBoolean = true
       val userAnswers = aUserAnswers.set(CanPhoneSecondaryContactPage, anyBoolean).get
 
-      underTest.apply(anyMode, userAnswers, form) mustBe
-        CanPhoneSecondaryContactViewModel(mode = anyMode, form = form.fill(anyBoolean))
+      underTest.apply(anyMode, userAnswers, form, anyName) mustBe
+        CanPhoneSecondaryContactViewModel(mode = anyMode, form = form.fill(anyBoolean), anyName)
     }
 
     "must return ViewModel without pre-filled form when CanPhoneSecondaryContactPage answer not available" in {
-      val emptyForm = formProvider()
+      val emptyForm = formProvider(anyName)
       val userAnswers = aUserAnswers.remove(CanPhoneSecondaryContactPage).get
 
-      underTest.apply(anyMode, userAnswers, emptyForm) mustBe
-        CanPhoneSecondaryContactViewModel(mode = anyMode, form = emptyForm)
+      underTest.apply(anyMode, userAnswers, emptyForm, anyName) mustBe
+        CanPhoneSecondaryContactViewModel(mode = anyMode, form = emptyForm, anyName)
     }
 
     "must return ViewModel with pre-filled form with errors, when the form has errors" in {
-      val formWithErrors = formProvider().bind(Map(CanPhoneSecondaryContactPage.toString -> "unknown-value"))
+      val formWithErrors = formProvider(anyName).bind(Map(CanPhoneSecondaryContactPage.toString -> "unknown-value"))
       val userAnswers = aUserAnswers.remove(CanPhoneSecondaryContactPage).get
 
-      underTest.apply(anyMode, userAnswers, formWithErrors) mustBe
-        CanPhoneSecondaryContactViewModel(mode = anyMode, form = formWithErrors)
+      underTest.apply(anyMode, userAnswers, formWithErrors, anyName) mustBe
+        CanPhoneSecondaryContactViewModel(mode = anyMode, form = formWithErrors, anyName)
     }
   }
 }

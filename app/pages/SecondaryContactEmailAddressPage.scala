@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.UserAnswers
+import models.{CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -28,5 +28,12 @@ case object SecondaryContactEmailAddressPage extends QuestionPage[String] {
   override def toString: String = "secondaryContactEmailAddress"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.IndexController.onPageLoad()
+    routes.CanPhoneSecondaryContactController.onPageLoad(NormalMode)
+
+  override protected def nextPageCheckMode(answers: UserAnswers): Call =
+    if (answers.isDefined(CanPhoneSecondaryContactPage)) {
+      routes.CheckYourAnswersController.onPageLoad()
+    } else {
+      routes.CanPhoneSecondaryContactController.onPageLoad(CheckMode)
+    }
 }

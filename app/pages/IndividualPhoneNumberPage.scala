@@ -28,5 +28,5 @@ case object IndividualPhoneNumberPage extends QuestionPage[String] {
   override def toString: String = "individualPhoneNumber"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.IndexController.onPageLoad()
+    routes.CheckYourAnswersController.onPageLoad()
 }
