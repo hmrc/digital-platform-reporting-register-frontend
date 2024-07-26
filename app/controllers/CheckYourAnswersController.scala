@@ -18,28 +18,40 @@ package controllers
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.BusinessType.*
+import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
+import models.requests.DataRequest
+import pages.BusinessTypePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.govuk.summarylist._
-import views.html.CheckYourAnswersView
+import views.html.{CheckYourAnswersIndividualView, CheckYourAnswersOrganisationView}
 
-class CheckYourAnswersController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            identify: IdentifierAction,
-                                            getData: DataRetrievalAction,
-                                            requireData: DataRequiredAction,
-                                            val controllerComponents: MessagesControllerComponents,
-                                            view: CheckYourAnswersView
-                                          ) extends FrontendBaseController with I18nSupport {
+class CheckYourAnswersController @Inject()(override val messagesApi: MessagesApi,
+                                           identify: IdentifierAction,
+                                           getData: DataRetrievalAction,
+                                           requireData: DataRequiredAction,
+                                           val controllerComponents: MessagesControllerComponents,
+                                           individualView: CheckYourAnswersIndividualView,
+                                           organisationView: CheckYourAnswersOrganisationView)
+  extends FrontendBaseController with I18nSupport with AnswerExtractor {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-
-      val list = SummaryListViewModel(
-        rows = Seq.empty
-      )
-
-      Ok(view(list))
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers.get(BusinessTypePage).map {
+      case SoleTrader | Individual => showIndividual(implicitly)
+      case _ => showOrganisation(implicitly)
+    }.getOrElse(showOrganisation(implicitly))
   }
+
+  private def showIndividual(implicit request: DataRequest[AnyContent]) =
+    CheckYourAnswersIndividualViewModel
+      .apply(request.userAnswers)
+      .map(viewModel => Ok(individualView(viewModel)))
+      .getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+    
+  private def showOrganisation(implicit request: DataRequest[AnyContent]) =
+    CheckYourAnswersOrganisationViewModel
+      .apply(request.userAnswers)
+      .map(viewModel => Ok(organisationView(viewModel)))
+      .getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
 }

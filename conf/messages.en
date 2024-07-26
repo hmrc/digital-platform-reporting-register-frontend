@@ -1,4 +1,4 @@
-service.name = digital-platform-reporting-register-frontend
+service.name = Digital Platform Reporting Service
 
 site.back = Back
 site.remove = Remove
@@ -29,6 +29,12 @@ error.summary.title = There is a problem
 
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
+checkYourAnswers.primaryContact = First contact
+checkYourAnswers.contactDetails = Contact details
+checkYourAnswers.secondaryContact = Second contact
+checkYourAnswers.p1 = Before completing your registration, make sure the details for {0} are correct.
+checkYourAnswers.h2 = Now complete your registration
+checkYourAnswers.p2 = By submitting these details, you are confirming that the information is correct and complete to the best of your knowledge.
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
@@ -278,6 +284,7 @@ hasSecondaryContact.change.hidden = if there is someone else we can contact if {
 
 individualEmailAddress.title = What is your email address?
 individualEmailAddress.heading = What is your email address?
+individualEmailAddress.hint = We will use this email address to send confirmation of your reports or if we have any questions about them.
 individualEmailAddress.checkYourAnswersLabel = Email address
 individualEmailAddress.error.required = Enter your email address
 individualEmailAddress.error.length = Email address must be 132 characters or less
@@ -286,6 +293,7 @@ individualEmailAddress.change.hidden = your email address
 
 individualPhoneNumber.title = What is your telephone number?
 individualPhoneNumber.heading = What is your telephone number?
+individualPhoneNumber.hint = For international numbers include the country code.
 individualPhoneNumber.checkYourAnswersLabel = Telephone number
 individualPhoneNumber.error.required = Enter your telephone number
 individualPhoneNumber.error.length = Telephone number must be 24 characters or less
@@ -322,7 +330,7 @@ secondaryContactEmailAddress.title = What is the email address for the second pe
 secondaryContactEmailAddress.heading = What is the email address for {0}?
 secondaryContactEmailAddress.hint = We will use this email address to send confirmation of your reports or if we have any questions about them.
 secondaryContactEmailAddress.checkYourAnswersLabel = Email address
-secondaryContactEmailAddress.error.required = Enter the email address of a second person or team we can contact
+secondaryContactEmailAddress.error.required = Enter the email address for {0}
 secondaryContactEmailAddress.error.length = Email must be 132 characters or less
 secondaryContactEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
 secondaryContactEmailAddress.change.hidden = the email address for {0}
@@ -333,7 +341,7 @@ secondaryContactName.p1.thirdParty = This should be the name of a person or team
 secondaryContactName.hint = For example, ‘Ashley Smith’ or ‘Tax Team’.
 secondaryContactName.checkYourAnswersLabel = Contact name
 secondaryContactName.error.required = Enter the name of a second person or team we can contact
-secondaryContactName.error.length = name must be {0} characters or less
+secondaryContactName.error.length = Name must be {0} characters or less
 secondaryContactName.change.hidden = the name of the second person or team we should contact
 
 soleTraderDetailsNotMatch.title = The details you entered did not match our records
@@ -354,4 +362,5 @@ secondaryContactPhoneNumber.hint = For international numbers include the country
 secondaryContactPhoneNumber.checkYourAnswersLabel = Telephone number
 secondaryContactPhoneNumber.error.required = Enter the telephone number for {0}
 secondaryContactPhoneNumber.error.length = Telephone number must be {0} characters or less
+secondaryContactPhoneNumber.error.format = Enter a telephone number in the correct format, like 01632 960 001, 07700 900 982 or +44 808 157 0192.
 secondaryContactPhoneNumber.change.hidden = the telephone number for {0}

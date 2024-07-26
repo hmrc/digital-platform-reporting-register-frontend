@@ -35,7 +35,7 @@ object CanPhoneSecondaryContactSummary  {
       val value = if (answer) "site.yes" else "site.no"
 
       SummaryListRowViewModel(
-        key = "canPhoneSecondaryContact.checkYourAnswersLabel",
+        key = messages("canPhoneSecondaryContact.checkYourAnswersLabel", contactName),
         value = ValueViewModel(value),
         actions = Seq(
           ActionItemViewModel("site.change", routes.CanPhoneSecondaryContactController.onPageLoad(CheckMode).url)
