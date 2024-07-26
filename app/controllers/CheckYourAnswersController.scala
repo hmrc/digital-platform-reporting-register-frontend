@@ -22,19 +22,18 @@ import models.BusinessType.*
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.requests.DataRequest
 import pages.BusinessTypePage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.{CheckYourAnswersIndividualView, CheckYourAnswersOrganisationView}
 
-class CheckYourAnswersController @Inject()(override val messagesApi: MessagesApi,
-                                           identify: IdentifierAction,
+class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            getData: DataRetrievalAction,
                                            requireData: DataRequiredAction,
-                                           val controllerComponents: MessagesControllerComponents,
                                            individualView: CheckYourAnswersIndividualView,
                                            organisationView: CheckYourAnswersOrganisationView)
-  extends FrontendBaseController with I18nSupport with AnswerExtractor {
+                                          (implicit mcc: MessagesControllerComponents)
+  extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers.get(BusinessTypePage).map {
@@ -43,11 +42,10 @@ class CheckYourAnswersController @Inject()(override val messagesApi: MessagesApi
     }.getOrElse(showOrganisation(implicitly))
   }
 
-  private def showIndividual(implicit request: DataRequest[AnyContent]) =
-    CheckYourAnswersIndividualViewModel
-      .apply(request.userAnswers)
-      .map(viewModel => Ok(individualView(viewModel)))
-      .getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+  private def showIndividual(implicit request: DataRequest[AnyContent]) = {
+    val viewModel = CheckYourAnswersIndividualViewModel.apply(request.userAnswers)
+    Ok(individualView(viewModel))
+  }
     
   private def showOrganisation(implicit request: DataRequest[AnyContent]) =
     CheckYourAnswersOrganisationViewModel

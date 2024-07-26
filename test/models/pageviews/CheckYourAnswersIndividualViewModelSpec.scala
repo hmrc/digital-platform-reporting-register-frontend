@@ -17,10 +17,9 @@
 package models.pageviews
 
 import builders.UserAnswersBuilder.anEmptyAnswer
-import models.{IndividualName, SoleTraderName}
-import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{OptionValues, TryValues}
 import pages.*
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
@@ -31,43 +30,20 @@ class CheckYourAnswersIndividualViewModelSpec extends AnyFreeSpec with Matchers 
 
   ".apply" - {
 
-    "must build a view model when Sole Trader Name has been answered" in {
-      val anyName = SoleTraderName("first", "last")
-      val answers = anEmptyAnswer.set(SoleTraderNamePage, anyName).success.value
-      val viewModel = CheckYourAnswersIndividualViewModel.apply(answers)
-      viewModel.value.businessName mustEqual "first last"
-    }
-
-    "must build a view model when Individual Name has been answered" in {
-      val anyName = IndividualName("first", "last")
-      val answers = anEmptyAnswer.set(IndividualNamePage, anyName).success.value
-      val viewModel = CheckYourAnswersIndividualViewModel.apply(answers)
-      viewModel.value.businessName mustEqual "first last"
-    }
-
     "must contain the expected rows (minimal set)" in {
-      val anyName = IndividualName("first", "last")
-      val answers = anEmptyAnswer.set(IndividualNamePage, anyName).success.value
-      val viewModel = CheckYourAnswersIndividualViewModel.apply(answers)
-      viewModel.value.list.rows mustBe empty
+      val viewModel = CheckYourAnswersIndividualViewModel.apply(anEmptyAnswer)
+      viewModel.list.rows mustBe empty
     }
 
     "must contain the expected rows (maximal set)" in {
-      val anyName = IndividualName("first", "last")
       val answers =
         anEmptyAnswer
-          .set(IndividualNamePage, anyName).success.value
           .set(IndividualEmailAddressPage, "email").success.value
           .set(CanPhoneIndividualPage, true).success.value
           .set(IndividualPhoneNumberPage, "phone").success.value
 
       val viewModel = CheckYourAnswersIndividualViewModel.apply(answers)
-      viewModel.value.list.rows.size mustEqual 3
-    }
-
-    "must not build when Sole Trader Name and Individual Name are both missing" in {
-      val viewModel = CheckYourAnswersIndividualViewModel.apply(anEmptyAnswer)
-      viewModel must not be defined
+      viewModel.list.rows.size mustEqual 3
     }
   }
 }

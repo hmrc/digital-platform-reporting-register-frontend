@@ -105,10 +105,11 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
           FakeRequest(POST, isThisYourBusinessRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
+        val expectedAnswers = emptyUserAnswers.set(IsThisYourBusinessPage, true).success.value
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IsThisYourBusinessPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual IsThisYourBusinessPage.nextPage(NormalMode, expectedAnswers).url
       }
     }
 

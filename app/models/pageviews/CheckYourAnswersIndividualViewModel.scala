@@ -22,21 +22,17 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import viewmodels.checkAnswers.*
 
-final case class CheckYourAnswersIndividualViewModel(list: SummaryList, businessName: String)
+final case class CheckYourAnswersIndividualViewModel(list: SummaryList)
 
 object CheckYourAnswersIndividualViewModel {
   
-  def apply(answers: UserAnswers)(implicit messages: Messages): Option[CheckYourAnswersIndividualViewModel] = {
-    val name =
-      answers.get(SoleTraderNamePage).map(name => s"${name.firstName} ${name.lastName}")
-        .orElse(answers.get(IndividualNamePage).map(name => s"${name.firstName} ${name.lastName}"))
-      
-    val list = SummaryList(rows = Seq(
-      IndividualEmailAddressSummary.row(answers),
-      CanPhoneIndividualSummary.row(answers),
-      IndividualPhoneNumberSummary.row(answers)
-    ).flatten)
-    
-    name.map(n => CheckYourAnswersIndividualViewModel(list, n))
+  def apply(answers: UserAnswers)(implicit messages: Messages): CheckYourAnswersIndividualViewModel = {
+    CheckYourAnswersIndividualViewModel(
+      SummaryList(rows = Seq(
+        IndividualEmailAddressSummary.row(answers),
+        CanPhoneIndividualSummary.row(answers),
+        IndividualPhoneNumberSummary.row(answers)
+      ).flatten)
+    )
   }
 }

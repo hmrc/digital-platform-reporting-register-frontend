@@ -37,7 +37,7 @@ class SecondaryContactPhoneNumberController @Inject()(sessionRepository: Session
                                                       formProvider: SecondaryContactPhoneNumberFormProvider,
                                                       view: SecondaryContactPhoneNumberView)
                                                      (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
-  extends FrontendController(mcc) with I18nSupport {
+  extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     getAnswer(SecondaryContactNamePage) { contactName =>

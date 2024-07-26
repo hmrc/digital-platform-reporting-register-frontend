@@ -18,12 +18,11 @@ package controllers
 
 import base.SpecBase
 import models.BusinessType.*
-import models.SoleTraderName
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.Address
 import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId}
 import org.scalacheck.Gen
-import pages.{BusinessNamePage, BusinessTypePage, SoleTraderNamePage}
+import pages.{BusinessNamePage, BusinessTypePage}
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -43,9 +42,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
       
       "for an individual" in {
         
-        val anyName = SoleTraderName("first", "last")
         val answers = emptyUserAnswers
-          .set(SoleTraderNamePage, anyName).success.value
           .set(BusinessTypePage, anyIndividualType).success.value
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
@@ -55,7 +52,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
           val result = route(application, request).value
 
           val view = application.injector.instanceOf[CheckYourAnswersIndividualView]
-          val viewModel = CheckYourAnswersIndividualViewModel.apply(answers).value
+          val viewModel = CheckYourAnswersIndividualViewModel.apply(answers)
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -163,21 +160,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
             status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
           }
-        }
-      }
-      
-      "if an individual's name has not been answered" in {
-
-        val answers = emptyUserAnswers.set(BusinessTypePage, anyOrganisationType).success.value
-        val application = applicationBuilder(userAnswers = Some(answers)).build()
-
-        running(application) {
-          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
     }
