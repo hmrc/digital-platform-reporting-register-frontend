@@ -24,7 +24,10 @@ trait RegistrationResponse
 object RegistrationResponse {
   
   implicit lazy val reads: Reads[RegistrationResponse] =
-    MatchResponseWithId.format.widen or MatchResponseWithoutId.format.widen or NoMatchResponse.reads.widen
+    MatchResponseWithId.format.widen or
+      MatchResponseWithoutId.format.widen or
+      NoMatchResponse.reads.widen or
+      AlreadySubscribedResponse.reads.widen
     
   implicit lazy val writes: OWrites[RegistrationResponse] = new OWrites[RegistrationResponse] {
     
@@ -33,6 +36,7 @@ object RegistrationResponse {
         case x: MatchResponseWithId => Json.toJsObject(x)(MatchResponseWithId.format)
         case x: MatchResponseWithoutId => Json.toJsObject(x)(MatchResponseWithoutId.format)
         case x: NoMatchResponse => Json.toJsObject(x)(NoMatchResponse.writes)
+        case x: AlreadySubscribedResponse => Json.toJsObject(x)(AlreadySubscribedResponse.writes)
       }
   }
 }

@@ -70,14 +70,29 @@ class RegistrationConnectorSpec
 
       wireMockServer.stubFor(
         post(urlMatching("/digital-platform-reporting/register"))
-          .willReturn(ok(Json.toJson(response).toString))
+          .willReturn(notFound())
       )
 
       val result = connector.register(request).futureValue
 
       result mustEqual response
     }
-    
+
+    "must return an `already subscribed` response when the server returns CONFLICT" in {
+
+      val request = OrganisationWithUtr("utr", None)
+      val response = AlreadySubscribedResponse()
+
+      wireMockServer.stubFor(
+        post(urlMatching("/digital-platform-reporting/register"))
+          .willReturn(aResponse().withStatus(409))
+      )
+
+      val result = connector.register(request).futureValue
+
+      result mustEqual response
+    }
+
     "must return a failed future when the server returns an error" in {
 
 
