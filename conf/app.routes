@@ -104,8 +104,8 @@ POST       /registration/check-business-details                      controllers
 GET        /registration/change-check-business-details               controllers.IsThisYourBusinessController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-check-business-details               controllers.IsThisYourBusinessController.onSubmit(mode: Mode = CheckMode)
 
-GET        /registration/check-details                controllers.DetailsMatchedController.onPageLoad()
-POST       /registration/check-details                controllers.DetailsMatchedController.onSubmit()
+GET        /registration/details-matched                             controllers.DetailsMatchedController.onPageLoad()
+POST       /registration/details-matched                             controllers.DetailsMatchedController.onSubmit()
 
 GET        /registration/individual-can-we-telephone                        controllers.CanPhoneIndividualController.onPageLoad(mode: Mode = NormalMode)
 POST       /registration/individual-can-we-telephone                        controllers.CanPhoneIndividualController.onSubmit(mode: Mode = NormalMode)

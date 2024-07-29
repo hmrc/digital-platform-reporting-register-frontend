@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.UserAnswers
+import models.{BusinessType, NormalMode, UserAnswers}
 import play.api.mvc.Call
 
 case object DetailsMatchedPage extends Page {
@@ -25,5 +25,8 @@ case object DetailsMatchedPage extends Page {
   override def toString: String = "DetailsMatched"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.IndexController.onPageLoad()
+    answers.get(BusinessTypePage).map {
+      case BusinessType.SoleTrader | BusinessType.Individual => routes.IndividualEmailAddressController.onPageLoad(NormalMode)
+      case _ => routes.ContactDetailsGuidanceController.onPageLoad()
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }

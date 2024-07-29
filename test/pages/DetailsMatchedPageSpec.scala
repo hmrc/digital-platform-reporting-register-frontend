@@ -17,21 +17,31 @@
 package pages
 
 import controllers.routes
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{BusinessType, CheckMode, NormalMode, UserAnswers}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{OptionValues, TryValues}
 
-class DetailsMatchedPageSpec extends AnyFreeSpec with Matchers {
+class DetailsMatchedPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
 
     val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
+      "must go to 'set-up-contact-details' if user is Organisation" in {
+        val answers = emptyAnswers.set(BusinessTypePage, BusinessType.Partnership).success.value
+        DetailsMatchedPage.nextPage(NormalMode, answers) mustEqual routes.ContactDetailsGuidanceController.onPageLoad()
+      }
 
-      "must go to Index" in {
+      "must go to 'individual-email-address' if user is Sole Trader" in {
+        val answers = emptyAnswers.set(BusinessTypePage, BusinessType.SoleTrader).success.value
+        DetailsMatchedPage.nextPage(NormalMode, answers) mustEqual routes.IndividualEmailAddressController.onPageLoad(NormalMode)
+      }
 
-        DetailsMatchedPage.nextPage(NormalMode, emptyAnswers) mustEqual routes.IndexController.onPageLoad()
+      "must go to 'individual-email-address' if user is Individual" in {
+        val answers = emptyAnswers.set(BusinessTypePage, BusinessType.Individual).success.value
+        DetailsMatchedPage.nextPage(NormalMode, answers) mustEqual routes.IndividualEmailAddressController.onPageLoad(NormalMode)
       }
     }
 
