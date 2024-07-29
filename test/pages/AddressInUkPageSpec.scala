@@ -25,28 +25,22 @@ import org.scalatest.matchers.must.Matchers
 class AddressInUkPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues{
 
   ".nextPage" - {
-
     val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
-
       "must go to Uk Address page if yes" in {
-
         val answers = emptyAnswers.set(AddressInUkPage, true).success.value
-        AddressInUkPage.nextPage(NormalMode, answers) mustEqual routes.UkAddressController.onPageLoad(NormalMode)
+        AddressInUkPage.nextPage(NormalMode, answers) mustEqual routes.UkPostCodeController.onPageLoad(NormalMode)
       }
 
       "must go to International Address page if no" in {
-
         val answers = emptyAnswers.set(AddressInUkPage, false).success.value
         AddressInUkPage.nextPage(NormalMode, answers) mustEqual routes.InternationalAddressController.onPageLoad(NormalMode)
       }
     }
 
     "in Check Mode" - {
-
       "must go to Check Answers" in {
-
         AddressInUkPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }

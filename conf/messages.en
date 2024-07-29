@@ -239,10 +239,10 @@ ukAddress.error.town.length = Town or city must be {0} characters or less
 ukAddress.error.county.length = County must be {0} characters or less
 ukAddress.error.postCode.length = Postcode must be {0} characters or less
 
-ukPostCode.title = What is your UK postcode?
-ukPostCode.heading = What is your UK postcode?
+ukPostCode.title = What is your postcode?
+ukPostCode.heading = What is your postcode?
 ukPostCode.p1 = Enter your postcode to find your address automatically.
-ukPostCode.hint = For example, AA3 1AB.
+ukPostCode.hint = For example, AA3 1AB
 ukPostCode.link.text = Or enter the address manually
 ukPostCode.error.required = Enter UK postcode
 ukPostCode.error.length = Uk postcode must be {0} characters or less

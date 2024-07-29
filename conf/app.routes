@@ -79,10 +79,10 @@ POST       /registration/what-is-ni-number          controllers.NinoController.o
 GET        /registration/change-what-is-ni-number   controllers.NinoController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-what-is-ni-number   controllers.NinoController.onSubmit(mode: Mode = CheckMode)
 
-GET        /registration/live-in-uk                 controllers.AddressInUkController.onPageLoad(mode: Mode = NormalMode)
-POST       /registration/live-in-uk                 controllers.AddressInUkController.onSubmit(mode: Mode = NormalMode)
-GET        /registration/change-live-in-uk          controllers.AddressInUkController.onPageLoad(mode: Mode = CheckMode)
-POST       /registration/change-live-in-uk          controllers.AddressInUkController.onSubmit(mode: Mode = CheckMode)
+GET        /registration/individual-address-uk                 controllers.AddressInUkController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/individual-address-uk                 controllers.AddressInUkController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-individual-address-uk          controllers.AddressInUkController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-individual-address-uk          controllers.AddressInUkController.onSubmit(mode: Mode = CheckMode)
 
 GET        /registration/international-address            controllers.InternationalAddressController.onPageLoad(mode: Mode = NormalMode)
 POST       /registration/international-address            controllers.InternationalAddressController.onSubmit(mode: Mode = NormalMode)
