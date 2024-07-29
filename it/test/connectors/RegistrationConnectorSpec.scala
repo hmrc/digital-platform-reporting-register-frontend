@@ -95,7 +95,6 @@ class RegistrationConnectorSpec
 
     "must return a failed future when the server returns an error" in {
 
-
       val address = Address("line 1", None, None, None, None, "GB")
       val request = OrganisationWithoutId("name", address)
 
