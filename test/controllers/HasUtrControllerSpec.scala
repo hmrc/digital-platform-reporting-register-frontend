@@ -34,28 +34,21 @@ import scala.concurrent.Future
 
 class HasUtrControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new HasUtrFormProvider()
-  val form = formProvider()
+  private val formProvider = new HasUtrFormProvider()
 
-  lazy val hasUtrRoute = routes.HasUtrController.onPageLoad(NormalMode).url
+  private lazy val hasUtrRoute = routes.HasUtrController.onPageLoad(NormalMode).url
 
   "HasUtr Controller" - {
-
     "must return OK and the correct view for a GET" - {
-
       for (businessType <- Seq(LimitedCompany, AssociationOrTrust)) {
-
         s"for a ${businessType.toString}" in {
-
+          val form = formProvider(businessType)
           val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
-
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
             val request = FakeRequest(GET, hasUtrRoute)
-
             val result = route(application, request).value
-
             val view = application.injector.instanceOf[HasUtrCorporationTaxView]
 
             status(result) mustEqual OK
@@ -65,18 +58,14 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
       }
 
       for (businessType <- Seq(Llp, Partnership)) {
-
         s"for a ${businessType.toString}" in {
-
+          val form = formProvider(businessType)
           val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
-
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
             val request = FakeRequest(GET, hasUtrRoute)
-
             val result = route(application, request).value
-
             val view = application.injector.instanceOf[HasUtrPartnershipView]
 
             status(result) mustEqual OK
@@ -86,16 +75,13 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
       }
 
       "for a Sole Trader" in {
-
+        val form = formProvider(SoleTrader)
         val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
-
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
         running(application) {
           val request = FakeRequest(GET, hasUtrRoute)
-
           val result = route(application, request).value
-
           val view = application.injector.instanceOf[HasUtrSelfAssessmentView]
 
           status(result) mustEqual OK
@@ -105,14 +91,11 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET for an Individual" in {
-
       val answers = emptyUserAnswers.set(BusinessTypePage, Individual).success.value
-
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasUtrRoute)
-
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -121,18 +104,14 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-
+      val form = formProvider(BusinessType.LimitedCompany)
       val answers = emptyUserAnswers.set(BusinessTypePage, BusinessType.LimitedCompany).success.value
-
       val userAnswers = answers.set(HasUtrPage, true).success.value
-
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasUtrRoute)
-
         val view = application.injector.instanceOf[HasUtrCorporationTaxView]
-
         val result = route(application, request).value
 
         status(result) mustEqual OK
@@ -141,50 +120,35 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page when valid data is submitted" in {
-
       val mockSessionRepository = mock[SessionRepository]
+      val answers = emptyUserAnswers.set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+      val application = applicationBuilder(userAnswers = Some(answers))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        .build()
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val answers = emptyUserAnswers.set(BusinessTypePage, BusinessType.LimitedCompany).success.value
-
-      val application =
-        applicationBuilder(userAnswers = Some(answers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
-
       running(application) {
-        val request =
-          FakeRequest(POST, hasUtrRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
+        val request = FakeRequest(POST, hasUtrRoute).withFormUrlEncodedBody(("value", "true"))
         val result = route(application, request).value
-
         val updatedAnswers = answers.set(HasUtrPage, true).success.value
+
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual HasUtrPage.nextPage(NormalMode, updatedAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" - {
-
       for (businessType <- Seq(LimitedCompany, AssociationOrTrust)) {
-
         s"for a ${businessType.toString}" in {
-
+          val form = formProvider(businessType)
           val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
-
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
-            val request =
-              FakeRequest(POST, hasUtrRoute)
-                .withFormUrlEncodedBody(("value", ""))
-
+            val request = FakeRequest(POST, hasUtrRoute).withFormUrlEncodedBody(("value", ""))
             val boundForm = form.bind(Map("value" -> ""))
-
             val view = application.injector.instanceOf[HasUtrCorporationTaxView]
-
             val result = route(application, request).value
 
             status(result) mustEqual BAD_REQUEST
@@ -194,22 +158,15 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
       }
 
       for (businessType <- Seq(Llp, Partnership)) {
-
         s"for a ${businessType.toString}" in {
-
+          val form = formProvider(businessType)
           val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
-
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
-            val request =
-              FakeRequest(POST, hasUtrRoute)
-                .withFormUrlEncodedBody(("value", ""))
-
+            val request = FakeRequest(POST, hasUtrRoute).withFormUrlEncodedBody(("value", ""))
             val boundForm = form.bind(Map("value" -> ""))
-
             val view = application.injector.instanceOf[HasUtrPartnershipView]
-
             val result = route(application, request).value
 
             status(result) mustEqual BAD_REQUEST
@@ -219,20 +176,14 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
       }
 
       "for a SoleTrader" in {
-
+        val form = formProvider(SoleTrader)
         val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
-
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
         running(application) {
-          val request =
-            FakeRequest(POST, hasUtrRoute)
-              .withFormUrlEncodedBody(("value", ""))
-
+          val request = FakeRequest(POST, hasUtrRoute).withFormUrlEncodedBody(("value", ""))
           val boundForm = form.bind(Map("value" -> ""))
-
           val view = application.injector.instanceOf[HasUtrSelfAssessmentView]
-
           val result = route(application, request).value
 
           status(result) mustEqual BAD_REQUEST
@@ -242,16 +193,11 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST for an Individual" in {
-
       val answers = emptyUserAnswers.set(BusinessTypePage, Individual).success.value
-
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, hasUtrRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
+        val request = FakeRequest(POST, hasUtrRoute).withFormUrlEncodedBody(("value", ""))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -260,12 +206,10 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, hasUtrRoute)
-
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -274,12 +218,10 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if business type has not been answered" in {
-
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasUtrRoute)
-
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -288,14 +230,10 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, hasUtrRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
+        val request = FakeRequest(POST, hasUtrRoute).withFormUrlEncodedBody(("value", "true"))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -304,14 +242,10 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST if business type has not been answered" in {
-
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, hasUtrRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
+        val request = FakeRequest(POST, hasUtrRoute).withFormUrlEncodedBody(("value", "true"))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

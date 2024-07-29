@@ -17,17 +17,14 @@
 package forms
 
 import forms.mappings.Mappings
-import models.BusinessType
-import models.BusinessType.{AssociationOrTrust, Individual, LimitedCompany, Llp, Partnership, SoleTrader}
 import play.api.data.Form
 
 import javax.inject.Inject
 
-class HasUtrFormProvider @Inject() extends Mappings {
+class BusinessNameNoUtrFormProvider @Inject() extends Mappings {
 
-  def apply(businessType: BusinessType): Form[Boolean] = businessType match {
-    case LimitedCompany | AssociationOrTrust => Form("value" -> boolean("hasUtrCorporationTax.error.required"))
-    case Llp | Partnership => Form("value" -> boolean("hasUtrPartnership.error.required"))
-    case SoleTrader | Individual => Form("value" -> boolean("hasUtrSelfAssessment.error.required"))
-  }
+  def apply(): Form[String] = Form(
+    "value" -> text("businessNameNoUtr.error.required")
+      .verifying(maxLength(35, "businessNameNoUtr.error.length"))
+  )
 }

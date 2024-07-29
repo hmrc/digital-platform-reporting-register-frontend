@@ -14,28 +14,22 @@
  * limitations under the License.
  */
 
-package pages
+package models.pageviews
 
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
-import play.api.mvc.Call
+import models.{Mode, UserAnswers}
+import pages.BusinessNameNoUtrPage
+import play.api.data.Form
 
-import scala.language.implicitConversions
+case class BusinessNameNoUtrViewModel(mode: Mode, form: Form[String])
 
-trait Page {
+object BusinessNameNoUtrViewModel {
 
-  final def nextPage(mode: Mode, answers: UserAnswers): Call = mode match {
-    case NormalMode => nextPageNormalMode(answers)
-    case CheckMode => nextPageCheckMode(answers)
+  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[String]): BusinessNameNoUtrViewModel = {
+    val optAnswerValue = userAnswers.get(BusinessNameNoUtrPage)
+
+    BusinessNameNoUtrViewModel(
+      mode = mode,
+      form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue))
+    )
   }
-
-  protected def nextPageNormalMode(answers: UserAnswers): Call
-
-  protected def nextPageCheckMode(answers: UserAnswers): Call =
-    controllers.routes.CheckYourAnswersController.onPageLoad()
-}
-
-object Page {
-
-  implicit def toString(page: Page): String =
-    page.toString
 }

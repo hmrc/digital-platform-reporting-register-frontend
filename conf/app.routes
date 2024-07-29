@@ -171,3 +171,8 @@ GET        /registration/organisation-second-telephone-number                   
 POST       /registration/organisation-second-telephone-number                        controllers.SecondaryContactPhoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /registration/change-organisation-second-telephone-number                  controllers.SecondaryContactPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-organisation-second-telephone-number                  controllers.SecondaryContactPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /registration/business-name-no-utr                        controllers.BusinessNameNoUtrController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/business-name-no-utr                        controllers.BusinessNameNoUtrController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-business-name-no-utr                 controllers.BusinessNameNoUtrController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-business-name-no-utr                 controllers.BusinessNameNoUtrController.onSubmit(mode: Mode = CheckMode)

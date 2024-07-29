@@ -16,26 +16,17 @@
 
 package pages
 
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import controllers.routes
+import models.UserAnswers
+import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-import scala.language.implicitConversions
+case object BusinessNameNoUtrPage extends QuestionPage[String] {
 
-trait Page {
+  override def path: JsPath = JsPath \ toString
 
-  final def nextPage(mode: Mode, answers: UserAnswers): Call = mode match {
-    case NormalMode => nextPageNormalMode(answers)
-    case CheckMode => nextPageCheckMode(answers)
-  }
+  override def toString: String = "businessNameNoUtr"
 
-  protected def nextPageNormalMode(answers: UserAnswers): Call
-
-  protected def nextPageCheckMode(answers: UserAnswers): Call =
-    controllers.routes.CheckYourAnswersController.onPageLoad()
-}
-
-object Page {
-
-  implicit def toString(page: Page): String =
-    page.toString
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
+    routes.IndexController.onPageLoad() //TODO: update navigation when page created
 }

@@ -19,28 +19,23 @@ package pages
 import controllers.routes
 import models.BusinessType.{Individual, SoleTrader}
 import models.{BusinessType, CheckMode, Nino, NormalMode, UserAnswers, Utr}
-import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{OptionValues, TryValues}
 
 class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
-
     val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
-
       "must go to UTR when the answer is yes" in {
-
         val answers = emptyAnswers.set(HasUtrPage, true).success.value
         HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.UtrController.onPageLoad(NormalMode)
       }
-      
+
       "when the answer is no" - {
-        
         "must go to business name when the user is not an individual or a sole trader" in {
-          
           val businessTypes = BusinessType.values.filterNot(x => x == Individual | x == SoleTrader)
 
           for (businessType <- businessTypes) {
@@ -48,12 +43,11 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
               .set(HasUtrPage, false).success.value
               .set(BusinessTypePage, businessType).success.value
 
-            HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
+            HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.BusinessNameNoUtrController.onPageLoad(NormalMode)
           }
         }
 
         "must go to Has Nino when the user is an individual or sole trader and we do not know their NINO" in {
-
           val businessTypes = Seq(Individual, SoleTrader)
 
           for (businessType <- businessTypes) {
@@ -66,7 +60,6 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
         }
 
         "must go to Individual Name when the user is an individual or sole trader and we know their NINO" in {
-
           val businessTypes = Seq(Individual, SoleTrader)
 
           for (businessType <- businessTypes) {
@@ -80,7 +73,6 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
         }
 
         "must go to Has Nino when the user is an individual or sole trader and we know their UTR instead of their NINO" in {
-
           val businessTypes = Seq(Individual, SoleTrader)
 
           for (businessType <- businessTypes) {
@@ -96,9 +88,7 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
     }
 
     "in Check Mode" - {
-
       "must go to Check Answers" in {
-
         HasUtrPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
