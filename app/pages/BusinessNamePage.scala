@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.registration.responses.MatchResponseWithId
+import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithId}
 import models.{BusinessType, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -30,7 +30,8 @@ case object BusinessNamePage extends QuestionPage[String] {
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
     answers.registrationResponse.map {
-      case _: MatchResponseWithId => routes.IndexController.onPageLoad() //TODO: update when subscription backend call implemented
+      case _: MatchResponseWithId => routes.DetailsMatchedController.onPageLoad()
+      case _: AlreadySubscribedResponse => routes.IndexController.onPageLoad() //TODO: update when REG-KO-3 content is confirmed
       case _ => answers.get(BusinessTypePage).map {
         case BusinessType.SoleTrader => routes.SoleTraderDetailsNotMatchController.onPageLoad()
         case _ => routes.IndexController.onPageLoad() //TODO: update when page created
