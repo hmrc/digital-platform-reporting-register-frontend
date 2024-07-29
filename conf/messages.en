@@ -109,19 +109,21 @@ hasUtrCorporationTax.heading = Do you have a Corporation Tax Unique Taxpayer Ref
 hasUtrCorporationTax.p1 = Your UTR can be 10 or 13 digits long. It will be on tax returns and other letters about Corporation Tax. It may be called ‘reference’, ‘UTR’ or ‘official use’.
 hasUtrCorporationTax.link.text = Ask for a copy of your Corporation Tax UTR
 hasUtrCorporationTax.link.href = https://www.tax.service.gov.uk/ask-for-copy-of-your-corporation-tax-utr
-hasUtrCorporationTax.error.required = Select yes if you have a Unique Taxpayer Reference
+hasUtrCorporationTax.error.required = Select yes if you have a Corporation Tax Unique Taxpayer Reference
 
 hasUtrPartnership.title = Do you have a Partnership Unique Taxpayer Reference (UTR)?
 hasUtrPartnership.heading = Do you have a Partnership Unique Taxpayer Reference (UTR)?
 hasUtrPartnership.p1 = Your UTR can be 10 or 13 digits long. You can find it in your Business Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 hasUtrPartnership.link.text = How to find your UTR
 hasUtrPartnership.link.href = https://www.gov.uk/find-utr-number
+hasUtrPartnership.error.required = Select yes if you have a Partnership Unique Taxpayer Reference
 
 hasUtrSelfAssessment.title = Do you have a Self Assessment Unique Taxpayer Reference (UTR)?
 hasUtrSelfAssessment.heading = Do you have a Self Assessment Unique Taxpayer Reference (UTR)?
 hasUtrSelfAssessment.p1 = Your UTR can be 10 or 13 digits long. You can find it in your Personal Tax Account, the HMRC app or on tax returns and other documents from HMRC. It might be called ‘reference’, ‘UTR’ or ‘official use’.
 hasUtrSelfAssessment.link.text = How to find your UTR
 hasUtrSelfAssessment.link.href = https://www.gov.uk/find-utr-number
+hasUtrSelfAssessment.error.required = Select yes if you have a Self Assessment Unique Taxpayer Reference
 
 registeredInUk.title = Is your registered address in the UK?
 registeredInUk.heading = Is your registered address in the UK?
@@ -368,3 +370,8 @@ secondaryContactPhoneNumber.error.required = Enter the telephone number for {0}
 secondaryContactPhoneNumber.error.length = Telephone number must be {0} characters or less
 secondaryContactPhoneNumber.error.format = Enter a telephone number in the correct format, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 secondaryContactPhoneNumber.change.hidden = the telephone number for {0}
+
+businessNameNoUtr.title = What is the registered name of your business?
+businessNameNoUtr.heading = What is the registered name of your business?
+businessNameNoUtr.error.required = Enter your business name
+businessNameNoUtr.error.length = Business name must be 35 characters or less

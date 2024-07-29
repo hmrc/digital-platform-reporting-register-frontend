@@ -28,22 +28,14 @@ case object HasUtrPage extends QuestionPage[Boolean] {
 
   override def toString: String = "hasUtr"
 
-  override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    answers.get(this).map {
-      case true =>
-        routes.UtrController.onPageLoad(NormalMode)
-
-      case false =>
-        answers.get(BusinessTypePage).map {
-          case Individual | SoleTrader =>
-            answers.taxIdentifier.map {
-              case _: Nino => routes.IndividualNameController.onPageLoad(NormalMode)
-              case _       => routes.HasNinoController.onPageLoad(NormalMode)
-            }.getOrElse(routes.HasNinoController.onPageLoad(NormalMode))
-
-          case _ =>
-            routes.IndexController.onPageLoad() //TODO: update navigation when page created
-
-        }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+  override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.get(this).map {
+    case true => routes.UtrController.onPageLoad(NormalMode)
+    case false => answers.get(BusinessTypePage).map {
+      case Individual | SoleTrader => answers.taxIdentifier.map {
+        case _: Nino => routes.IndividualNameController.onPageLoad(NormalMode)
+        case _ => routes.HasNinoController.onPageLoad(NormalMode)
+      }.getOrElse(routes.HasNinoController.onPageLoad(NormalMode))
+      case _ => routes.BusinessNameNoUtrController.onPageLoad(NormalMode)
     }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+  }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }

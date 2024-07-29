@@ -17,29 +17,69 @@
 package forms
 
 import forms.behaviours.BooleanFieldBehaviours
+import models.BusinessType.{AssociationOrTrust, Individual, LimitedCompany, Llp, Partnership, SoleTrader}
 import play.api.data.FormError
 
 class HasUtrFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "hasUtr.error.required"
-  val invalidKey = "error.boolean"
+  private val fieldName = "value"
 
-  val form = new HasUtrFormProvider()()
+  private val requiredCorporationTaxKey = "hasUtrCorporationTax.error.required"
+  private val requiredPartnershipKey = "hasUtrPartnership.error.required"
+  private val requiredSelfAssessmentKey = "hasUtrSelfAssessment.error.required"
+  private val invalidKey = "error.boolean"
 
-  ".value" - {
+  for (businessType <- Seq(LimitedCompany, AssociationOrTrust)) {
+    s".value $businessType" - {
+      val underTest = new HasUtrFormProvider()(businessType)
 
-    val fieldName = "value"
+      behave like booleanField(
+        underTest,
+        fieldName,
+        invalidError = FormError(fieldName, invalidKey)
+      )
 
-    behave like booleanField(
-      form,
-      fieldName,
-      invalidError = FormError(fieldName, invalidKey)
-    )
+      behave like mandatoryField(
+        underTest,
+        fieldName,
+        requiredError = FormError(fieldName, requiredCorporationTaxKey)
+      )
+    }
+  }
 
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
+  for (businessType <- Seq(Llp, Partnership)) {
+    s".value $businessType" - {
+      val underTest = new HasUtrFormProvider()(businessType)
+
+      behave like booleanField(
+        underTest,
+        fieldName,
+        invalidError = FormError(fieldName, invalidKey)
+      )
+
+      behave like mandatoryField(
+        underTest,
+        fieldName,
+        requiredError = FormError(fieldName, requiredPartnershipKey)
+      )
+    }
+  }
+
+  for (businessType <- Seq(SoleTrader, Individual)) {
+    s".value $businessType" - {
+      val underTest = new HasUtrFormProvider()(businessType)
+
+      behave like booleanField(
+        underTest,
+        fieldName,
+        invalidError = FormError(fieldName, invalidKey)
+      )
+
+      behave like mandatoryField(
+        underTest,
+        fieldName,
+        requiredError = FormError(fieldName, requiredSelfAssessmentKey)
+      )
+    }
   }
 }
