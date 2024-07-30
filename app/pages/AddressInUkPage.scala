@@ -28,7 +28,7 @@ case object AddressInUkPage extends QuestionPage[Boolean] {
   override def toString: String = "addressInUk"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.get(this).map {
-    case true => routes.UkPostCodeController.onPageLoad(NormalMode)
+    case true => routes.UkAddressController.onPageLoad(NormalMode)
     case false => routes.InternationalAddressController.onPageLoad(NormalMode)
   }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }
