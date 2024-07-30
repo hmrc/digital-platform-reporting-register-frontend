@@ -382,3 +382,8 @@ businessNameNoUtr.error.length = Business name must be 35 characters or less
 businessHaveTradingName.title = Does your business trade under a different name?
 businessHaveTradingName.heading = Does your business trade under a different name?
 businessHaveTradingName.error.required = Select yes if your business trades under a different name
+
+businessEnterTradingName.title = What is the trading name of your business?
+businessEnterTradingName.heading = What is the trading name of your business?
+businessEnterTradingName.error.required = Enter your trading name
+businessEnterTradingName.error.length = Trading name must be 35 characters or less

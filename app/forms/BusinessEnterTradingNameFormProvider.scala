@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import controllers.routes
-import models.{NormalMode, UserAnswers}
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case object BusinessHaveTradingNamePage extends QuestionPage[Boolean] {
+import javax.inject.Inject
 
-  override def path: JsPath = JsPath \ toString
+class BusinessEnterTradingNameFormProvider @Inject() extends Mappings {
 
-  override def toString: String = "businessHaveTradingName"
-
-  override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.BusinessEnterTradingNameController.onPageLoad(NormalMode)
+  def apply(): Form[String] = Form(
+    "value" -> text("businessEnterTradingName.error.required")
+      .verifying(maxLength(35, "businessEnterTradingName.error.length"))
+  )
 }
