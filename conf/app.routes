@@ -181,3 +181,8 @@ GET        /registration/business-have-trading-name                 controllers.
 POST       /registration/business-have-trading-name                 controllers.BusinessHaveTradingNameController.onSubmit(mode: Mode = NormalMode)
 GET        /registration/change-business-have-trading-name          controllers.BusinessHaveTradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-business-have-trading-name          controllers.BusinessHaveTradingNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /registration/business-enter-trading-name                controllers.BusinessEnterTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/business-enter-trading-name                controllers.BusinessEnterTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-business-enter-trading-name         controllers.BusinessEnterTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-business-enter-trading-name         controllers.BusinessEnterTradingNameController.onSubmit(mode: Mode = CheckMode)
