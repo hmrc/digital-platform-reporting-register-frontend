@@ -84,10 +84,10 @@ POST       /registration/individual-address-uk                 controllers.Addre
 GET        /registration/change-individual-address-uk          controllers.AddressInUkController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-individual-address-uk          controllers.AddressInUkController.onSubmit(mode: Mode = CheckMode)
 
-GET        /registration/international-address            controllers.InternationalAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /registration/international-address            controllers.InternationalAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /registration/change-international-address     controllers.InternationalAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /registration/change-international-address     controllers.InternationalAddressController.onSubmit(mode: Mode = CheckMode)
+GET    	   /registration/individual-international-address            controllers.InternationalAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/individual-international-address            controllers.InternationalAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-individual-international-address     controllers.InternationalAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-individual-international-address     controllers.InternationalAddressController.onSubmit(mode: Mode = CheckMode)
 
 GET        /registration/manual-address-entry                        controllers.UkAddressController.onPageLoad(mode: Mode = NormalMode)
 POST       /registration/manual-address-entry                        controllers.UkAddressController.onSubmit(mode: Mode = NormalMode)
