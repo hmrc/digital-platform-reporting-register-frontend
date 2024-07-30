@@ -17,17 +17,17 @@
 package models.pageviews
 
 import models.{Mode, UserAnswers}
-import pages.BusinessHaveTradingNamePage
+import pages.HasBusinessTradingNamePage
 import play.api.data.Form
 
-case class BusinessHaveTradingNameViewModel(mode: Mode, form: Form[Boolean])
+case class HasBusinessTradingNameViewModel(mode: Mode, form: Form[Boolean])
 
-object BusinessHaveTradingNameViewModel {
+object HasBusinessTradingNameViewModel {
 
-  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[Boolean]): BusinessHaveTradingNameViewModel = {
-    val optAnswerValue = userAnswers.get(BusinessHaveTradingNamePage)
+  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[Boolean]): HasBusinessTradingNameViewModel = {
+    val optAnswerValue = userAnswers.get(HasBusinessTradingNamePage)
 
-    BusinessHaveTradingNameViewModel(
+    HasBusinessTradingNameViewModel(
       mode = mode,
       form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue))
     )

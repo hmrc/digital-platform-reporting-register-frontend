@@ -17,43 +17,43 @@
 package models.pageviews
 
 import builders.UserAnswersBuilder.aUserAnswers
-import forms.BusinessHaveTradingNameFormProvider
+import forms.HasBusinessTradingNameFormProvider
 import models.NormalMode
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import pages.BusinessHaveTradingNamePage
+import pages.HasBusinessTradingNamePage
 
-class BusinessHaveTradingNameViewModelSpec extends AnyFreeSpec with Matchers {
+class HasBusinessTradingNameViewModelSpec extends AnyFreeSpec with Matchers {
 
   private val anyMode = NormalMode
-  private val formProvider = new BusinessHaveTradingNameFormProvider()
+  private val formProvider = new HasBusinessTradingNameFormProvider()
 
-  private val underTest = BusinessHaveTradingNameViewModel
+  private val underTest = HasBusinessTradingNameViewModel
 
   ".apply(...)" - {
-    "must return ViewModel with pre-filled form when BusinessHaveTradingNamePage answer available" in {
+    "must return ViewModel with pre-filled form when HasBusinessTradingNamePage answer available" in {
       val form = formProvider()
       val anyBoolean = true
-      val userAnswers = aUserAnswers.set(BusinessHaveTradingNamePage, anyBoolean).get
+      val userAnswers = aUserAnswers.set(HasBusinessTradingNamePage, anyBoolean).get
 
       underTest.apply(anyMode, userAnswers, form) mustBe
-        BusinessHaveTradingNameViewModel(mode = anyMode, form = form.fill(anyBoolean))
+        HasBusinessTradingNameViewModel(mode = anyMode, form = form.fill(anyBoolean))
     }
 
-    "must return ViewModel without pre-filled form when BusinessHaveTradingNamePage answer not available" in {
+    "must return ViewModel without pre-filled form when HasBusinessTradingNamePage answer not available" in {
       val emptyForm = formProvider()
-      val userAnswers = aUserAnswers.remove(BusinessHaveTradingNamePage).get
+      val userAnswers = aUserAnswers.remove(HasBusinessTradingNamePage).get
 
       underTest.apply(anyMode, userAnswers, emptyForm) mustBe
-        BusinessHaveTradingNameViewModel(mode = anyMode, form = emptyForm)
+        HasBusinessTradingNameViewModel(mode = anyMode, form = emptyForm)
     }
 
     "must return ViewModel with pre-filled form with errors, when the form has errors" in {
-      val formWithErrors = formProvider().bind(Map(BusinessHaveTradingNamePage.toString -> "unknown-value"))
-      val userAnswers = aUserAnswers.remove(BusinessHaveTradingNamePage).get
+      val formWithErrors = formProvider().bind(Map(HasBusinessTradingNamePage.toString -> "unknown-value"))
+      val userAnswers = aUserAnswers.remove(HasBusinessTradingNamePage).get
 
       underTest.apply(anyMode, userAnswers, formWithErrors) mustBe
-        BusinessHaveTradingNameViewModel(mode = anyMode, form = formWithErrors)
+        HasBusinessTradingNameViewModel(mode = anyMode, form = formWithErrors)
     }
   }
 }

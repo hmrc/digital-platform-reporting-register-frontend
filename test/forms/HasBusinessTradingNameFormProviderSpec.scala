@@ -19,12 +19,12 @@ package forms
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
 
-class BusinessHaveTradingNameFormProviderSpec extends BooleanFieldBehaviours {
+class HasBusinessTradingNameFormProviderSpec extends BooleanFieldBehaviours {
 
-  private val requiredKey = "businessHaveTradingName.error.required"
+  private val requiredKey = "hasBusinessTradingName.error.required"
   private val invalidKey = "error.boolean"
 
-  private val underTest = new BusinessHaveTradingNameFormProvider()()
+  private val underTest = new HasBusinessTradingNameFormProvider()()
 
   ".value" - {
     val fieldName = "value"

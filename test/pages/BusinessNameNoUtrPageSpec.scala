@@ -27,7 +27,7 @@ class BusinessNameNoUtrPageSpec extends AnyFreeSpec with Matchers {
   ".nextPage" - {
     "in Normal Mode" - {
       "must go to Index" in {
-        BusinessNameNoUtrPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.BusinessHaveTradingNameController.onPageLoad(NormalMode)
+        BusinessNameNoUtrPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.HasBusinessTradingNameController.onPageLoad(NormalMode)
       }
     }
 

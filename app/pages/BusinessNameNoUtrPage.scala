@@ -28,5 +28,5 @@ case object BusinessNameNoUtrPage extends QuestionPage[String] {
   override def toString: String = "businessNameNoUtr"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.BusinessHaveTradingNameController.onPageLoad(NormalMode)
+    routes.HasBusinessTradingNameController.onPageLoad(NormalMode)
 }

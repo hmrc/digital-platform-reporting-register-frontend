@@ -21,11 +21,11 @@ import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
-case object BusinessHaveTradingNamePage extends QuestionPage[Boolean] {
+case object HasBusinessTradingNamePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "businessHaveTradingName"
+  override def toString: String = "hasBusinessTradingName"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
     routes.BusinessEnterTradingNameController.onPageLoad(NormalMode)
