@@ -21,14 +21,13 @@ import play.api.data.FormError
 
 class UkPostCodeFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "ukPostCode.error.required"
-  val lengthKey = "ukPostCode.error.length"
-  val maxLength = 10
+  private val requiredKey = "ukPostCode.error.required"
+  private val lengthKey = "ukPostCode.error.length"
+  private val maxLength = 8
 
-  val form = new UkPostCodeFormProvider()()
+  private val form = new UkPostCodeFormProvider()()
 
   ".value" - {
-
     val fieldName = "value"
 
     behave like fieldThatBindsValidData(

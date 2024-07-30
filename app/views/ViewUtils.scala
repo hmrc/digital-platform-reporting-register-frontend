@@ -16,8 +16,8 @@
 
 package views
 
-import models.{Country, InternationalAddress, UkAddress}
 import models.registration.Address
+import models.{Country, InternationalAddress, UkAddress}
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -44,9 +44,9 @@ object ViewUtils {
       Some(ukAddress.town),
       ukAddress.county,
       Some(ukAddress.postCode),
-      Country.unitedKingdom.code
+      ukAddress.country.code
     ))
-    
+
   def formatInternationalAddress(internationalAddress: InternationalAddress): String =
     formatAddress(Address(
       internationalAddress.line1,
