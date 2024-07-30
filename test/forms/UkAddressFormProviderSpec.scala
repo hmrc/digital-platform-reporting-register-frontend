@@ -17,18 +17,20 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import models.Country
+import org.scalacheck.Gen
 import play.api.data.FormError
 
 class UkAddressFormProviderSpec extends StringFieldBehaviours {
 
-  val form = new UkAddressFormProvider()()
+  private val form = new UkAddressFormProvider()()
 
   ".line1" - {
 
     val fieldName = "line1"
     val requiredKey = "ukAddress.error.line1.required"
     val lengthKey = "ukAddress.error.line1.length"
-    val maxLength = 100
+    val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
@@ -54,7 +56,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "line2"
     val lengthKey = "ukAddress.error.line2.length"
-    val maxLength = 100
+    val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
@@ -75,7 +77,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "town"
     val requiredKey = "ukAddress.error.town.required"
     val lengthKey = "ukAddress.error.town.length"
-    val maxLength = 30
+    val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
@@ -101,7 +103,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "county"
     val lengthKey = "ukAddress.error.county.length"
-    val maxLength = 30
+    val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
@@ -122,7 +124,7 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "postCode"
     val requiredKey = "ukAddress.error.postCode.required"
     val lengthKey = "ukAddress.error.postCode.length"
-    val maxLength = 10
+    val maxLength = 8
 
     behave like fieldThatBindsValidData(
       form,
@@ -135,6 +137,23 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
+
+  ".country" - {
+    val fieldName = "country"
+    val requiredKey = "ukAddress.error.country.required"
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      Gen.oneOf(Country.ukCountries.map(_.code))
     )
 
     behave like mandatoryField(

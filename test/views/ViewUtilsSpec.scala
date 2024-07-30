@@ -29,7 +29,7 @@ class ViewUtilsSpec extends AnyFreeSpec {
     val line2   = ""
     val city    = "Alabama"
     val postal  = "AL1"
-    val country = Country.unitedKingdom
+    val country = Country.ukCountries.head
 
     val expectedResult = Seq(
       line1,
@@ -57,7 +57,8 @@ class ViewUtilsSpec extends AnyFreeSpec {
         Some(line2),
         city,
         None,
-        postal
+        postal,
+        Country.ukCountries.head
       )
 
       ViewUtils.formatUkAddress(address) mustEqual expectedResult

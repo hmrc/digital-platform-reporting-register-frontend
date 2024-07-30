@@ -19,7 +19,7 @@ package models
 import play.api.i18n.Messages
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
-import viewmodels.govuk.select._
+import viewmodels.govuk.select.*
 
 final case class Country(code: String, name: String) {
   def message(implicit messages: Messages): String = messages(s"country.$code")
@@ -29,9 +29,6 @@ object Country {
 
   implicit val format: OFormat[Country] = Json.format[Country]
 
-  val unitedKingdom: Country =
-    Country("GB", "United Kingdom")
-  
   val allCountries: Seq[Country] = Seq(
     Country("AF", "Afghanistan"),
     Country("AL", "Albania"),
@@ -100,6 +97,7 @@ object Country {
     Country("GR", "Greece"),
     Country("GD", "Grenada"),
     Country("GT", "Guatemala"),
+    Country("GG", "Guernsey"),
     Country("GN", "Guinea"),
     Country("GW", "Guinea-Bissau"),
     Country("GY", "Guyana"),
@@ -112,11 +110,13 @@ object Country {
     Country("IR", "Iran"),
     Country("IQ", "Iraq"),
     Country("IE", "Ireland"),
+    Country("IM", "Isle of Man"),
     Country("IL", "Israel"),
     Country("IT", "Italy"),
     Country("CI", "Ivory Coast"),
     Country("JM", "Jamaica"),
     Country("JP", "Japan"),
+    Country("JE", "Jersey"),
     Country("JO", "Jordan"),
     Country("KZ", "Kazakhstan"),
     Country("KE", "Kenya"),
@@ -217,7 +217,7 @@ object Country {
     Country("UG", "Uganda"),
     Country("UA", "Ukraine"),
     Country("AE", "United Arab Emirates"),
-    unitedKingdom,
+    Country("GB", "United Kingdom"),
     Country("US", "United States"),
     Country("UY", "Uruguay"),
     Country("UZ", "Uzbekistan"),
@@ -230,16 +230,16 @@ object Country {
     Country("ZW", "Zimbabwe")
   )
 
-  val internationalCountries: Seq[Country] =
-    allCountries.filterNot(_ == unitedKingdom)
+  val ukCountries: Seq[Country] = allCountries.filter(x => x.code == "GB" || x.code == "GG" || x.code == "IM" || x.code == "JE")
+  val internationalCountries: Seq[Country] = allCountries.filterNot(x => ukCountries.exists(_.code == x.code))
 
   def selectItems(countries: Seq[Country])(implicit messages: Messages): Seq[SelectItem] =
-    SelectItem(value = None, text = messages("internationalAddress.country.selectCountry")) +:
+    SelectItem(value = None, text = messages("common.selectCountry")) +:
       countries.map {
         country =>
           SelectItemViewModel(
             value = country.code,
-            text  = country.name
+            text = country.name
           )
       }
 }

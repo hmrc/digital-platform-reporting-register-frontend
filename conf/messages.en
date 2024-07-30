@@ -27,6 +27,8 @@ error.title.prefix = Error:
 error.prefix = Error
 error.summary.title = There is a problem
 
+common.selectCountry = Select a country
+
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
 checkYourAnswers.primaryContact = First contact
@@ -221,7 +223,6 @@ internationalAddress.error.city.length = City must be {0} characters or less
 internationalAddress.error.region.length = Region must be {0} characters or less
 internationalAddress.error.postal.length = Postal or zip code must be {0} characters or less
 internationalAddress.error.country.required = Start typing in country and select from dropdown
-internationalAddress.country.selectCountry = Select a country
 
 ukAddress.title = What is your address?
 ukAddress.heading = What is your address?
@@ -230,14 +231,16 @@ ukAddress.line2 = Address line 2 (optional)
 ukAddress.town = Town or city
 ukAddress.county = County (optional)
 ukAddress.postCode = Postcode
-ukAddress.error.line1.required = Enter address line 1
+ukAddress.country = Country
+ukAddress.error.line1.required = Enter address line 1, typically the building and street
 ukAddress.error.town.required = Enter town or city
 ukAddress.error.postCode.required = Enter postcode
-ukAddress.error.line1.length = Address line 1 must be {0} characters or less
-ukAddress.error.line2.length = Address line 2 must be {0} characters or less
-ukAddress.error.town.length = Town or city must be {0} characters or less
-ukAddress.error.county.length = County must be {0} characters or less
-ukAddress.error.postCode.length = Postcode must be {0} characters or less
+ukAddress.error.country.required = Start typing in country and select from dropdown
+ukAddress.error.line1.length = Address line 1 must be 35 characters or less
+ukAddress.error.line2.length = Address line 2 must be 35 characters or less
+ukAddress.error.town.length = Town or city must be 35 characters or less
+ukAddress.error.county.length = County must be 35 characters or less
+ukAddress.error.postCode.length = Postcode must be 8 characters or less
 
 ukPostCode.title = What is your postcode?
 ukPostCode.heading = What is your postcode?

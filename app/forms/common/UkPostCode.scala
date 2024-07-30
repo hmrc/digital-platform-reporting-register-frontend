@@ -20,7 +20,7 @@ import forms.mappings.Mappings
 import play.api.data.Mapping
 
 class UkPostCode extends Mappings {
+
   def ukPostCode(requiredKey: String, lengthKey: String): Mapping[String] =
-    text(requiredKey)
-      .verifying(maxLength(10, lengthKey))
+    text(requiredKey).verifying(maxLength(8, lengthKey))
 }
