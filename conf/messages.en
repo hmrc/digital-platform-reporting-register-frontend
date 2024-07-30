@@ -378,3 +378,7 @@ businessNameNoUtr.title = What is the registered name of your business?
 businessNameNoUtr.heading = What is the registered name of your business?
 businessNameNoUtr.error.required = Enter your business name
 businessNameNoUtr.error.length = Business name must be 35 characters or less
+
+businessHaveTradingName.title = Does your business trade under a different name?
+businessHaveTradingName.heading = Does your business trade under a different name?
+businessHaveTradingName.error.required = Select yes if your business trades under a different name

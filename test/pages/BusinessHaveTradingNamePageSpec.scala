@@ -22,18 +22,18 @@ import models.{CheckMode, NormalMode}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class BusinessNameNoUtrPageSpec extends AnyFreeSpec with Matchers {
+class BusinessHaveTradingNamePageSpec extends AnyFreeSpec with Matchers {
 
   ".nextPage" - {
     "in Normal Mode" - {
       "must go to Index" in {
-        BusinessNameNoUtrPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.BusinessHaveTradingNameController.onPageLoad(NormalMode)
+        BusinessHaveTradingNamePage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndexController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
       "must go to Check Answers" in {
-        BusinessNameNoUtrPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        BusinessHaveTradingNamePage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

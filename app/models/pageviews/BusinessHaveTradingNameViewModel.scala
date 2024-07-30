@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package pages
+package models.pageviews
 
-import controllers.routes
-import models.{NormalMode, UserAnswers}
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
+import models.{Mode, UserAnswers}
+import pages.BusinessHaveTradingNamePage
+import play.api.data.Form
 
-case object BusinessNameNoUtrPage extends QuestionPage[String] {
+case class BusinessHaveTradingNameViewModel(mode: Mode, form: Form[Boolean])
 
-  override def path: JsPath = JsPath \ toString
+object BusinessHaveTradingNameViewModel {
 
-  override def toString: String = "businessNameNoUtr"
+  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[Boolean]): BusinessHaveTradingNameViewModel = {
+    val optAnswerValue = userAnswers.get(BusinessHaveTradingNamePage)
 
-  override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.BusinessHaveTradingNameController.onPageLoad(NormalMode)
+    BusinessHaveTradingNameViewModel(
+      mode = mode,
+      form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue))
+    )
+  }
 }
