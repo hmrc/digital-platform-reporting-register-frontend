@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.{InternationalAddress, UserAnswers}
+import models.{InternationalAddress, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
 
@@ -28,5 +28,5 @@ case object InternationalAddressPage extends QuestionPage[InternationalAddress] 
   override def toString: String = "internationalAddress"
 
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.IndexController.onPageLoad()
+    routes.IndividualEmailAddressController.onPageLoad(NormalMode)
 }
