@@ -30,7 +30,7 @@ class AddressInUkPageSpec extends AnyFreeSpec with Matchers with TryValues with 
     "in Normal Mode" - {
       "must go to Uk Address page if yes" in {
         val answers = emptyAnswers.set(AddressInUkPage, true).success.value
-        AddressInUkPage.nextPage(NormalMode, answers) mustEqual routes.UkPostCodeController.onPageLoad(NormalMode)
+        AddressInUkPage.nextPage(NormalMode, answers) mustEqual routes.UkAddressController.onPageLoad(NormalMode)
       }
 
       "must go to International Address page if no" in {
