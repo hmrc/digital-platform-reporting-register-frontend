@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package models
 
-import controllers.routes
-import models.{NormalMode, UserAnswers}
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
+import play.api.libs.json.*
 
-case object BusinessHaveTradingNamePage extends QuestionPage[Boolean] {
+case class BusinessAddress(addressLine1: String,
+                           addressLine2: Option[String] = None,
+                           city: String,
+                           region: Option[String] = None,
+                           postalCode: Option[String] = None,
+                           country: Country)
 
-  override def path: JsPath = JsPath \ toString
+object BusinessAddress {
 
-  override def toString: String = "businessHaveTradingName"
-
-  override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.BusinessEnterTradingNameController.onPageLoad(NormalMode)
+  implicit val format: OFormat[BusinessAddress] = Json.format
 }

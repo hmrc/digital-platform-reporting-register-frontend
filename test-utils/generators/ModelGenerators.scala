@@ -16,32 +16,44 @@
 
 package generators
 
-import models._
+import models.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryBusinessAddress: Arbitrary[BusinessAddress] =
+    Arbitrary {
+      for {
+        addressLine1 <- arbitrary[String]
+        addressLine2 <- arbitrary[Option[String]]
+        city <- arbitrary[String]
+        region <- arbitrary[Option[String]]
+        postalCode <- arbitrary[Option[String]]
+        country <- Gen.oneOf(Country.nonUkInternationalCountries)
+      } yield BusinessAddress(addressLine1, addressLine2, city, region, postalCode, country)
+    }
+
   implicit lazy val arbitraryUkAddress: Arbitrary[UkAddress] =
     Arbitrary {
       for {
-        line1    <- arbitrary[String]
-        line2    <- arbitrary[String]
-        town     <- arbitrary[String]
-        county   <- arbitrary[String]
+        line1 <- arbitrary[String]
+        line2 <- arbitrary[String]
+        town <- arbitrary[String]
+        county <- arbitrary[String]
         postCode <- arbitrary[String]
-        country  <- Gen.oneOf(Country.ukCountries)
+        country <- Gen.oneOf(Country.ukCountries)
       } yield UkAddress(line1, Some(line2), town, Some(county), postCode, country)
     }
 
   implicit lazy val arbitraryInternationalAddress: Arbitrary[InternationalAddress] =
     Arbitrary {
       for {
-        line1   <- arbitrary[String]
-        line2   <- arbitrary[Option[String]]
-        city    <- arbitrary[String]
-        region  <- arbitrary[Option[String]]
-        postal  <- arbitrary[Option[String]]
+        line1 <- arbitrary[String]
+        line2 <- arbitrary[Option[String]]
+        city <- arbitrary[String]
+        region <- arbitrary[Option[String]]
+        postal <- arbitrary[Option[String]]
         country <- Gen.oneOf(Country.internationalCountries)
       } yield InternationalAddress(line1, line2, city, region, postal, country)
     }

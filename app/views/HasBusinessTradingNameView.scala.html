@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.pageviews.BusinessHaveTradingNameViewModel
+@import models.pageviews.HasBusinessTradingNameViewModel
 
 @this(
     layout: templates.Layout,
@@ -24,11 +24,11 @@
     govukButton: GovukButton
 )
 
-@(viewModel: BusinessHaveTradingNameViewModel)(implicit request: Request[_], messages: Messages)
+@(viewModel: HasBusinessTradingNameViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(viewModel.form, messages("businessHaveTradingName.title"))) {
+@layout(pageTitle = title(viewModel.form, messages("hasBusinessTradingName.title"))) {
 
-    @formHelper(action = routes.BusinessHaveTradingNameController.onSubmit(viewModel.mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.HasBusinessTradingNameController.onSubmit(viewModel.mode), Symbol("autoComplete") -> "off") {
 
         @if(viewModel.form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(viewModel.form))
@@ -37,7 +37,7 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = viewModel.form("value"),
-                legend = LegendViewModel(messages("businessHaveTradingName.heading")).asPageHeading()
+                legend = LegendViewModel(messages("hasBusinessTradingName.heading")).asPageHeading()
             )
         )
 

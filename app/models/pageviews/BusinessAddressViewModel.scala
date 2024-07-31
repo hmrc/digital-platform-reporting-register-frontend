@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package pages
+package models.pageviews
 
-import controllers.routes
-import models.{NormalMode, UserAnswers}
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
+import models.{BusinessAddress, Mode, UserAnswers}
+import pages.BusinessAddressPage
+import play.api.data.Form
 
-case object BusinessEnterTradingNamePage extends QuestionPage[String] {
+case class BusinessAddressViewModel(mode: Mode, form: Form[BusinessAddress])
 
-  override def path: JsPath = JsPath \ toString
+object BusinessAddressViewModel {
 
-  override def toString: String = "businessEnterTradingName"
+  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[BusinessAddress]): BusinessAddressViewModel = {
+    val optAnswerValue = userAnswers.get(BusinessAddressPage)
 
-  override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.BusinessAddressController.onPageLoad(NormalMode)
+    BusinessAddressViewModel(
+      mode = mode,
+      form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue))
+    )
+  }
 }

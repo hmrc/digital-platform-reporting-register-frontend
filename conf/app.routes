@@ -177,12 +177,17 @@ POST       /registration/business-name-no-utr                        controllers
 GET        /registration/change-business-name-no-utr                 controllers.BusinessNameNoUtrController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-business-name-no-utr                 controllers.BusinessNameNoUtrController.onSubmit(mode: Mode = CheckMode)
 
-GET        /registration/business-have-trading-name                 controllers.BusinessHaveTradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /registration/business-have-trading-name                 controllers.BusinessHaveTradingNameController.onSubmit(mode: Mode = NormalMode)
-GET        /registration/change-business-have-trading-name          controllers.BusinessHaveTradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /registration/change-business-have-trading-name          controllers.BusinessHaveTradingNameController.onSubmit(mode: Mode = CheckMode)
+GET        /registration/business-have-trading-name                 controllers.HasBusinessTradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/business-have-trading-name                 controllers.HasBusinessTradingNameController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-business-have-trading-name          controllers.HasBusinessTradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-business-have-trading-name          controllers.HasBusinessTradingNameController.onSubmit(mode: Mode = CheckMode)
 
 GET        /registration/business-enter-trading-name                controllers.BusinessEnterTradingNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /registration/business-enter-trading-name                controllers.BusinessEnterTradingNameController.onSubmit(mode: Mode = NormalMode)
 GET        /registration/change-business-enter-trading-name         controllers.BusinessEnterTradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-business-enter-trading-name         controllers.BusinessEnterTradingNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /registration/business-address                   controllers.BusinessAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/business-address                   controllers.BusinessAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-business-address            controllers.BusinessAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-business-address            controllers.BusinessAddressController.onSubmit(mode: Mode = CheckMode)
