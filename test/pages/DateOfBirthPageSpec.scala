@@ -22,6 +22,7 @@ import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalatest.TryValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import builders.MatchResponseWithIdBuilder.aMatchResponseWithId
 
 class DateOfBirthPageSpec extends AnyFreeSpec with Matchers with TryValues {
 
@@ -34,6 +35,13 @@ class DateOfBirthPageSpec extends AnyFreeSpec with Matchers with TryValues {
           .copy(registrationResponse = Some(AlreadySubscribedResponse()))
 
         DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IndividualAlreadyRegisteredController.onPageLoad()
+      }
+
+      "must go to individual-identity-confirmed page if NINO supplied and user not already registered" in {
+        val answers = emptyAnswers.set(HasNinoPage, true).success.value
+          .copy(registrationResponse = Some(aMatchResponseWithId))
+
+        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IndividualIdentityConfirmedController.onPageLoad()
       }
 
       "must go to error page if NINO supplied and invalid response" in {
