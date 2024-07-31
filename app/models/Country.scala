@@ -232,6 +232,7 @@ object Country {
 
   val ukCountries: Seq[Country] = allCountries.filter(x => x.code == "GB" || x.code == "GG" || x.code == "IM" || x.code == "JE")
   val internationalCountries: Seq[Country] = allCountries.filterNot(x => ukCountries.exists(_.code == x.code))
+  val nonUkInternationalCountries: Seq[Country] = allCountries.filterNot(_.code == "GB")
 
   def selectItems(countries: Seq[Country])(implicit messages: Messages): Seq[SelectItem] =
     SelectItem(value = None, text = messages("common.selectCountry")) +:

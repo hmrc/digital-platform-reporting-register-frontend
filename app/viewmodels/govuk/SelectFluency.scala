@@ -18,6 +18,7 @@ package viewmodels.govuk
 
 import play.api.data.Field
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.FormGroup
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.{Select, SelectItem}
@@ -29,14 +30,13 @@ trait SelectFluency {
 
   object SelectViewModel extends ErrorMessageAwareness {
 
-    def apply(
-               field: Field,
-               items: Seq[SelectItem],
-               label: Label
-             )(implicit messages: Messages): Select =
+    def apply(field: Field,
+              items: Seq[SelectItem],
+              label: Label)
+             (implicit messages: Messages): Select =
       Select(
-        id    = field.id,
-        name  = field.name,
+        id = field.id,
+        name = field.name,
         items = items map (item => item copy (selected = field.value.isDefined && field.value == item.value)),
         label = label,
         errorMessage = errorMessage(field)
@@ -50,6 +50,9 @@ trait SelectFluency {
 
     def describedBy(value: String): Select =
       select copy (describedBy = Some(value))
+
+    def withFormGroupClasses(classes: String): Select =
+      select copy (formGroup = FormGroup(classes = Some(classes)))
 
     def withCssClass(newClass: String): Select =
       select copy (classes = s"${select.classes} $newClass")

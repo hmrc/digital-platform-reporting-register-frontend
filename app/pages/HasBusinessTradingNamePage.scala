@@ -27,6 +27,8 @@ case object HasBusinessTradingNamePage extends QuestionPage[Boolean] {
 
   override def toString: String = "hasBusinessTradingName"
 
-  override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    routes.BusinessEnterTradingNameController.onPageLoad(NormalMode)
+  override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.get(this).map {
+    case true => routes.BusinessEnterTradingNameController.onPageLoad(NormalMode)
+    case false => routes.BusinessAddressController.onPageLoad(NormalMode)
+  }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }

@@ -18,36 +18,37 @@ package controllers
 
 import base.SpecBase
 import builders.UserAnswersBuilder.aUserAnswers
-import forms.HasBusinessTradingNameFormProvider
-import models.NormalMode
-import models.pageviews.HasBusinessTradingNameViewModel
+import forms.BusinessAddressFormProvider
+import generators.Generators
+import models.pageviews.BusinessAddressViewModel
+import models.{BusinessAddress, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.HasBusinessTradingNamePage
+import pages.BusinessAddressPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.HasBusinessTradingNameView
+import views.html.BusinessAddressView
 
 import scala.concurrent.Future
 
-class HasBusinessTradingNameControllerSpec extends SpecBase with MockitoSugar {
+class BusinessAddressControllerSpec extends SpecBase with MockitoSugar with Generators {
 
-  private val form = new HasBusinessTradingNameFormProvider()()
+  private lazy val businessAddressRoute = routes.BusinessAddressController.onPageLoad(NormalMode).url
 
-  private lazy val hasBusinessTradingNameRoute = routes.HasBusinessTradingNameController.onPageLoad(NormalMode).url
+  private val form = new BusinessAddressFormProvider()()
 
-  "HasBusinessTradingName Controller" - {
+  "BusinessAddress Controller" - {
     "must return OK and the correct view for a GET" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, hasBusinessTradingNameRoute)
+        val request = FakeRequest(GET, businessAddressRoute)
         val result = route(application, request).value
-        val view = application.injector.instanceOf[HasBusinessTradingNameView]
-        val viewModel = HasBusinessTradingNameViewModel(NormalMode, aUserAnswers, form)
+        val view = application.injector.instanceOf[BusinessAddressView]
+        val viewModel = BusinessAddressViewModel(NormalMode, aUserAnswers, form)
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -55,14 +56,15 @@ class HasBusinessTradingNameControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = emptyUserAnswers.set(HasBusinessTradingNamePage, true).success.value
+      val address = arbitraryBusinessAddress.arbitrary.sample.get
+      val userAnswers = emptyUserAnswers.set(BusinessAddressPage, address).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, hasBusinessTradingNameRoute)
-        val view = application.injector.instanceOf[HasBusinessTradingNameView]
+        val request = FakeRequest(GET, businessAddressRoute)
+        val view = application.injector.instanceOf[BusinessAddressView]
         val result = route(application, request).value
-        val viewModel = HasBusinessTradingNameViewModel(NormalMode, aUserAnswers, form.fill(true))
+        val viewModel = BusinessAddressViewModel(NormalMode, aUserAnswers, form.fill(address))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -79,14 +81,12 @@ class HasBusinessTradingNameControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val request = FakeRequest(POST, hasBusinessTradingNameRoute)
-          .withFormUrlEncodedBody(("value", "true"))
+        val request = FakeRequest(POST, businessAddressRoute)
+          .withFormUrlEncodedBody(("addressLine1", "value 1"), ("city", "value 2"), ("country", "US"))
         val result = route(application, request).value
-        val updatedAnswers = emptyUserAnswers.set(HasBusinessTradingNamePage, true).success.value
-
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual HasBusinessTradingNamePage.nextPage(NormalMode, updatedAnswers).url
+        redirectLocation(result).value mustEqual BusinessAddressPage.nextPage(NormalMode, emptyUserAnswers).url
       }
     }
 
@@ -94,12 +94,12 @@ class HasBusinessTradingNameControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(POST, hasBusinessTradingNameRoute)
-          .withFormUrlEncodedBody(("value", ""))
-        val boundForm = form.bind(Map("value" -> ""))
-        val view = application.injector.instanceOf[HasBusinessTradingNameView]
+        val request = FakeRequest(POST, businessAddressRoute)
+          .withFormUrlEncodedBody(("value", "invalid value"))
+        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val view = application.injector.instanceOf[BusinessAddressView]
         val result = route(application, request).value
-        val viewModel = HasBusinessTradingNameViewModel(NormalMode, aUserAnswers, boundForm)
+        val viewModel = BusinessAddressViewModel(NormalMode, aUserAnswers, boundForm)
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -110,7 +110,7 @@ class HasBusinessTradingNameControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, hasBusinessTradingNameRoute)
+        val request = FakeRequest(GET, businessAddressRoute)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -122,8 +122,8 @@ class HasBusinessTradingNameControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(POST, hasBusinessTradingNameRoute)
-          .withFormUrlEncodedBody(("value", "true"))
+        val request = FakeRequest(POST, businessAddressRoute)
+          .withFormUrlEncodedBody(("addressLine1", "value 1"), ("addressLine2", "value 2"))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

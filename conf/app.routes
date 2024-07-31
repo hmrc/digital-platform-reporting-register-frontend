@@ -186,3 +186,8 @@ GET        /registration/business-enter-trading-name                controllers.
 POST       /registration/business-enter-trading-name                controllers.BusinessEnterTradingNameController.onSubmit(mode: Mode = NormalMode)
 GET        /registration/change-business-enter-trading-name         controllers.BusinessEnterTradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-business-enter-trading-name         controllers.BusinessEnterTradingNameController.onSubmit(mode: Mode = CheckMode)
+
+GET        /registration/business-address                   controllers.BusinessAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /registration/business-address                   controllers.BusinessAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /registration/change-business-address            controllers.BusinessAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /registration/change-business-address            controllers.BusinessAddressController.onSubmit(mode: Mode = CheckMode)
