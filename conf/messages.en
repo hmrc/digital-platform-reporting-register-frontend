@@ -222,7 +222,7 @@ internationalAddress.error.city.required = Enter city
 internationalAddress.error.city.length = City must be {0} characters or less
 internationalAddress.error.region.length = Region must be {0} characters or less
 internationalAddress.error.postal.length = Postal or zip code must be {0} characters or less
-internationalAddress.error.country.required = Start typing in country and select from dropdown
+internationalAddress.error.country.required = Start typing in country and choose from the list
 
 ukAddress.title = What is your address?
 ukAddress.heading = What is your address?
