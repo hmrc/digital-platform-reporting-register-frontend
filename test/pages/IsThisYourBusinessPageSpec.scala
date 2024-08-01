@@ -18,35 +18,29 @@ package pages
 
 import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
-import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{OptionValues, TryValues}
 
 class IsThisYourBusinessPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
-
     val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
-
       "must go to Contact Details Guidance when the answer is yes" in {
-
         val answers = emptyAnswers.set(IsThisYourBusinessPage, true).success.value
         IsThisYourBusinessPage.nextPage(NormalMode, answers) mustEqual routes.ContactDetailsGuidanceController.onPageLoad()
       }
 
       "must go to Index when the answer is no" in {
-
         val answers = emptyAnswers.set(IsThisYourBusinessPage, false).success.value
-        IsThisYourBusinessPage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
+        IsThisYourBusinessPage.nextPage(NormalMode, answers) mustEqual routes.BusinessDetailsMatchOtherController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
-
       "must go to Check Answers" in {
-
         IsThisYourBusinessPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }

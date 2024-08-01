@@ -27,8 +27,6 @@ error.title.prefix = Error:
 error.prefix = Error
 error.summary.title = There is a problem
 
-common.selectCountry = Select a country
-
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
 checkYourAnswers.primaryContact = First contact
@@ -194,7 +192,7 @@ individualName.error.lastName.length = Last name or family name must be 35 chara
 
 nino.title = What is your National Insurance number?
 nino.heading = What is your National Insurance number?
-nino.p1 = It's on your National Insurance card, benefit letter, payslip or P60.
+nino.p1 = It’s on your National Insurance card, benefit letter, payslip or P60.
 nino.hint = For example, ‘QQ 12 34 56 C’.
 nino.checkYourAnswersLabel = nino
 nino.error.required = Enter your National Insurance number
@@ -421,3 +419,9 @@ businessDetailsDoNotMatch.p5.link.text = search the register for your company na
 businessDetailsDoNotMatch.h2.3 = Contact HMRC to help us find your business
 businessDetailsDoNotMatch.p6.1 = If you have checked and entered your UTR and name again and we still cannot find your business, then email
 businessDetailsDoNotMatch.p6.2 = for help.
+
+businessDetailsMatchOther.title = You’re unable to use this service with these sign in details
+businessDetailsMatchOther.heading = You’re unable to use this service with these sign in details
+businessDetailsMatchOther.p1 = You have signed in with details that are linked to the following business details:
+businessDetailsMatchOther.p2 = If you want to register a different business for reporting, you must
+businessDetailsMatchOther.p2.link.text = use the HMRC sign in details for the business you wish to register.
