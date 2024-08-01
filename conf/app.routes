@@ -191,3 +191,5 @@ GET        /registration/business-address                   controllers.Business
 POST       /registration/business-address                   controllers.BusinessAddressController.onSubmit(mode: Mode = NormalMode)
 GET        /registration/change-business-address            controllers.BusinessAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /registration/change-business-address            controllers.BusinessAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET        /registration/business-details-not-match             controllers.BusinessDetailsDoNotMatchController.onPageLoad()
