@@ -1,0 +1,65 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+
+@this(
+    layout: templates.Layout,
+    newTabLink: HmrcNewTabLinkHelper,
+    govukButton: GovukButton
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("businessDetailsDoNotMatch.title"))) {
+
+    <h1 class="govuk-heading-xl">@messages("businessDetailsDoNotMatch.heading")</h1>
+
+    <p class="govuk-body">@messages("businessDetailsDoNotMatch.p1")</p>
+
+    <h2 class="govuk-heading-m">@messages("businessDetailsDoNotMatch.h2.1")</h2>
+
+    <p class="govuk-body">
+        @messages("businessDetailsDoNotMatch.p2")
+        <a class="govuk-link" href="https://www.gov.uk/find-utr-number">@messages("businessDetailsDoNotMatch.p2.link.text")</a>
+    </p>
+
+    <h2 class="govuk-heading-m">@messages("businessDetailsDoNotMatch.h2.2")</h2>
+
+    <p class="govuk-body">@messages("businessDetailsDoNotMatch.p3")</p>
+
+    <p class="govuk-body">@messages("businessDetailsDoNotMatch.p4")</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("businessDetailsDoNotMatch.li.1")</li>
+        <li>@messages("businessDetailsDoNotMatch.li.2")</li>
+    </ul>
+
+    <p class="govuk-body">
+        @messages("businessDetailsDoNotMatch.p5")
+        @newTabLink(NewTabLinkHelper(
+            text = messages("businessDetailsDoNotMatch.p5.link.text"),
+            href = Some("https://find-and-update.company-information.service.gov.uk/")
+        ))
+    </p>
+
+    <h2 class="govuk-heading-m">@messages("businessDetailsDoNotMatch.h2.3")</h2>
+
+    <p class="govuk-body">
+        @messages("businessDetailsDoNotMatch.p6.1")
+        <a class="govuk-link" href= "TODO: add correct link when confirmed">[support].enquiries&commat;hmrc.gov.uk</a>
+        @messages("businessDetailsDoNotMatch.p6.2")
+    </p>
+}

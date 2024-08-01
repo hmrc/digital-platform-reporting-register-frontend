@@ -34,7 +34,7 @@ case object BusinessNamePage extends QuestionPage[String] {
       case _: AlreadySubscribedResponse => routes.IndexController.onPageLoad() //TODO: update when REG-KO-3 content is confirmed
       case _ => answers.get(BusinessTypePage).map {
         case BusinessType.SoleTrader => routes.SoleTraderDetailsNotMatchController.onPageLoad()
-        case _ => routes.IndexController.onPageLoad() //TODO: update when page created
+        case _ => routes.BusinessDetailsDoNotMatchController.onPageLoad()
       }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
     }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }

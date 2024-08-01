@@ -47,17 +47,15 @@ class BusinessNamePageSpec extends AnyFreeSpec with Matchers with TryValues with
         val answers = noResponseAnswer.set(BusinessTypePage, BusinessType.SoleTrader).success.value
         BusinessNamePage.nextPage(NormalMode, answers) mustEqual routes.SoleTraderDetailsNotMatchController.onPageLoad()
       }
-      //TODO: update test when page created
+
       "ETMP returns no match & user not Sole Trader" in {
         val answers = noResponseAnswer.set(BusinessTypePage, BusinessType.Partnership).success.value
-        BusinessNamePage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
+        BusinessNamePage.nextPage(NormalMode, answers) mustEqual routes.BusinessDetailsDoNotMatchController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
-
       "must go to Check Answers" in {
-
         BusinessNamePage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
