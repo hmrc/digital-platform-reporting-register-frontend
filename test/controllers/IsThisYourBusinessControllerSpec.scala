@@ -17,10 +17,10 @@
 package controllers
 
 import base.SpecBase
+import builders.AddressBuilder.anAddress
 import forms.IsThisYourBusinessFormProvider
 import helpers.UserAnswerHelper
 import models.NormalMode
-import models.registration.Address
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -39,14 +39,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
   private val form = formProvider()
   private lazy val isThisYourBusinessRoute = routes.IsThisYourBusinessController.onPageLoad(NormalMode).url
   private val businessName = "Coca-Cola"
-  private val businessAddress = Address(
-    "Manhattan",
-    None,
-    None,
-    None,
-    None,
-    "US"
-  )
+  private val businessAddress = anAddress
 
   "IsThisYourBusiness Controller" - {
 

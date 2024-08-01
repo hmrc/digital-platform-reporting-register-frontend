@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package builders
 
-import controllers.routes
-import models.UserAnswers
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
+import models.registration.Address
 
-case object IsThisYourBusinessPage extends QuestionPage[Boolean] {
+object AddressBuilder {
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "isThisYourBusiness"
-
-  override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.get(this).map {
-    case true => routes.ContactDetailsGuidanceController.onPageLoad()
-    case false => routes.BusinessDetailsMatchOtherController.onPageLoad()
-  }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+  val anAddress: Address = Address(
+    addressLine1 = "Address line 1",
+    addressLine2 = Some("Address line 2"),
+    addressLine3 = Some("Address line 3"),
+    addressLine4 = Some("Address line 4"),
+    postalCode = None,
+    countryCode = "UK"
+  )
 }

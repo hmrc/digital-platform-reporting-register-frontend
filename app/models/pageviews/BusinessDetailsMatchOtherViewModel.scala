@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package models.pageviews
 
-import controllers.routes
 import models.UserAnswers
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
+import models.registration.Address
+import models.registration.responses.MatchResponseWithId
 
-case object IsThisYourBusinessPage extends QuestionPage[Boolean] {
+case class BusinessDetailsMatchOtherViewModel(businessName: String, address: Address)
 
-  override def path: JsPath = JsPath \ toString
+object BusinessDetailsMatchOtherViewModel {
 
-  override def toString: String = "isThisYourBusiness"
-
-  override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.get(this).map {
-    case true => routes.ContactDetailsGuidanceController.onPageLoad()
-    case false => routes.BusinessDetailsMatchOtherController.onPageLoad()
-  }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+  def apply(userAnswers: UserAnswers): Option[BusinessDetailsMatchOtherViewModel] = userAnswers.registrationResponse.flatMap {
+    case MatchResponseWithId(safeId, address, organisationName) => Some(BusinessDetailsMatchOtherViewModel(organisationName.get, address))
+    case _ => None
+  }
 }

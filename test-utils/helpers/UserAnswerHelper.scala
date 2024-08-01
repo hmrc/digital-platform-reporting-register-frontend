@@ -25,9 +25,10 @@ import java.util.UUID
 trait UserAnswerHelper {
 
   implicit class UserAnswerHelper(answers: UserAnswers) {
-    def withBusiness(name: String, address: Address) = answers.copy(
+
+    def withBusiness(name: String, address: Address): UserAnswers = answers.copy(
       registrationResponse = Some(MatchResponseWithId(
-        UUID.randomUUID().toString(),
+        UUID.randomUUID().toString,
         address,
         Some(name)
       ))

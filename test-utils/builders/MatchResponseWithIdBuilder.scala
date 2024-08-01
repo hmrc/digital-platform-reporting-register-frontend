@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package pages
+package builders
 
-import controllers.routes
-import models.UserAnswers
-import play.api.libs.json.JsPath
-import play.api.mvc.Call
+import builders.AddressBuilder.anAddress
+import cats.implicits.*
+import models.registration.responses.MatchResponseWithId
 
-case object IsThisYourBusinessPage extends QuestionPage[Boolean] {
+import java.util.UUID
 
-  override def path: JsPath = JsPath \ toString
+object MatchResponseWithIdBuilder {
 
-  override def toString: String = "isThisYourBusiness"
-
-  override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.get(this).map {
-    case true => routes.ContactDetailsGuidanceController.onPageLoad()
-    case false => routes.BusinessDetailsMatchOtherController.onPageLoad()
-  }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+  val aMatchResponseWithId: MatchResponseWithId = MatchResponseWithId(
+    safeId = UUID.randomUUID().toString,
+    address = anAddress,
+    organisationName = "default-organisation-name".some
+  )
 }

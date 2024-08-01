@@ -235,7 +235,7 @@ object Country {
   val nonUkInternationalCountries: Seq[Country] = allCountries.filterNot(_.code == "GB")
 
   def selectItems(countries: Seq[Country])(implicit messages: Messages): Seq[SelectItem] =
-    SelectItem(value = None, text = messages("common.selectCountry")) +:
+    SelectItem(value = None, text = "") +:
       countries.map {
         country =>
           SelectItemViewModel(

@@ -193,3 +193,5 @@ GET        /registration/change-business-address            controllers.Business
 POST       /registration/change-business-address            controllers.BusinessAddressController.onSubmit(mode: Mode = CheckMode)
 
 GET        /registration/business-details-not-match             controllers.BusinessDetailsDoNotMatchController.onPageLoad()
+
+GET        /registration/business-details-match-other               controllers.BusinessDetailsMatchOtherController.onPageLoad()
