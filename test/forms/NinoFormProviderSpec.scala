@@ -17,15 +17,27 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import forms.common.Validation
+import org.scalacheck.Gen
+import org.scalacheck.Gen.{alphaUpperChar, choose, chooseNum, listOfN, numChar}
 import play.api.data.FormError
 
 class NinoFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "nino.error.required"
-  val lengthKey = "nino.error.length"
-  val maxLength = 100
+  val invalidKey = "nino.error.invalid"
 
-  val form = new NinoFormProvider()()
+  private val provider = new NinoFormProvider()
+  private val form = provider()
+
+  private val invalidChars = "DFIQUVO"
+
+  private def validNino(): Gen[String] = for {
+    spaces <- listOfN(chooseNum(1, 10).sample.getOrElse(0), choose[Char](' ', ' '))
+    letters <- listOfN(2, alphaUpperChar suchThat (!invalidChars.contains(_)))
+    numbers <- listOfN(6, numChar)
+    letter <- listOfN(1, alphaUpperChar suchThat (c => c >= 'A' && (c <= 'D')))
+  } yield Seq(spaces, letters, spaces, numbers, spaces, letter, spaces).flatten.mkString
 
   ".value" - {
 
@@ -34,14 +46,14 @@ class NinoFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      validNino()
     )
 
-    behave like fieldWithMaxLength(
+    behave like fieldThatDoesNotBindInvalidData(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      stringsThatDoNotMatchRegex(Validation.ninoPattern.regex),
+      invalidError = FormError(fieldName, invalidKey, Seq(Validation.ninoPattern.regex))
     )
 
     behave like mandatoryField(

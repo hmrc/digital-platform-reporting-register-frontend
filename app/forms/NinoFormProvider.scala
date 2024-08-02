@@ -16,8 +16,9 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.common.Validation
 
+import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -26,6 +27,7 @@ class NinoFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("nino.error.required")
-        .verifying(maxLength(100, "nino.error.length"))
+        .transform(_.replace(" ", "").toUpperCase, identity)
+        .verifying(regexp(Validation.ninoPattern.regex, "nino.error.invalid"))
     )
 }
