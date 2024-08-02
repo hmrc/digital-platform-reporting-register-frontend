@@ -53,13 +53,13 @@ trait Generators extends ModelGenerators {
   }
 
   def intsLargerThanMaxValue: Gen[BigInt] =
-    arbitrary[BigInt] suchThat(x => x > Int.MaxValue)
+    arbitrary[BigInt] suchThat (x => x > Int.MaxValue)
 
   def intsSmallerThanMinValue: Gen[BigInt] =
-    arbitrary[BigInt] suchThat(x => x < Int.MinValue)
+    arbitrary[BigInt] suchThat (x => x < Int.MinValue)
 
   def nonNumerics: Gen[String] =
-    alphaStr suchThat(_.size > 0)
+    alphaStr suchThat (_.nonEmpty)
 
   def decimals: Gen[String] =
     arbitrary[BigDecimal]
@@ -68,19 +68,19 @@ trait Generators extends ModelGenerators {
       .map("%f".format(_))
 
   def intsBelowValue(value: Int): Gen[Int] =
-    arbitrary[Int] suchThat(_ < value)
+    arbitrary[Int] suchThat (_ < value)
 
   def intsAboveValue(value: Int): Gen[Int] =
-    arbitrary[Int] suchThat(_ > value)
+    arbitrary[Int] suchThat (_ > value)
 
   def intsOutsideRange(min: Int, max: Int): Gen[Int] =
-    arbitrary[Int] suchThat(x => x < min || x > max)
+    arbitrary[Int] suchThat (x => x < min || x > max)
 
   def nonBooleans: Gen[String] =
     arbitrary[String]
-      .suchThat (_.nonEmpty)
-      .suchThat (_ != "true")
-      .suchThat (_ != "false")
+      .suchThat(_.nonEmpty)
+      .suchThat(_ != "true")
+      .suchThat(_ != "false")
 
   def nonEmptyString: Gen[String] =
     arbitrary[String] suchThat (_.nonEmpty)
@@ -98,22 +98,21 @@ trait Generators extends ModelGenerators {
     } yield chars.mkString
 
   def stringsShorterThan(minLength: Int): Gen[String] = for {
-    length    <- Gen.chooseNum(1, minLength - 1)
-    chars     <- listOfN(length, arbitrary[Char])
+    length <- Gen.chooseNum(1, minLength - 1)
+    chars <- listOfN(length, arbitrary[Char])
   } yield chars.mkString
 
   def stringsLongerThan(minLength: Int): Gen[String] = for {
     maxLength <- (minLength * 2).max(100)
-    length    <- Gen.chooseNum(minLength + 1, maxLength)
-    chars     <- listOfN(length, arbitrary[Char])
+    length <- Gen.chooseNum(minLength + 1, maxLength)
+    chars <- listOfN(length, arbitrary[Char])
   } yield chars.mkString
 
   def stringsExceptSpecificValues(excluded: Seq[String]): Gen[String] =
     nonEmptyString suchThat (!excluded.contains(_))
 
-  def stringsThatDoNotMatchRegex(regex: String): Gen[String] = {
-    val pattern = Regex(regex)
-    nonEmptyString suchThat (!pattern.matches(_))
+  def stringsThatDoNotMatchRegex(regex: Regex): Gen[String] = {
+    nonEmptyString suchThat (!regex.matches(_))
   }
 
   def oneOf[T](xs: Seq[Gen[T]]): Gen[T] =

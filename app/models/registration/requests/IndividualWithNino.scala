@@ -16,20 +16,33 @@
 
 package models.registration.requests
 
+import cats.data.*
+import cats.implicits.*
+import models.UserAnswers
+import pages.{DateOfBirthPage, IndividualNamePage, NinoPage}
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
+import queries.Query
 
 import java.time.LocalDate
 
 final case class IndividualWithNino(nino: String, details: IndividualDetails, dateOfBirth: LocalDate) extends RegistrationRequest
 
 object IndividualWithNino {
-  
+
+  def build(answers: UserAnswers): EitherNec[Query, IndividualWithNino] =
+    (
+      answers.getEither(NinoPage),
+      answers.getEither(IndividualNamePage)
+        .map(name => IndividualDetails(name.firstName, name.lastName)),
+      answers.getEither(DateOfBirthPage)
+    ).parMapN(IndividualWithNino.apply)
+
   implicit lazy val writes: OWrites[IndividualWithNino] =
     (
       (__ \ "nino").write[String] and
-      (__ \ "firstName").write[String] and
-      (__ \ "lastName").write[String] and
-      (__ \ "dateOfBirth").write[LocalDate]
-    )(i => (i.nino, i.details.firstName, i.details.lastName, i.dateOfBirth))
+        (__ \ "firstName").write[String] and
+        (__ \ "lastName").write[String] and
+        (__ \ "dateOfBirth").write[LocalDate]
+      )(i => (i.nino, i.details.firstName, i.details.lastName, i.dateOfBirth))
 }

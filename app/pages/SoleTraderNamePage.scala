@@ -28,14 +28,13 @@ case object SoleTraderNamePage extends QuestionPage[SoleTraderName] {
 
   override def toString: String = "soleTraderName"
 
-  override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    answers.registrationResponse.map {
-      case _: MatchResponseWithId => routes.DetailsMatchedController.onPageLoad()
-      case _: AlreadySubscribedResponse => routes.IndexController.onPageLoad() //TODO: update when REG-KO-7 page created
-      case _ => answers.get(BusinessTypePage).map {
-        case BusinessType.SoleTrader => routes.SoleTraderDetailsNotMatchController.onPageLoad()
-        case _ => routes.IndexController.onPageLoad() //TODO: update to kickout page when created
-      }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+  override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.registrationResponse.map {
+    case _: MatchResponseWithId => routes.DetailsMatchedController.onPageLoad()
+    case _: AlreadySubscribedResponse => routes.IndividualAlreadyRegisteredController.onPageLoad()
+    case _ => answers.get(BusinessTypePage).map {
+      case BusinessType.SoleTrader => routes.SoleTraderDetailsNotMatchController.onPageLoad()
+      case _ => routes.BusinessDetailsDoNotMatchController.onPageLoad()
     }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+  }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }
 

@@ -17,11 +17,12 @@
 package pages
 
 import controllers.routes
+import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithId}
+import models.{NormalMode, UserAnswers}
+import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
 import java.time.LocalDate
-import models.{NormalMode, UserAnswers}
-import play.api.mvc.Call
-import play.api.libs.json.JsPath
 
 case object DateOfBirthPage extends QuestionPage[LocalDate] {
 
@@ -29,10 +30,16 @@ case object DateOfBirthPage extends QuestionPage[LocalDate] {
 
   override def toString: String = "dateOfBirth"
 
-  override protected def nextPageNormalMode(answers: UserAnswers): Call =
-    answers.get(HasNinoPage) match {
-      case Some(true)  => routes.IndexController.onPageLoad()
-      case Some(false) => routes.AddressInUkController.onPageLoad(NormalMode)
-      case None        => routes.JourneyRecoveryController.onPageLoad()
+  override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.get(HasNinoPage) match {
+    case Some(true) => answers.registrationResponse match {
+      case Some(value) => value match {
+        case _: AlreadySubscribedResponse => routes.IndividualAlreadyRegisteredController.onPageLoad()
+        case _: MatchResponseWithId => routes.IndexController.onPageLoad()
+        case _ => routes.JourneyRecoveryController.onPageLoad()
+      }
+      case None => routes.JourneyRecoveryController.onPageLoad()
     }
+    case Some(false) => routes.AddressInUkController.onPageLoad(NormalMode)
+    case None => routes.JourneyRecoveryController.onPageLoad()
+  }
 }
