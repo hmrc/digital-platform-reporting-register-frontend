@@ -272,7 +272,7 @@ canPhoneSecondaryContact.title = Can we contact the second person or team by tel
 canPhoneSecondaryContact.heading = Can we contact {0} by telephone?
 canPhoneSecondaryContact.p1 = We may use this phone number if we have any questions about your reports.
 canPhoneSecondaryContact.checkYourAnswersLabel = Can we contact {0} by telephone?
-canPhoneSecondaryContact.error.required = Select yes if we can contact {0} by telephone?
+canPhoneSecondaryContact.error.required = Select yes if we can contact {0} by telephone
 canPhoneSecondaryContact.change.hidden = if we can contact {0} by telephone
 
 contactDetailsGuidance.title = Set up contact details for reporting with this service
@@ -297,7 +297,7 @@ individualEmailAddress.change.hidden = your email address
 
 individualPhoneNumber.title = What is your telephone number?
 individualPhoneNumber.heading = What is your telephone number?
-individualPhoneNumber.hint = For international numbers include the country code.
+individualPhoneNumber.hint = For international numbers, include the country code.
 individualPhoneNumber.checkYourAnswersLabel = Telephone number
 individualPhoneNumber.error.required = Enter your telephone number
 individualPhoneNumber.error.length = Telephone number must be 24 characters or less
@@ -364,7 +364,7 @@ soleTraderDetailsNotMatch.p7.2 = for help.
 
 secondaryContactPhoneNumber.title = What is the telephone number for the second person or team we should contact?
 secondaryContactPhoneNumber.heading = What is the telephone number for {0}?
-secondaryContactPhoneNumber.hint = For international numbers include the country code.
+secondaryContactPhoneNumber.hint = For international numbers, include the country code.
 secondaryContactPhoneNumber.checkYourAnswersLabel = Telephone number
 secondaryContactPhoneNumber.error.required = Enter the telephone number for {0}
 secondaryContactPhoneNumber.error.length = Telephone number must be {0} characters or less
