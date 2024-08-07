@@ -17,6 +17,7 @@
 package pages
 
 import controllers.routes
+import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithoutId}
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalatest.TryValues
 import org.scalatest.freespec.AnyFreeSpec
@@ -25,35 +26,43 @@ import org.scalatest.matchers.must.Matchers
 class DateOfBirthPageSpec extends AnyFreeSpec with Matchers with TryValues {
 
   ".nextPage" - {
-
     val emptyAnswers = UserAnswers("id", None)
 
     "in Normal Mode" - {
-
-      "must go to Index if NINO supplied" in {
-
+      "must go to REG-KO-7 if NINO supplied and user already registered" in {
         val answers = emptyAnswers.set(HasNinoPage, true).success.value
+          .copy(registrationResponse = Some(AlreadySubscribedResponse()))
 
-        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
+        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IndividualAlreadyRegisteredController.onPageLoad()
+      }
+
+      "must go to error page if NINO supplied and invalid response" in {
+        val answers = emptyAnswers.set(HasNinoPage, true).success.value
+          .copy(registrationResponse = Some(MatchResponseWithoutId("")))
+
+        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.JourneyRecoveryController.onPageLoad()
+      }
+
+      "must go to error page if NINO supplied and no response" in {
+        val answers = emptyAnswers.set(HasNinoPage, true).success.value
+          .copy(registrationResponse = None)
+
+        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
 
       "must go to live-in-uk page if NINO absent" in {
-
         val answers = emptyAnswers.set(HasNinoPage, false).success.value
 
         DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.AddressInUkController.onPageLoad(NormalMode)
       }
 
       "must go to error page if no data" in {
-
         DateOfBirthPage.nextPage(NormalMode, emptyAnswers) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
-
       "must go to Check Answers" in {
-
         DateOfBirthPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }

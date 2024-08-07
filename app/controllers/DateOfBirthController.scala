@@ -16,57 +16,62 @@
 
 package controllers
 
-import controllers.actions._
+import connectors.RegistrationConnector
+import controllers.actions.*
 import forms.DateOfBirthFormProvider
-import javax.inject.Inject
-import models.Mode
-import pages.DateOfBirthPage
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import models.registration.requests.IndividualWithNino
+import models.registration.responses.RegistrationResponse
+import models.{Mode, UserAnswers}
+import pages.{DateOfBirthPage, HasNinoPage}
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.DateOfBirthView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DateOfBirthController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: DateOfBirthFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: DateOfBirthView
-                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class DateOfBirthController @Inject()(sessionRepository: SessionRepository,
+                                      identify: IdentifierAction,
+                                      getData: DataRetrievalAction,
+                                      requireData: DataRequiredAction,
+                                      formProvider: DateOfBirthFormProvider,
+                                      view: DateOfBirthView,
+                                      registrationConnector: RegistrationConnector)
+                                     (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val preparedForm = request.userAnswers.get(DateOfBirthPage) match {
+      case None => formProvider()
+      case Some(value) => formProvider().fill(value)
+    }
 
-      val form = formProvider()
+    Ok(view(preparedForm, mode))
+  }
 
-      val preparedForm = request.userAnswers.get(DateOfBirthPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    formProvider().bindFromRequest().fold(
+      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+      value =>
+        val hasNino = request.userAnswers.get(HasNinoPage).getOrElse(false)
+        for {
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(DateOfBirthPage, value))
+          fullAnswers <- if (hasNino) registerAndSave(updatedAnswers) else Future.successful(updatedAnswers)
+          _ <- sessionRepository.set(fullAnswers)
+        } yield Redirect(DateOfBirthPage.nextPage(mode, fullAnswers))
+    )
+  }
+
+  private def registerAndSave(answers: UserAnswers)(implicit request: Request[_]): Future[UserAnswers] =
+    IndividualWithNino.build(answers).fold(
+      errors => Future.failed(Exception(s"Unable to build registration request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
+      details => registrationConnector.register(details).map {
+        response =>
+          answers.copy(
+            registrationResponse = Some(response)
+          )
       }
-
-      Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-
-      val form = formProvider()
-
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(DateOfBirthPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(DateOfBirthPage.nextPage(mode, updatedAnswers))
-      )
-  }
+    )
 }

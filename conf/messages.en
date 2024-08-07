@@ -425,6 +425,11 @@ businessDetailsMatchOther.p1 = You have signed in with details that are linked t
 businessDetailsMatchOther.p2 = If you want to register a different business for reporting, you must
 businessDetailsMatchOther.p2.link.text = use the HMRC sign in details for the business you wish to register.
 
+individualAlreadyRegistered.title = You have already registered to use this service
+individualAlreadyRegistered.heading = You have already registered to use this service
+individualAlreadyRegistered.p1 = You can access the service using the same sign in details you used to register with.
+individualAlreadyRegistered.link.text = Try signing in again
+
 businessAlreadyRegistered.title = Your business is already registered to use this service
 businessAlreadyRegistered.heading = Your business is already registered to use this service
 businessAlreadyRegistered.p1 = You’ll need to sign in using the sign in details that were used when you registered for this service.

@@ -52,7 +52,7 @@ class NinoFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatDoesNotBindInvalidData(
       form,
       fieldName,
-      stringsThatDoNotMatchRegex(Validation.ninoPattern.regex),
+      stringsThatDoNotMatchRegex(Validation.ninoPattern),
       invalidError = FormError(fieldName, invalidKey, Seq(Validation.ninoPattern.regex))
     )
 

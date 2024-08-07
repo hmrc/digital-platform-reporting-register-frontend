@@ -31,10 +31,9 @@ class SoleTraderNamePageSpec extends AnyFreeSpec with Matchers with TryValues wi
     val noResponseAnswer = emptyAnswers.copy(registrationResponse = Some(NoMatchResponse()))
 
     "in Normal Mode" - {
-      //TODO: update test when REG-KO-3 content is confirmed
       "ETMP returns match & account already registered leads to 'business-already-registered' page" in {
         val alreadySubscribedAnswer = emptyAnswers.copy(registrationResponse = Some(AlreadySubscribedResponse()))
-        SoleTraderNamePage.nextPage(NormalMode, alreadySubscribedAnswer) mustEqual routes.IndexController.onPageLoad()
+        SoleTraderNamePage.nextPage(NormalMode, alreadySubscribedAnswer) mustEqual routes.IndividualAlreadyRegisteredController.onPageLoad()
       }
       
       "ETMP returns match & account not already registered leads to 'we have matched your details' page" in {
@@ -46,17 +45,15 @@ class SoleTraderNamePageSpec extends AnyFreeSpec with Matchers with TryValues wi
         val answers = noResponseAnswer.set(BusinessTypePage, BusinessType.SoleTrader).success.value
         SoleTraderNamePage.nextPage(NormalMode, answers) mustEqual routes.SoleTraderDetailsNotMatchController.onPageLoad()
       }
-      //TODO: update test when page created
+
       "ETMP returns no match & user not Sole Trader leads to 'business-details-not-match' page" in {
         val answers = noResponseAnswer.set(BusinessTypePage, BusinessType.Partnership).success.value
-        SoleTraderNamePage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
+        SoleTraderNamePage.nextPage(NormalMode, answers) mustEqual routes.BusinessDetailsDoNotMatchController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
-
       "must go to Check Answers" in {
-
         SoleTraderNamePage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
