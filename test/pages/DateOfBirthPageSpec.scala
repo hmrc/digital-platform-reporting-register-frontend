@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithoutId}
+import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithoutId, NoMatchResponse}
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalatest.TryValues
 import org.scalatest.freespec.AnyFreeSpec
@@ -42,6 +42,13 @@ class DateOfBirthPageSpec extends AnyFreeSpec with Matchers with TryValues {
           .copy(registrationResponse = Some(aMatchResponseWithId))
 
         DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IndividualIdentityConfirmedController.onPageLoad()
+      }
+
+      "must go to individual-identity-not-confirmed page if NINO supplied but match not found" in {
+        val answers = emptyAnswers.set(HasNinoPage, true).success.value
+          .copy(registrationResponse = Some(NoMatchResponse()))
+
+        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IdentityNotConfirmedController.onPageLoad()
       }
 
       "must go to error page if NINO supplied and invalid response" in {

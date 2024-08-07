@@ -20,15 +20,15 @@ import controllers.actions.*
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.IndividualIdentityConfirmedView
+import views.html.IdentityNotConfirmedView
 
 import javax.inject.Inject
 
-class IndividualIdentityConfirmedController @Inject()(identify: IdentifierAction,
-                                                      getData: DataRetrievalAction,
-                                                      requireData: DataRequiredAction,
-                                                      view: IndividualIdentityConfirmedView)
-                                                     (implicit mcc: MessagesControllerComponents)
+class IdentityNotConfirmedController @Inject()(identify: IdentifierAction,
+                                               getData: DataRetrievalAction,
+                                               requireData: DataRequiredAction,
+                                               view: IdentityNotConfirmedView)
+                                              (implicit mcc: MessagesControllerComponents)
   extends FrontendController(mcc) with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>

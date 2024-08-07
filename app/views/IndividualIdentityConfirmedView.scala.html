@@ -16,19 +16,17 @@
 
 @this(
         layout: templates.Layout,
-        govukButton: GovukButton,
-        formHelper: FormWithCSRF
+        govukButton: GovukButton
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("individualIdentityConfirmed.title"))) {
 
-    @formHelper(action = routes.IndividualIdentityConfirmedController.onSubmit()) {
-      <h1 class="govuk-heading-xl">@messages("individualIdentityConfirmed.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("individualIdentityConfirmed.heading")</h1>
 
-      @govukButton(
+    @govukButton(
         ButtonViewModel(messages("site.continue"))
-      )
-    }
+        .asLink(routes.IndividualEmailAddressController.onPageLoad(NormalMode).url)
+    )
 }
