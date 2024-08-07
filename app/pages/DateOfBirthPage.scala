@@ -17,7 +17,7 @@
 package pages
 
 import controllers.routes
-import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithId}
+import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithId, NoMatchResponse}
 import models.{NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
@@ -35,6 +35,7 @@ case object DateOfBirthPage extends QuestionPage[LocalDate] {
       case Some(value) => value match {
         case _: AlreadySubscribedResponse => routes.IndividualAlreadyRegisteredController.onPageLoad()
         case _: MatchResponseWithId => routes.IndividualIdentityConfirmedController.onPageLoad()
+        case _: NoMatchResponse => routes.IdentityNotConfirmedController.onPageLoad()
         case _ => routes.JourneyRecoveryController.onPageLoad()
       }
       case None => routes.JourneyRecoveryController.onPageLoad()

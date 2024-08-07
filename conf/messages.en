@@ -10,6 +10,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.tryAgain = Try again
 
 date.day = Day
 date.month = Month
@@ -439,3 +440,7 @@ businessAlreadyRegistered.p3.link.text = Try signing in again
 
 individualIdentityConfirmed.title = We have confirmed your identity
 individualIdentityConfirmed.heading = We have confirmed your identity
+
+identityNotConfirmed.title = We could not confirm your identity
+identityNotConfirmed.heading = We could not confirm your identity
+identityNotConfirmed.p1 = The information you have entered does not match our records.
