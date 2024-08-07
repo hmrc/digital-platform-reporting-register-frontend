@@ -199,3 +199,6 @@ GET        /registration/business-details-match-other           controllers.Busi
 GET        /registration/business-already-registered            controllers.BusinessAlreadyRegisteredController.onPageLoad()
 
 GET        /registration/individual-already-registered              controllers.IndividualAlreadyRegisteredController.onPageLoad()
+
+GET        /registration/confirmed-identity                         controllers.IndividualIdentityConfirmedController.onPageLoad()
+POST       /registration/confirmed-identity                         controllers.IndividualIdentityConfirmedController.onSubmit()

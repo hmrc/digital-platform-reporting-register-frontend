@@ -436,3 +436,6 @@ businessAlreadyRegistered.p1 = You’ll need to sign in using the sign in detail
 businessAlreadyRegistered.p2 = If you need to request access to the service, you will need to contact your administrator to give you access via the ‘Manage account’ settings within their
 businessAlreadyRegistered.p2.link.text = business tax account.
 businessAlreadyRegistered.p3.link.text = Try signing in again
+
+individualIdentityConfirmed.title = We have confirmed your identity
+individualIdentityConfirmed.heading = We have confirmed your identity
