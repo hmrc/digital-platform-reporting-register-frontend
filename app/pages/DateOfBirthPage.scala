@@ -35,7 +35,7 @@ case object DateOfBirthPage extends QuestionPage[LocalDate] {
       case Some(value) => value match {
         case _: AlreadySubscribedResponse => routes.IndividualAlreadyRegisteredController.onPageLoad()
         case _: MatchResponseWithId => routes.IndividualIdentityConfirmedController.onPageLoad()
-        case _: NoMatchResponse => routes.IdentityNotConfirmedController.onPageLoad()
+        case _: NoMatchResponse => routes.IndividualIdentityNotConfirmedController.onPageLoad()
         case _ => routes.JourneyRecoveryController.onPageLoad()
       }
       case None => routes.JourneyRecoveryController.onPageLoad()

@@ -202,4 +202,4 @@ GET        /registration/individual-already-registered                          
 
 GET        /registration/confirmed-identity                                      controllers.IndividualIdentityConfirmedController.onPageLoad()
 
-GET        /registration/individual-identity-not-confirmed                       controllers.IdentityNotConfirmedController.onPageLoad()
+GET        /registration/individual-identity-not-confirmed                       controllers.IndividualIdentityNotConfirmedController.onPageLoad()

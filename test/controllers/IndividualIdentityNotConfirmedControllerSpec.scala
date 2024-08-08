@@ -19,18 +19,18 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.IdentityNotConfirmedView
+import views.html.IndividualIdentityNotConfirmedView
 
-class IdentityNotConfirmedControllerSpec extends SpecBase {
+class IndividualIdentityNotConfirmedControllerSpec extends SpecBase {
 
-  "IdentityNotConfirmed Controller" - {
+  "IndividualIdentityNotConfirmed Controller" - {
     "must return OK and the correct view for a GET" in {
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.IdentityNotConfirmedController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.IndividualIdentityNotConfirmedController.onPageLoad().url)
         val result = route(application, request).value
-        val view = application.injector.instanceOf[IdentityNotConfirmedView]
+        val view = application.injector.instanceOf[IndividualIdentityNotConfirmedView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
