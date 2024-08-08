@@ -48,7 +48,7 @@ class DateOfBirthPageSpec extends AnyFreeSpec with Matchers with TryValues {
         val answers = emptyAnswers.set(HasNinoPage, true).success.value
           .copy(registrationResponse = Some(NoMatchResponse()))
 
-        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IdentityNotConfirmedController.onPageLoad()
+        DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IndividualIdentityNotConfirmedController.onPageLoad()
       }
 
       "must go to error page if NINO supplied and invalid response" in {

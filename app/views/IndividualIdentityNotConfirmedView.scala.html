@@ -21,14 +21,14 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("identityNotConfirmed.title"))) {
+@layout(pageTitle = titleNoForm(messages("individualIdentityNotConfirmed.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("identityNotConfirmed.heading")</h1>
+   <h1 class="govuk-heading-xl">@messages("individualIdentityNotConfirmed.heading")</h1>
 
-    <p class="govuk-body">@messages("identityNotConfirmed.p1")</p>
+   <p class="govuk-body">@messages("individualIdentityNotConfirmed.p1")</p>
 
-    @govukButton(
-        ButtonViewModel(messages("site.tryAgain"))
-        .asLink(routes.HasNinoController.onPageLoad(NormalMode).url)
-    )
+   @govukButton(
+      ButtonViewModel(messages("site.tryAgain"))
+      .asLink(routes.HasNinoController.onPageLoad(NormalMode).url)
+  )
 }
