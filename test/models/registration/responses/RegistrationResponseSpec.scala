@@ -19,7 +19,12 @@ package models.registration.responses
 import models.registration.Address
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import play.api.Configuration
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter, SymmetricCryptoFactory}
+
+import java.security.SecureRandom
+import java.util.Base64
 
 class RegistrationResponseSpec extends AnyFreeSpec with Matchers {
 
@@ -56,6 +61,53 @@ class RegistrationResponseSpec extends AnyFreeSpec with Matchers {
         val response = AlreadySubscribedResponse()
         val json = Json.toJson(response)
         val result = json.as[RegistrationResponse]
+        result mustEqual response
+      }
+    }
+
+    "must serialise / deserialise with encryption" - {
+
+      val aesKey = {
+        val aesKey = new Array[Byte](32)
+        new SecureRandom().nextBytes(aesKey)
+        Base64.getEncoder.encodeToString(aesKey)
+      }
+
+      val configuration = Configuration("crypto.key" -> aesKey)
+
+      implicit val crypto: Encrypter with Decrypter =
+        SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
+
+      "a match with Id" in {
+
+        val response = MatchResponseWithId("safeId", Address("line 1", None, None, None, None, "GB"), None)
+        val json = Json.toJson(response)(RegistrationResponse.encryptedFormat)
+        val result = json.as[RegistrationResponse](RegistrationResponse.encryptedFormat)
+
+        result mustEqual response
+      }
+
+      "a match without Id" in {
+
+        val response = MatchResponseWithoutId("safeId")
+        val json = Json.toJson(response)(RegistrationResponse.encryptedFormat)
+        val result = json.as[RegistrationResponse](RegistrationResponse.encryptedFormat)
+        result mustEqual response
+      }
+
+      "a `no match`" in {
+
+        val response = NoMatchResponse()
+        val json = Json.toJson(response)(RegistrationResponse.encryptedFormat)
+        val result = json.as[RegistrationResponse](RegistrationResponse.encryptedFormat)
+        result mustEqual response
+      }
+
+      "an `already subscribed`" in {
+
+        val response = AlreadySubscribedResponse()
+        val json = Json.toJson(response)(RegistrationResponse.encryptedFormat)
+        val result = json.as[RegistrationResponse](RegistrationResponse.encryptedFormat)
         result mustEqual response
       }
     }

@@ -19,8 +19,12 @@ package models
 import cats.data.{EitherNec, NonEmptyChain}
 import cats.implicits.*
 import models.registration.responses.RegistrationResponse
+import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 import queries.{Gettable, Query, Settable}
+import uk.gov.hmrc.crypto.Sensitive.SensitiveString
+import uk.gov.hmrc.crypto.json.JsonEncryption
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
@@ -78,29 +82,29 @@ final case class UserAnswers(id: String,
 
 object UserAnswers {
 
-  val reads: Reads[UserAnswers] = {
+  def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[UserAnswers] = {
 
-    import play.api.libs.functional.syntax.*
+    implicit val sensitiveFormat: Format[SensitiveString] =
+      JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)
 
-    (
-      (__ \ "_id").read[String] and
-        (__ \ "registrationResponse").readNullable[RegistrationResponse] and
-        (__ \ "data").read[JsObject] and
+    val encryptedReads: Reads[UserAnswers] =
+      (
+        (__ \ "_id").read[String] and
+        (__ \ "registrationResponse").readNullable[RegistrationResponse](RegistrationResponse.encryptedFormat) and
+        (__ \ "data").read[SensitiveString] and
         (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
-      )(UserAnswers.apply(_, None, _, _, _))
-  }
+      )((id, registrationResponse, data, lastUpdated) =>
+        UserAnswers(id, None, registrationResponse, Json.parse(data.decryptedValue).as[JsObject], lastUpdated)
+      )
 
-  val writes: OWrites[UserAnswers] = {
-
-    import play.api.libs.functional.syntax.*
-
-    (
-      (__ \ "_id").write[String] and
-        (__ \ "registrationResponse").writeNullable[RegistrationResponse] and
-        (__ \ "data").write[JsObject] and
+    val encryptedWrites: OWrites[UserAnswers] =
+      (
+        (__ \ "_id").write[String] and
+        (__ \ "registrationResponse").writeNullable[RegistrationResponse](RegistrationResponse.encryptedFormat) and
+        (__ \ "data").write[SensitiveString] and
         (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-      )(ua => (ua.id, ua.registrationResponse, ua.data, ua.lastUpdated))
-  }
+      )(ua => (ua.id, ua.registrationResponse, SensitiveString(Json.stringify(ua.data)), ua.lastUpdated))
 
-  implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
+    OFormat(encryptedReads, encryptedWrites)
+  }
 }
