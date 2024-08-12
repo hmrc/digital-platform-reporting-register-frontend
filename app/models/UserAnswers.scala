@@ -19,8 +19,12 @@ package models
 import cats.data.{EitherNec, NonEmptyChain}
 import cats.implicits.*
 import models.registration.responses.RegistrationResponse
+import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 import queries.{Gettable, Query, Settable}
+import uk.gov.hmrc.crypto.Sensitive.SensitiveString
+import uk.gov.hmrc.crypto.json.JsonEncryption
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
@@ -46,39 +50,59 @@ final case class UserAnswers(id: String,
   def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
 
     val updatedData = data.setObject(page.path, Json.toJson(value)) match {
-      case JsSuccess(jsValue, _) =>
-        Success(jsValue)
-      case JsError(errors) =>
-        Failure(JsResultException(errors))
+      case JsSuccess(jsValue, _) => Success(jsValue)
+      case JsError(errors) => Failure(JsResultException(errors))
     }
 
-    updatedData.flatMap {
-      d =>
-        val updatedAnswers = copy(data = d)
-        page.cleanup(Some(value), updatedAnswers)
+    updatedData.flatMap { d =>
+      val updatedAnswers = copy(data = d)
+      page.cleanup(Some(value), updatedAnswers)
     }
   }
 
   def remove[A](page: Settable[A]): Try[UserAnswers] = {
 
     val updatedData = data.removeObject(page.path) match {
-      case JsSuccess(jsValue, _) =>
-        Success(jsValue)
-      case JsError(_) =>
-        Success(data)
+      case JsSuccess(jsValue, _) => Success(jsValue)
+      case JsError(_) => Success(data)
     }
 
-    updatedData.flatMap {
-      d =>
-        val updatedAnswers = copy(data = d)
-        page.cleanup(None, updatedAnswers)
+    updatedData.flatMap { d =>
+      val updatedAnswers = copy(data = d)
+      page.cleanup(None, updatedAnswers)
     }
   }
 }
 
 object UserAnswers {
 
-  val reads: Reads[UserAnswers] = {
+  def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[UserAnswers] = {
+
+    implicit val sensitiveFormat: Format[SensitiveString] =
+      JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)
+
+    val encryptedReads: Reads[UserAnswers] =
+      (
+        (__ \ "_id").read[String] and
+          (__ \ "registrationResponse").readNullable[RegistrationResponse](RegistrationResponse.encryptedFormat) and
+          (__ \ "data").read[SensitiveString] and
+          (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
+        )((id, registrationResponse, data, lastUpdated) =>
+        UserAnswers(id, None, registrationResponse, Json.parse(data.decryptedValue).as[JsObject], lastUpdated)
+      )
+
+    val encryptedWrites: OWrites[UserAnswers] =
+      (
+        (__ \ "_id").write[String] and
+          (__ \ "registrationResponse").writeNullable[RegistrationResponse](RegistrationResponse.encryptedFormat) and
+          (__ \ "data").write[SensitiveString] and
+          (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
+        )(ua => (ua.id, ua.registrationResponse, SensitiveString(Json.stringify(ua.data)), ua.lastUpdated))
+
+    OFormat(encryptedReads, encryptedWrites)
+  }
+
+  private val reads: Reads[UserAnswers] = {
 
     import play.api.libs.functional.syntax.*
 
@@ -90,7 +114,7 @@ object UserAnswers {
       )(UserAnswers.apply(_, None, _, _, _))
   }
 
-  val writes: OWrites[UserAnswers] = {
+  private val writes: OWrites[UserAnswers] = {
 
     import play.api.libs.functional.syntax.*
 

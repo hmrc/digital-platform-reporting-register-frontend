@@ -17,7 +17,10 @@
 package models.registration.responses
 
 import play.api.libs.functional.syntax.*
-import play.api.libs.json.{JsObject, Json, OWrites, Reads}
+import play.api.libs.json.*
+import uk.gov.hmrc.crypto.Sensitive.SensitiveString
+import uk.gov.hmrc.crypto.json.JsonEncryption
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 trait RegistrationResponse
 
@@ -36,5 +39,23 @@ object RegistrationResponse {
         case x: NoMatchResponse => Json.toJsObject(x)(NoMatchResponse.writes)
         case x: AlreadySubscribedResponse => Json.toJsObject(x)(AlreadySubscribedResponse.writes)
       }
+  }
+
+  def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[RegistrationResponse] = {
+
+    implicit val sensitiveFormat: Format[SensitiveString] =
+      JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)
+
+    val encryptedReads: Reads[RegistrationResponse] =
+      (__ \ "encrypted").read[SensitiveString].map(x => Json.parse(x.decryptedValue).as[RegistrationResponse])
+
+    val encryptedWrites: OWrites[RegistrationResponse] = new OWrites[RegistrationResponse] {
+      override def writes(o: RegistrationResponse): JsObject =
+        Json.obj(
+          "encrypted" -> SensitiveString(Json.stringify(Json.toJsObject(o)))
+        )
+    }
+
+    OFormat(encryptedReads, encryptedWrites)
   }
 }

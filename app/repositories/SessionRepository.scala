@@ -18,10 +18,11 @@ package repositories
 
 import config.FrontendAppConfig
 import models.UserAnswers
-import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model._
 import org.mongodb.scala.SingleObservableFuture
+import org.mongodb.scala.bson.conversions.Bson
+import org.mongodb.scala.model.*
 import play.api.libs.json.Format
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
@@ -33,16 +34,15 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SessionRepository @Inject()(
-                                   mongoComponent: MongoComponent,
-                                   appConfig: FrontendAppConfig,
-                                   clock: Clock
-                                 )(implicit ec: ExecutionContext)
+class SessionRepository @Inject()(mongoComponent: MongoComponent,
+                                  appConfig: FrontendAppConfig,
+                                  clock: Clock)
+                                 (implicit ec: ExecutionContext, crypto: Encrypter with Decrypter)
   extends PlayMongoRepository[UserAnswers](
     collectionName = "user-answers",
     mongoComponent = mongoComponent,
-    domainFormat   = UserAnswers.format,
-    indexes        = Seq(
+    domainFormat = if (appConfig.dataEncryptionEnabled) UserAnswers.encryptedFormat else UserAnswers.format,
+    indexes = Seq(
       IndexModel(
         Indexes.ascending("lastUpdated"),
         IndexOptions()
@@ -81,9 +81,9 @@ class SessionRepository @Inject()(
 
     collection
       .replaceOne(
-        filter      = byId(updatedAnswers.id),
+        filter = byId(updatedAnswers.id),
         replacement = updatedAnswers,
-        options     = ReplaceOptions().upsert(true)
+        options = ReplaceOptions().upsert(true)
       )
       .toFuture()
       .map(_ => true)
