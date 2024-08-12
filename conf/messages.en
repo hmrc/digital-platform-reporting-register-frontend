@@ -459,6 +459,24 @@ businessAlreadyRegistered.p3.link.text = Try signing in again
 individualIdentityConfirmed.title = We have confirmed your identity
 individualIdentityConfirmed.heading = We have confirmed your identity
 
+registrationConfirmation.title = Registration successful
+registrationConfirmation.panel.heading = Registration successful
+registrationConfirmation.panel.p1 = Your DPR user ID is {0}
+registrationConfirmation.p1.0 = Make a note of your DPR user ID.
+registrationConfirmation.p1.1 = Make a note of your DPR user ID. We have sent a confirmation email to {0} and {1}.
+registrationConfirmation.p1.2 = Make a note of your DPR user ID. We have sent a confirmation email to {0}.
+registrationConfirmation.h2 = What you need to do next
+registrationConfirmation.p3.1 = To send submissions, you must add the platform operators you will report for.
+registrationConfirmation.p3.2 = To send submissions, you must add your business as a platform operator.
+registrationConfirmation.h3 = Do you want to add a platform operator now?
+registrationConfirmation.p4 = You can add a platform operator at any time.
+registrationConfirmation.link.text = Print this page
+registrationConfirmation.error.required = Select yes if you want to add a Platform Operator now
+registrationConfirmation.privateBeta.warning = You will not be emailed a confirmation of this registration.
+registrationConfirmation.privateBeta.h2 = What happens next
+registrationConfirmation.privateBeta.p1 = You can now
+registrationConfirmation.privateBeta.link.text = manage your digital platform reporting
+
 individualIdentityNotConfirmed.title = We could not confirm your identity
 individualIdentityNotConfirmed.heading = We could not confirm your identity
 individualIdentityNotConfirmed.p1 = The information you have entered does not match our records.
