@@ -21,6 +21,7 @@ import models.BusinessType.{Individual, SoleTrader}
 import models.registration.responses as registrationResponses
 import models.subscription.responses as subscriptionResponses
 import models.{SubscriptionDetails, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import play.api.mvc.Call
 
 case object CheckYourAnswersPage extends Page {
@@ -39,10 +40,10 @@ case object CheckYourAnswersPage extends Page {
             alreadySubscribedRoute(answers)
 
           case _ =>
-            routes.IndexController.onPageLoad() // TODO: Change to success page when it is available
+            routes.RegistrationConfirmationController.onPageLoad(NormalMode)
         }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
     }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
-    
+
   private def alreadySubscribedRoute(answers: UserAnswers): Call =
     answers.get(BusinessTypePage).map {
       case Individual | SoleTrader => routes.IndividualAlreadyRegisteredController.onPageLoad()
