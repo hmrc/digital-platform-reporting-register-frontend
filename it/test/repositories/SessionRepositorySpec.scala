@@ -58,6 +58,7 @@ class SessionRepositorySpec
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1L
+  when(mockAppConfig.dataEncryptionEnabled) thenReturn true
 
   private val aesKey = {
     val aesKey = new Array[Byte](32)
@@ -99,6 +100,7 @@ class SessionRepositorySpec
         .value
 
       val json = Json.parse(record.toJson)
+      
       val data = (json \ "data").as[String]
 
       assertThrows[JsonParseException] {
