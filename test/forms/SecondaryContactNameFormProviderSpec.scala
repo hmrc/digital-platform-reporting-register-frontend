@@ -35,14 +35,14 @@ class SecondaryContactNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       underTest,
       fieldName,
-      safeNameInputsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
     )
 
     behave like fieldThatDoesNotBindInvalidData(
       underTest,
       fieldName,
-      unsafeInputsWithMaxLength(maxLength),
-      FormError(fieldName, formatKey, Seq(Validation.nameInputPattern.toString))
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(
