@@ -23,7 +23,7 @@ class BusinessNameNoUtrFormProviderSpec extends StringFieldBehaviours {
 
   private val requiredKey = "businessNameNoUtr.error.required"
   private val lengthKey = "businessNameNoUtr.error.length"
-  private val maxLength = 35
+  private val maxLength = 105
 
   private val underTest = new BusinessNameNoUtrFormProvider()()
 
