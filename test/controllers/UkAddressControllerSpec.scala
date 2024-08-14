@@ -17,18 +17,25 @@
 package controllers
 
 import base.SpecBase
+import builders.IndividualWithoutIdBuilder.anIndividualWithoutId
+import builders.UserAnswersBuilder.aUserAnswers
+import connectors.RegistrationConnector
 import forms.UkAddressFormProvider
-import models.{Country, NormalMode, UkAddress}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import models.registration.Address
+import models.registration.responses.NoMatchResponse
+import models.{Country, IndividualName, NormalMode, UkAddress, UserAnswers}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.UkAddressPage
+import pages.{AddressInUkPage, DateOfBirthPage, IndividualNamePage, UkAddressPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.UkAddressView
 
+import java.time.LocalDate
 import scala.concurrent.Future
 
 class UkAddressControllerSpec extends SpecBase with MockitoSugar {
@@ -79,13 +86,20 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
       val mockSessionRepository = mock[SessionRepository]
+      val mockConnector = mock[RegistrationConnector]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockConnector.register(any())(any())) thenReturn Future.successful(NoMatchResponse())
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
+      val answers = aUserAnswers
+        .set(IndividualNamePage, IndividualName("first-name", "last-name")).success.value
+        .set(DateOfBirthPage, LocalDate.of(2000, 1, 1)).success.value
+        .set(AddressInUkPage, true).success.value
+        .set(UkAddressPage, validUkAddress).success.value
+      val application = applicationBuilder(userAnswers = Some(answers)).overrides(
+        bind[SessionRepository].toInstance(mockSessionRepository),
+        bind[RegistrationConnector].toInstance(mockConnector)
+      ).build()
 
       running(application) {
         val params = getParam("line1", Some(validUkAddress.line1)) ++
@@ -94,12 +108,20 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
           getParam("county", validUkAddress.county) ++
           getParam("postCode", Some(validUkAddress.postCode)) ++
           getParam("country", Some(validUkAddress.country.code))
-        val request = FakeRequest(POST, ukAddressRoute)
-          .withFormUrlEncodedBody(params.flatten: _*)
+        val request = FakeRequest(POST, ukAddressRoute).withFormUrlEncodedBody(params.flatten: _*)
+        val expectedRegistrationRequest = anIndividualWithoutId.copy(firstName = "first-name", lastName = "last-name", address = Address(validUkAddress))
+        val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual UkAddressPage.nextPage(NormalMode, emptyUserAnswers).url
+
+        verify(mockConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
+        verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+
+        val savedAnswers = answersCaptor.getValue
+        savedAnswers.registrationResponse.value mustEqual NoMatchResponse()
       }
     }
 

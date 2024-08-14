@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package builders
 
-import play.api.libs.json.*
+import models.{Country, InternationalAddress}
 
-case class IndividualName(firstName: String, lastName: String)
+object InternationalAddressBuilder {
 
-object IndividualName {
-
-  implicit val format: OFormat[IndividualName] = Json.format
+  val anInternationalAddress: InternationalAddress = InternationalAddress(
+    line1 = "Address line 1",
+    line2 = Some("Address line 2"),
+    city = "default-city",
+    region = Some("default-region"),
+    postal = Some("default-postal-code"),
+    country = Country("UK", "United Kingdom")
+  )
 }

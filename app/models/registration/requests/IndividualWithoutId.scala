@@ -16,20 +16,38 @@
 
 package models.registration.requests
 
+import cats.data.*
+import cats.implicits.*
+import models.UserAnswers
 import models.registration.Address
-import play.api.libs.json.{Json, OWrites}
+import pages.*
+import play.api.libs.json.{JsObject, Json, OWrites}
+import queries.Query
 
 import java.time.LocalDate
 
 
-final case class IndividualWithoutId(
-                                      firstName: String,
-                                      lastName: String,
-                                      dateOfBirth: LocalDate,
-                                      address: Address
-                                    ) extends RegistrationRequest
+final case class IndividualWithoutId(firstName: String,
+                                     lastName: String,
+                                     dateOfBirth: LocalDate,
+                                     address: Address) extends RegistrationRequest
 
 object IndividualWithoutId {
-  
+
   implicit lazy val writes: OWrites[IndividualWithoutId] = Json.writes
+
+  def build(answers: UserAnswers): EitherNec[Query, IndividualWithoutId] = answers.get(AddressInUkPage) match {
+    case Some(true) => (
+      answers.getEither(IndividualNamePage).map(_.firstName),
+      answers.getEither(IndividualNamePage).map(_.lastName),
+      answers.getEither(DateOfBirthPage),
+      answers.getEither(UkAddressPage).map(Address(_)),
+    ).parMapN(IndividualWithoutId.apply)
+    case _ => (
+      answers.getEither(IndividualNamePage).map(_.firstName),
+      answers.getEither(IndividualNamePage).map(_.lastName),
+      answers.getEither(DateOfBirthPage),
+      answers.getEither(InternationalAddressPage).map(Address(_)),
+    ).parMapN(IndividualWithoutId.apply)
+  }
 }
