@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package builders
 
-import play.api.libs.json.*
+import models.{Country, UkAddress}
 
-case class IndividualName(firstName: String, lastName: String)
+object UkAddressBuilder {
 
-object IndividualName {
-
-  implicit val format: OFormat[IndividualName] = Json.format
+  val aUkAddress: UkAddress = UkAddress(
+    line1 = "Address line 1",
+    line2 = Some("Address line 2"),
+    town = "default-city",
+    county = Some("default-region"),
+    postCode = "default-postal-code",
+    country = Country("UK", "United Kingdom")
+  )
 }

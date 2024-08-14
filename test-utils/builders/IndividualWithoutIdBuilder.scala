@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package models
+package builders
 
-import play.api.libs.json.*
+import builders.AddressBuilder.anAddress
+import models.registration.requests.IndividualWithoutId
 
-case class IndividualName(firstName: String, lastName: String)
+import java.time.LocalDate
 
-object IndividualName {
+object IndividualWithoutIdBuilder {
 
-  implicit val format: OFormat[IndividualName] = Json.format
+  val anIndividualWithoutId: IndividualWithoutId = IndividualWithoutId(
+    firstName = "default-first-name",
+    lastName = "default-last-name",
+    dateOfBirth = LocalDate.of(2000, 1, 1),
+    address = anAddress
+  )
 }
