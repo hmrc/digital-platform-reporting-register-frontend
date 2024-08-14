@@ -16,9 +16,9 @@
 
 package models
 
-import play.api.libs.json.*
+import play.api.libs.json._
 
-case class IndividualName(firstName: String, lastName: String)
+case class IndividualName (firstName: String, lastName: String)
 
 object IndividualName {
 

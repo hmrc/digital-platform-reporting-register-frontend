@@ -16,44 +16,43 @@
 
 package controllers
 
-
 import base.SpecBase
-import builders.InternationalAddressBuilder.anInternationalAddress
-import builders.UserAnswersBuilder.aUserAnswers
-import connectors.RegistrationConnector
 import forms.InternationalAddressFormProvider
-import models.registration.responses.NoMatchResponse
-import models.{Country, IndividualName, NormalMode}
+import models.{Country, InternationalAddress, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{DateOfBirthPage, IndividualNamePage, InternationalAddressPage}
+import pages.InternationalAddressPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.InternationalAddressView
 
-import java.time.LocalDate
 import scala.concurrent.Future
 
 class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  private val form = new InternationalAddressFormProvider()()
-  private val country = Country.internationalCountries.head
-  private val userAnswers = aUserAnswers.set(IndividualNamePage, IndividualName("first-name", "last-name")).success.value
-    .set(DateOfBirthPage, LocalDate.of(2000, 1, 1)).success.value
-    .set(InternationalAddressPage, anInternationalAddress).success.value
+  val formProvider = new InternationalAddressFormProvider()
+  val form = formProvider()
 
-  private lazy val underTest = routes.InternationalAddressController.onPageLoad(NormalMode).url
+  lazy val internationalAddressRoute = routes.InternationalAddressController.onPageLoad(NormalMode).url
+
+  val country = Country.internationalCountries.head
+  val address = InternationalAddress("Testing Lane", None, "New York", None, None, country)
+  val userAnswers = emptyUserAnswers.set(InternationalAddressPage, address).success.value
 
   "InternationalAddress Controller" - {
+
     "must return OK and the correct view for a GET" in {
+
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, underTest)
+        val request = FakeRequest(GET, internationalAddressRoute)
+
         val view = application.injector.instanceOf[InternationalAddressView]
+
         val result = route(application, request).value
 
         status(result) mustEqual OK
@@ -62,33 +61,37 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
+
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, underTest)
+        val request = FakeRequest(GET, internationalAddressRoute)
+
         val view = application.injector.instanceOf[InternationalAddressView]
+
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(anInternationalAddress), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(address), NormalMode)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
+
       val mockSessionRepository = mock[SessionRepository]
-      val mockConnector = mock[RegistrationConnector]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockConnector.register(any())(any())) thenReturn Future.successful(NoMatchResponse())
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).overrides(
-        bind[SessionRepository].toInstance(mockSessionRepository),
-        bind[RegistrationConnector].toInstance(mockConnector),
-      ).build()
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
 
       running(application) {
-        val request = FakeRequest(POST, underTest)
-          .withFormUrlEncodedBody(("line1", "Testing Lane"), ("city", "New York"), ("country", country.code))
+        val request =
+          FakeRequest(POST, internationalAddressRoute)
+            .withFormUrlEncodedBody(("line1", "Testing Lane"), ("city", "New York"),("country", country.code))
+
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -97,12 +100,18 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
+
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(POST, underTest).withFormUrlEncodedBody(("value", "invalid value"))
+        val request =
+          FakeRequest(POST, internationalAddressRoute)
+            .withFormUrlEncodedBody(("value", "invalid value"))
+
         val boundForm = form.bind(Map("value" -> "invalid value"))
+
         val view = application.injector.instanceOf[InternationalAddressView]
+
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
@@ -111,10 +120,12 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, underTest)
+        val request = FakeRequest(GET, internationalAddressRoute)
+
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -123,10 +134,14 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
+
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(POST, underTest).withFormUrlEncodedBody(("line1", "value 1"), ("line2", "value 2"))
+        val request =
+          FakeRequest(POST, internationalAddressRoute)
+            .withFormUrlEncodedBody(("line1", "value 1"), ("line2", "value 2"))
+
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

@@ -16,57 +16,55 @@
 
 package controllers
 
-import connectors.RegistrationConnector
-import controllers.actions.*
+import controllers.actions._
 import forms.InternationalAddressFormProvider
-import models.registration.requests.IndividualWithoutId
-import models.registration.responses.RegistrationResponse
-import models.{Mode, UserAnswers}
+import javax.inject.Inject
+import models.Mode
 import pages.InternationalAddressPage
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.InternationalAddressView
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class InternationalAddressController @Inject()(sessionRepository: SessionRepository,
-                                               identify: IdentifierAction,
-                                               getData: DataRetrievalAction,
-                                               requireData: DataRequiredAction,
-                                               formProvider: InternationalAddressFormProvider,
-                                               view: InternationalAddressView,
-                                               registrationConnector: RegistrationConnector)
-                                              (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
-  extends FrontendController(mcc) with I18nSupport {
+class InternationalAddressController @Inject()(
+                                      override val messagesApi: MessagesApi,
+                                      sessionRepository: SessionRepository,
+                                      identify: IdentifierAction,
+                                      getData: DataRetrievalAction,
+                                      requireData: DataRequiredAction,
+                                      formProvider: InternationalAddressFormProvider,
+                                      val controllerComponents: MessagesControllerComponents,
+                                      view: InternationalAddressView
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val preparedForm = request.userAnswers.get(InternationalAddressPage) match {
-      case None => formProvider()
-      case Some(value) => formProvider().fill(value)
-    }
+  val form = formProvider()
 
-    Ok(view(preparedForm, mode))
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(InternationalAddressPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-      value =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(InternationalAddressPage, value))
-          registerResponse <- register(updatedAnswers)
-          fullAnswers = updatedAnswers.copy(registrationResponse = Some(registerResponse))
-          _ <- sessionRepository.set(fullAnswers)
-        } yield Redirect(InternationalAddressPage.nextPage(mode, fullAnswers))
-    )
-  }
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
 
-  private def register(answers: UserAnswers)
-                      (implicit request: Request[_]): Future[RegistrationResponse] = IndividualWithoutId.build(answers).fold(
-    errors => Future.failed(Exception(s"Unable to build registration request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
-    details => registrationConnector.register(details)
-  )
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(InternationalAddressPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(InternationalAddressPage.nextPage(mode, updatedAnswers))
+      )
+  }
 }
