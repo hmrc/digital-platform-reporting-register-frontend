@@ -16,15 +16,12 @@
 
 package controllers
 
-import connectors.RegistrationConnector
 import controllers.actions.*
 import forms.UkAddressFormProvider
-import models.registration.requests.IndividualWithoutId
-import models.registration.responses.RegistrationResponse
-import models.{Mode, UserAnswers}
+import models.Mode
 import pages.UkAddressPage
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.UkAddressView
@@ -37,12 +34,12 @@ class UkAddressController @Inject()(sessionRepository: SessionRepository,
                                     getData: DataRetrievalAction,
                                     requireData: DataRequiredAction,
                                     formProvider: UkAddressFormProvider,
-                                    view: UkAddressView,
-                                    registrationConnector: RegistrationConnector)
+                                    view: UkAddressView)
                                    (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+
     val preparedForm = request.userAnswers.get(UkAddressPage) match {
       case None => formProvider()
       case Some(value) => formProvider().fill(value)
@@ -52,21 +49,14 @@ class UkAddressController @Inject()(sessionRepository: SessionRepository,
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+
     formProvider().bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
       value =>
         for {
           updatedAnswers <- Future.fromTry(request.userAnswers.set(UkAddressPage, value))
-          registerResponse <- register(updatedAnswers)
-          fullAnswers = updatedAnswers.copy(registrationResponse = Some(registerResponse))
-          _ <- sessionRepository.set(fullAnswers)
-        } yield Redirect(UkAddressPage.nextPage(mode, fullAnswers))
+          _ <- sessionRepository.set(updatedAnswers)
+        } yield Redirect(UkAddressPage.nextPage(mode, updatedAnswers))
     )
   }
-
-  private def register(answers: UserAnswers)
-                      (implicit request: Request[_]): Future[RegistrationResponse] = IndividualWithoutId.build(answers).fold(
-    errors => Future.failed(Exception(s"Unable to build registration request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
-    details => registrationConnector.register(details)
-  )
 }
