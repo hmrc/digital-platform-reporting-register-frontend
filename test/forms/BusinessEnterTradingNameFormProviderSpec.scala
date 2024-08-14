@@ -23,7 +23,7 @@ class BusinessEnterTradingNameFormProviderSpec extends StringFieldBehaviours {
 
   private val requiredKey = "businessEnterTradingName.error.required"
   private val lengthKey = "businessEnterTradingName.error.length"
-  private val maxLength = 35
+  private val maxLength = 105
 
   private val underTest = new BusinessEnterTradingNameFormProvider()()
 
