@@ -103,7 +103,7 @@ businessName.p1.link.text = search for your registered name on Companies House
 businessName.p1.link.href = https://find-and-update.company-information.service.gov.uk/
 businessName.hint = Enter the name in full as it appears on the certificate or Companies House.
 businessName.error.required = Enter your business name
-businessName.error.length = Business name must be 35 characters or less
+businessName.error.length = Business name must be 105 characters or less
 
 hasUtrCorporationTax.title = Do you have a Corporation Tax Unique Taxpayer Reference (UTR)?
 hasUtrCorporationTax.heading = Do you have a Corporation Tax Unique Taxpayer Reference (UTR)?
@@ -375,7 +375,7 @@ secondaryContactPhoneNumber.change.hidden = the telephone number for {0}
 businessNameNoUtr.title = What is the registered name of your business?
 businessNameNoUtr.heading = What is the registered name of your business?
 businessNameNoUtr.error.required = Enter your business name
-businessNameNoUtr.error.length = Business name must be 35 characters or less
+businessNameNoUtr.error.length = Business name must be 105 characters or less
 
 hasBusinessTradingName.title = Does your business trade under a different name?
 hasBusinessTradingName.heading = Does your business trade under a different name?
@@ -384,7 +384,7 @@ hasBusinessTradingName.error.required = Select yes if your business trades under
 businessEnterTradingName.title = What is the trading name of your business?
 businessEnterTradingName.heading = What is the trading name of your business?
 businessEnterTradingName.error.required = Enter your trading name
-businessEnterTradingName.error.length = Trading name must be 35 characters or less
+businessEnterTradingName.error.length = Trading name must be 80 characters or less
 
 businessAddress.title = What is the main address of your business?
 businessAddress.heading = What is the main address of your business?
