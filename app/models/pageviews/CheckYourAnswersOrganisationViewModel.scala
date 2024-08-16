@@ -16,9 +16,9 @@
 
 package models.pageviews
 
-import models.registration.responses.MatchResponseWithId
+import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId}
 import models.UserAnswers
-import pages.BusinessNamePage
+import pages.*
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import viewmodels.checkAnswers.*
@@ -27,20 +27,23 @@ final case class CheckYourAnswersOrganisationViewModel(primaryContactList: Summa
                                                        businessName: String)
 
 object CheckYourAnswersOrganisationViewModel {
-  
+
   def apply(answers: UserAnswers)(implicit messages: Messages): Option[CheckYourAnswersOrganisationViewModel] = {
+    def getOrgNameWithoutId = answers.get(BusinessEnterTradingNamePage) orElse answers.get(BusinessNameNoUtrPage)
+
     val name = answers.registrationResponse.flatMap {
       case MatchResponseWithId(_, _, organisationName) => organisationName
+      case MatchResponseWithoutId(_) => getOrgNameWithoutId
       case _ => None
-    } orElse answers.get(BusinessNamePage)
-    
+    } orElse getOrgNameWithoutId orElse answers.get(BusinessNamePage)
+
     val primaryContactList = SummaryList(rows = Seq(
       PrimaryContactNameSummary.row(answers),
       PrimaryContactEmailAddressSummary.row(answers),
       CanPhonePrimaryContactSummary.row(answers),
       PrimaryContactPhoneNumberSummary.row(answers)
     ).flatten)
-    
+
     val secondaryContactList = SummaryList(rows = Seq(
       HasSecondaryContactSummary.row(answers),
       SecondaryContactNameSummary.row(answers),
