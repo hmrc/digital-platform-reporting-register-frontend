@@ -17,28 +17,39 @@
 @import models.pageviews.CheckYourAnswersOrganisationViewModel
 
 @this(
-    layout: templates.Layout,
-    govukSummaryList: GovukSummaryList
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukSummaryList: GovukSummaryList,
+        govukButton: GovukButton,
 )
 
 @(viewModel: CheckYourAnswersOrganisationViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
+    @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
+        <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
 
-    <p class="govuk-body">@messages("checkYourAnswers.p1.organisation", viewModel.businessName)</p>
+        <p class="govuk-body">@messages("checkYourAnswers.p1.organisation", viewModel.businessName)</p>
 
-    <h2 class="govuk-heading-m">@messages("checkYourAnswers.primaryContact")</h2>
+        <h2 class="govuk-heading-m">@messages("checkYourAnswers.primaryContact")</h2>
 
-    @govukSummaryList(viewModel.primaryContactList)
+        @govukSummaryList(viewModel.primaryContactList)
 
-    <h2 class="govuk-heading-m">@messages("checkYourAnswers.secondaryContact")</h2>
+        <h2 class="govuk-heading-m">@messages("checkYourAnswers.secondaryContact")</h2>
 
-    @govukSummaryList(viewModel.secondaryContactList)
+        @govukSummaryList(viewModel.secondaryContactList)
+    
+        <h2 class="govuk-heading-m">@messages("checkYourAnswers.address")</h2>
 
-    <h2 class="govuk-heading-m">@messages("checkYourAnswers.h2")</h2>
+        @govukSummaryList(viewModel.addressList)
 
-    <p class="govuk-body">@messages("checkYourAnswers.p2")</p>
-}
+        <h2 class="govuk-heading-m">@messages("checkYourAnswers.h2")</h2>
 
+        <p class="govuk-body">@messages("checkYourAnswers.p2")</p>
+
+        @formHelper(action = routes.CheckYourAnswersController.onSubmit()) {
+            @govukButton(
+                ButtonViewModel(messages("checkYourAnswers.button.complete"))
+            )
+        }
+    }

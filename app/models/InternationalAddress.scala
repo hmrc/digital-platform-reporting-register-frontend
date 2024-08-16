@@ -16,9 +16,11 @@
 
 package models
 
-import play.api.libs.json._
+import models.Country.allCountries
+import play.api.libs.json.*
+import models.registration.Address
 
-case class InternationalAddress (line1: String,
+case class InternationalAddress(line1: String,
                                  line2: Option[String],
                                  city: String,
                                  region: Option[String],
@@ -28,4 +30,21 @@ case class InternationalAddress (line1: String,
 object InternationalAddress {
 
   implicit val format: OFormat[InternationalAddress] = Json.format
+
+  implicit class InternationalAddressOps(intlAddress: InternationalAddress) {
+
+    def toAddress: Address = {
+      Address(
+        addressLine1 = intlAddress.line1,
+        addressLine2 = intlAddress.line2,
+        addressLine3 = Some(intlAddress.city),
+        addressLine4 = None,
+        postalCode = intlAddress.postal,
+        countryCode = allCountries
+          .find(_ == intlAddress.country)
+          .map(_.code)
+          .getOrElse("GB")
+      )
+    }
+  }
 }

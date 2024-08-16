@@ -33,11 +33,13 @@ checkYourAnswers.heading = Check your answers
 checkYourAnswers.primaryContact = First contact
 checkYourAnswers.contactDetails = Contact details
 checkYourAnswers.secondaryContact = Second contact
+checkYourAnswers.address = Address
 checkYourAnswers.p1.organisation = Make sure the details for {0} are correct.
 checkYourAnswers.p1.individual = Make sure your details are correct.
 checkYourAnswers.h2.individual = Your details
 checkYourAnswers.h2 = Now complete your registration
 checkYourAnswers.p2 = By submitting these details, you are confirming that the information is correct and complete to the best of your knowledge.
+checkYourAnswers.button.complete = complete registration
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
@@ -410,6 +412,7 @@ businessAddress.error.addressLine2.length = Address line 2 must be 35 characters
 businessAddress.error.city.length = City must be 35 characters or less
 businessAddress.error.region.length = Region must be 35 characters or less
 businessAddress.error.postalCode.length = Postal or zip code must be 10 characters or less
+businessAddress.checkYourAnswersLabel = Business address
 
 businessDetailsDoNotMatch.title = The details you entered did not match our records
 businessDetailsDoNotMatch.heading = The details you entered did not match our records

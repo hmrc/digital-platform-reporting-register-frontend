@@ -32,7 +32,8 @@ case object HasSecondaryContactPage extends QuestionPage[Boolean] {
   override protected def nextPageNormalMode(answers: UserAnswers): Call =
     answers.get(this).map {
       case true => routes.SecondaryContactNameController.onPageLoad(NormalMode)
-      case false => routes.CheckYourAnswersController.onPageLoad()
+      case false =>
+        routes.CheckYourAnswersController.onPageLoad()
     }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 
   override protected def nextPageCheckMode(answers: UserAnswers): Call =

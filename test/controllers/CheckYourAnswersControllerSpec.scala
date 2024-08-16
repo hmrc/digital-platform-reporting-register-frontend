@@ -17,10 +17,13 @@
 package controllers
 
 import base.SpecBase
+import connectors.{RegistrationConnector, SubscriptionConnector}
 import models.BusinessType.*
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.Address
 import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId}
+import models.subscription.responses.{AlreadySubscribedResponse, SubscribedResponse, SubscriptionResponse}
+import models.{BusinessAddress, Country}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalacheck.Gen
@@ -58,6 +61,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
   private val anyOrganisationType = Gen.oneOf(LimitedCompany, Llp, Partnership, AssociationOrTrust).sample.value
   private val anyAddress = Address("line 1", None, None, None, None, "ZZ")
 
+  private val country = Country.internationalCountries.head
+  private val businessAddress: BusinessAddress =
+    BusinessAddress("Testing Lane", None, "New York", None, None, country)
+
   "Check Your Answers Controller" - {
 
     "must return OK and the correct view for a GET" - {
@@ -87,7 +94,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
         val answers = emptyUserAnswers
           .set(BusinessNamePage, anyName).success.value
           .set(BusinessTypePage, anyOrganisationType).success.value
-        
+
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
         running(application) {
@@ -127,6 +134,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
         val answers =
           emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
             .set(BusinessNameNoUtrPage, "business name").get
+            .set(BusinessAddressPage, businessAddress).get
 
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
@@ -205,6 +213,144 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
           }
         }
+      }
+    }
+
+    "must Redirect to Registration success for org with id with Registration response" in {
+
+      val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val answers =
+        emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithId("safe", anyAddress, Some("anyName"))))
+          .set(BusinessTypePage, LimitedCompany).get
+          .set(PrimaryContactNamePage, "name").get
+          .set(PrimaryContactEmailAddressPage, "email").get
+          .set(BusinessNameNoUtrPage, "business name").get
+
+      val subscriptionResponse = SubscribedResponse("dprsId")
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSubscriptionConnector.subscribe(any())(any())) thenReturn Future.successful(subscriptionResponse)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[SubscriptionConnector].toInstance(mockSubscriptionConnector))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url //TODO Change to RegistrationSuccessful Page ODPR-1284/SUB-16
+      }
+    }
+
+    "must Redirect to Registration success for org with no id with Registration response" in { //impossible but must test
+
+      val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val answers =
+        emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
+          .set(BusinessTypePage, LimitedCompany).get
+          .set(PrimaryContactNamePage, "name").get
+          .set(PrimaryContactEmailAddressPage, "email").get
+          .set(BusinessNameNoUtrPage, "business name").get
+          .set(BusinessAddressPage, businessAddress).get
+
+      val subscriptionResponse = SubscribedResponse("dprsId")
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSubscriptionConnector.subscribe(any())(any())) thenReturn Future.successful(subscriptionResponse)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[SubscriptionConnector].toInstance(mockSubscriptionConnector))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url //TODO Change to RegistrationSuccessful Page ODPR-1284/SUB-16
+      }
+    }
+
+    "must Redirect to Registration success for org with no id and no registration response" in {
+
+      val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
+      val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val answers =
+        emptyUserAnswers
+          .set(BusinessTypePage, LimitedCompany).get
+          .set(PrimaryContactNamePage, "name").get
+          .set(PrimaryContactEmailAddressPage, "email").get
+          .set(BusinessNameNoUtrPage, "business name").get
+          .set(BusinessAddressPage, businessAddress).get
+
+      val registrationResponse = MatchResponseWithoutId("safeid")
+      val subscriptionResponse = SubscribedResponse("dprsId")
+
+      when(mockRegistrationConnector.register(any())(any())) thenReturn Future.successful(registrationResponse)
+      when(mockSubscriptionConnector.subscribe(any())(any())) thenReturn Future.successful(subscriptionResponse)
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[RegistrationConnector].toInstance(mockRegistrationConnector))
+          .overrides(bind[SubscriptionConnector].toInstance(mockSubscriptionConnector))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url //TODO Change to RegistrationSuccessful Page ODPR-1284/SUB-16
+      }
+    }
+
+    "must Redirect to BusinessAlreadyRegisteredController for org with no id" in {
+
+      val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
+      val mockSessionRepository = mock[SessionRepository]
+
+      val subscriptionResponse = AlreadySubscribedResponse()
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSubscriptionConnector.subscribe(any())(any())) thenReturn Future.successful(subscriptionResponse)
+
+      val answers = emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
+        .set(BusinessTypePage, LimitedCompany).get
+        .set(PrimaryContactNamePage, "name").get
+        .set(PrimaryContactEmailAddressPage, "email").get
+        .set(BusinessNameNoUtrPage, "business name").get
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(bind[SubscriptionConnector].toInstance(mockSubscriptionConnector))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.BusinessAlreadyRegisteredController.onPageLoad().url
       }
     }
   }

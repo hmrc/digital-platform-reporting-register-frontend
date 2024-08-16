@@ -71,7 +71,10 @@ class BusinessNameController @Inject()(sessionRepository: SessionRepository,
   private def register(answers: UserAnswers)(implicit request: Request[_]): Future[RegistrationResponse] =
     OrganisationWithUtr.build(answers)
       .fold(
-        errors => Future.failed(Exception(s"Unable to build registration request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
+        errors =>
+          Future.failed(Exception(
+            s"Unable to build registration request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}"
+          )),
         details => registrationConnector.register(details)
       )
 }

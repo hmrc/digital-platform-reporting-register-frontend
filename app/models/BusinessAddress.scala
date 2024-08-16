@@ -16,6 +16,8 @@
 
 package models
 
+import models.Country.allCountries
+import models.registration.Address
 import play.api.libs.json.*
 
 case class BusinessAddress(addressLine1: String,
@@ -28,4 +30,21 @@ case class BusinessAddress(addressLine1: String,
 object BusinessAddress {
 
   implicit val format: OFormat[BusinessAddress] = Json.format
+
+  implicit class BusinessAddressOps(address: BusinessAddress) {
+
+    def toAddress: Address = {
+      Address(
+        addressLine1 = address.addressLine1,
+        addressLine2 = address.addressLine2,
+        addressLine3 = Some(address.city),
+        addressLine4 = None,
+        postalCode = address.postalCode,
+        countryCode = allCountries
+          .find(_ == address.country)
+          .map(_.code)
+          .getOrElse("GB")
+      )
+    }
+  }
 }

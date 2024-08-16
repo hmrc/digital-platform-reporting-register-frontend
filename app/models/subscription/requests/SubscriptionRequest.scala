@@ -16,8 +16,16 @@
 
 package models.subscription.requests
 
-import models.subscription.Contact
+import cats.data.EitherNec
+import cats.implicits.*
+import models.pageviews.CheckYourAnswersOrganisationViewModel
+import models.registration.Address
+import models.subscription.{Contact, Organisation, OrganisationContact}
+import models.{BusinessAddress, Country, InternationalAddress, UserAnswers}
+import pages.{BusinessAddressPage, *}
+import play.api.i18n.Messages
 import play.api.libs.json.*
+import queries.Query
 
 final case class SubscriptionRequest(safeId: String,
                                      gbUser: Boolean,
@@ -27,4 +35,54 @@ final case class SubscriptionRequest(safeId: String,
 
 object SubscriptionRequest {
   implicit lazy val writes: OWrites[SubscriptionRequest] = Json.format
+
+  def build(safeId: String,
+            userAnswers: UserAnswers,
+            orgWithIdAddress: Option[Address])
+           (implicit messages: Messages): EitherNec[Query, SubscriptionRequest] = {
+
+    lazy val getOrgWithoutIdIsGb = (businessAddress: BusinessAddress) =>
+      Some(Country.ukCountries.contains(businessAddress.country))
+
+    lazy val getOrgWithIdIsGb = (address: Address) => Country.ukCountries.exists(_.code == address.countryCode)
+
+    val maybeIsGb: Option[Boolean] = userAnswers.get(BusinessAddressPage)
+      .fold(orgWithIdAddress.map(getOrgWithIdIsGb))(getOrgWithoutIdIsGb)
+
+    val isGb = maybeIsGb.getOrElse(false)
+
+    val secondaryContactInfo = for {
+      secondaryContactName <- userAnswers.get(SecondaryContactNamePage)
+      secondaryEmailAddress <- userAnswers.get(SecondaryContactEmailAddressPage)
+    } yield {
+      OrganisationContact(
+        Organisation(name = secondaryContactName),
+        email = secondaryEmailAddress,
+        phone = userAnswers.get(SecondaryContactPhoneNumberPage)
+      )
+    }
+
+    (
+      userAnswers.getEither(PrimaryContactNamePage),
+      userAnswers.getEither(PrimaryContactEmailAddressPage),
+    ).parMapN{ (primaryContactName, primaryEmailAddress) =>
+      SubscriptionRequest(
+        safeId,
+        gbUser = isGb,
+        tradingName = userAnswers.get(BusinessEnterTradingNamePage),
+        primaryContact = OrganisationContact(
+          Organisation(name = primaryContactName),
+          email = primaryEmailAddress,
+          phone = userAnswers.get(PrimaryContactPhoneNumberPage)
+        ),
+        secondaryContact = secondaryContactInfo
+      )
+    }
+  }
+
+  private def getModel(userAnswers: UserAnswers)
+                      (implicit messages: Messages): Option[CheckYourAnswersOrganisationViewModel] = {
+    CheckYourAnswersOrganisationViewModel
+      .apply(userAnswers)
+  }
 }

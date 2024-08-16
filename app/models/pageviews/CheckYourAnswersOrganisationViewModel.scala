@@ -22,14 +22,16 @@ import pages.*
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import viewmodels.checkAnswers.*
+
 final case class CheckYourAnswersOrganisationViewModel(primaryContactList: SummaryList,
                                                        secondaryContactList: SummaryList,
+                                                       addressList: SummaryList,
                                                        businessName: String)
 
 object CheckYourAnswersOrganisationViewModel {
 
   def apply(answers: UserAnswers)(implicit messages: Messages): Option[CheckYourAnswersOrganisationViewModel] = {
-    def getOrgNameWithoutId = answers.get(BusinessEnterTradingNamePage) orElse answers.get(BusinessNameNoUtrPage)
+    def getOrgNameWithoutId = answers.get(BusinessNameNoUtrPage)
 
     val name = answers.registrationResponse.flatMap {
       case MatchResponseWithId(_, _, organisationName) => organisationName
@@ -52,6 +54,10 @@ object CheckYourAnswersOrganisationViewModel {
       SecondaryContactPhoneNumberSummary.row(answers)
     ).flatten)
     
-    name.map(n => CheckYourAnswersOrganisationViewModel(primaryContactList, secondaryContactList, n))
+    val addressList = SummaryList(rows = Seq(
+      BusinessAddressSummary.row(answers)
+    ).flatten)
+    
+    name.map(n => CheckYourAnswersOrganisationViewModel(primaryContactList, secondaryContactList, addressList, n))
   }
 }
