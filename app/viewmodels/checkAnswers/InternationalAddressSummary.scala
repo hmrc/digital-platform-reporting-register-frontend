@@ -20,36 +20,32 @@ import controllers.routes
 import models.{CheckMode, UserAnswers}
 import pages.InternationalAddressPage
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
+import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
-object InternationalAddressSummary  {
+object InternationalAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(InternationalAddressPage).map {
-      answer =>
-        val line2 = answer.line2.map(x => HtmlFormat.escape(x).toString + "<br/>").getOrElse("")
-        val region = answer.region.map(x => HtmlFormat.escape(x).toString + "<br/>").getOrElse("")
-        val postal = answer.postal.map(x => HtmlFormat.escape(x).toString + "<br/>").getOrElse("")
+    answers.get(InternationalAddressPage).map { answer =>
+      val value: String = Seq(
+        Some(HtmlFormat.escape(answer.line1)),
+        answer.line2.map(HtmlFormat.escape),
+        Some(HtmlFormat.escape(answer.city)),
+        answer.region.map(HtmlFormat.escape),
+        answer.postal.map(HtmlFormat.escape),
+        Some(HtmlFormat.escape(answer.country.name))
+      ).flatten.map(_.toString).mkString("<br/>")
 
-
-        val value = HtmlFormat.escape(answer.line1).toString + "<br/>" +
-                  line2 +
-                  HtmlFormat.escape(answer.city).toString + "<br/>" +
-                  region +
-                  postal +
-                  HtmlFormat.escape(answer.country.name).toString
-
-        SummaryListRowViewModel(
-          key     = "internationalAddress.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.InternationalAddressController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("internationalAddress.change.hidden"))
-          )
+      SummaryListRowViewModel(
+        key = "internationalAddress.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(value)),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.InternationalAddressController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("internationalAddress.change.hidden"))
         )
+      )
     }
 }

@@ -23,24 +23,22 @@ import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
-object IndividualNameSummary  {
+object IndividualNameSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(IndividualNamePage).map {
-      answer =>
+    answers.get(IndividualNamePage).map { answer =>
+      val value = HtmlFormat.escape(answer.firstName).toString + " " + HtmlFormat.escape(answer.lastName).toString
 
-      val value = HtmlFormat.escape(answer.firstName).toString + "<br/>" + HtmlFormat.escape(answer.lastName).toString
-
-        SummaryListRowViewModel(
-          key     = "individualName.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlContent(value)),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.IndividualNameController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("individualName.change.hidden"))
-          )
+      SummaryListRowViewModel(
+        key = "individualName.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(value)),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.IndividualNameController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("individualName.change.hidden"))
         )
+      )
     }
 }
