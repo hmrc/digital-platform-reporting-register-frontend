@@ -17,12 +17,10 @@
 package controllers
 
 import base.SpecBase
-import connectors.SubscriptionConnector
 import models.BusinessType.*
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.Address
 import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId}
-import models.subscription.responses.{AlreadySubscribedResponse, SubscribedResponse, SubscriptionResponse}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalacheck.Gen
