@@ -17,31 +17,55 @@
 package controllers
 
 import base.SpecBase
+import connectors.SubscriptionConnector
 import models.BusinessType.*
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.Address
 import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId}
+import models.subscription.responses.{AlreadySubscribedResponse, SubscribedResponse, SubscriptionResponse}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalacheck.Gen
-import pages.{BusinessNamePage, BusinessTypePage}
-import play.api.i18n.Messages
+import org.scalatestplus.mockito.MockitoSugar
+import pages.*
+import play.api.i18n.{DefaultLangsProvider, DefaultMessagesApi, Messages, MessagesApi}
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import viewmodels.govuk.SummaryListFluency
+import play.api.{Configuration, Environment, Mode}
+import repositories.SessionRepository
 import views.html.{CheckYourAnswersIndividualView, CheckYourAnswersOrganisationView}
 
-class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
+import java.io.File
+import scala.concurrent.Future
 
-  private implicit val messages: Messages = stubMessages()
+class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar {
+
+  val testMessageMap =
+    Map(
+      "primaryContactName.checkYourAnswersLabel" -> "Contact name",
+      "primaryContactName.change.hidden" -> "the name of the person or team we should contact",
+      "site.change" -> "Change"
+    )
+
+  val messagesApi: MessagesApi = {
+    val env = new Environment(new File("."), this.getClass.getClassLoader, Mode.Dev)
+    val config = Configuration.reference ++ Configuration.from(Map("play.i18n.langs" -> Seq("en", "fr", "fr-CH")))
+    val langs = new DefaultLangsProvider(config).get
+    new DefaultMessagesApi(Map("en" -> testMessageMap), langs)
+  }
+
+  private implicit val messages: Messages = messagesApi.preferred(FakeRequest())
   private val anyIndividualType = Gen.oneOf(SoleTrader, Individual).sample.value
   private val anyOrganisationType = Gen.oneOf(LimitedCompany, Llp, Partnership, AssociationOrTrust).sample.value
   private val anyAddress = Address("line 1", None, None, None, None, "ZZ")
-  
+
   "Check Your Answers Controller" - {
 
     "must return OK and the correct view for a GET" - {
-      
+
       "for an individual" in {
-        
+
         val answers = emptyUserAnswers
           .set(BusinessTypePage, anyIndividualType).success.value
         val application = applicationBuilder(userAnswers = Some(answers)).build()
@@ -65,6 +89,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
         val answers = emptyUserAnswers
           .set(BusinessNamePage, anyName).success.value
           .set(BusinessTypePage, anyOrganisationType).success.value
+        
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
         running(application) {
@@ -98,12 +123,33 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
           contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
         }
       }
+
+      "for an organisation when the registration response is a match without Id containing " in {
+
+        val answers =
+          emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
+            .set(BusinessNameNoUtrPage, "business name").get
+
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[CheckYourAnswersOrganisationView]
+          val viewModel = CheckYourAnswersOrganisationViewModel.apply(answers).value
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
+        }
+      }
     }
 
     "must redirect to Journey Recovery for a GET" - {
 
       "if no existing data is found" in {
-        
+
         val application = applicationBuilder(userAnswers = None).build()
 
         running(application) {
