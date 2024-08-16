@@ -16,13 +16,16 @@
 
 package pages
 
+import builders.InternationalAddressBuilder.anInternationalAddress
+import builders.UkAddressBuilder.aUkAddress
+import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.{CheckMode, NormalMode, UserAnswers}
-import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{OptionValues, TryValues}
 
-class AddressInUkPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues{
+class AddressInUkPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
     val emptyAnswers = UserAnswers("id", None)
@@ -40,8 +43,44 @@ class AddressInUkPageSpec extends AnyFreeSpec with Matchers with TryValues with 
     }
 
     "in Check Mode" - {
-      "must go to Check Answers" in {
-        AddressInUkPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+      "must go to UK address when the answer is yes and answers do not contain a UK address" in {
+        val answers = anEmptyAnswer.set(AddressInUkPage, true).success.value
+        AddressInUkPage.nextPage(CheckMode, answers) mustEqual routes.UkAddressController.onPageLoad(CheckMode)
+      }
+
+      "must go to International address when the answer is no and answers do not contain an International address" in {
+        val answers = anEmptyAnswer.set(AddressInUkPage, false).success.value
+        AddressInUkPage.nextPage(CheckMode, answers) mustEqual routes.InternationalAddressController.onPageLoad(CheckMode)
+      }
+
+      "must go to Check Answers" - {
+        "when the answer is yes and answers contains a UK address" in {
+          val answers = anEmptyAnswer
+            .set(AddressInUkPage, true).success.value
+            .set(UkAddressPage, aUkAddress).success.value
+          AddressInUkPage.nextPage(CheckMode, answers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "when the answer is no and answers contains an international address" in {
+          val answers = anEmptyAnswer
+            .set(AddressInUkPage, false).success.value
+            .set(InternationalAddressPage, anInternationalAddress).success.value
+          AddressInUkPage.nextPage(CheckMode, answers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        }
+      }
+    }
+
+    ".cleanup" - {
+      "must remove International address when the answer is yes" in {
+        val initialAnswers = anEmptyAnswer.set(InternationalAddressPage, anInternationalAddress).success.value
+        val result = initialAnswers.set(AddressInUkPage, true).success.value
+        result.get(InternationalAddressPage) must not be defined
+      }
+
+      "must not remove UK Address when answer is no" in {
+        val initialAnswers = anEmptyAnswer.set(UkAddressPage, aUkAddress).success.value
+        val result = initialAnswers.set(AddressInUkPage, false).success.value
+        result.get(UkAddressPage) must not be defined
       }
     }
   }

@@ -16,7 +16,9 @@
 
 package models.pageviews
 
-import builders.UserAnswersBuilder.anEmptyAnswer
+import builders.InternationalAddressBuilder.anInternationalAddress
+import builders.UserAnswersBuilder.*
+import models.IndividualName
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
@@ -24,26 +26,42 @@ import pages.*
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 
+import java.time.LocalDate
+
 class CheckYourAnswersIndividualViewModelSpec extends AnyFreeSpec with Matchers with OptionValues with TryValues {
 
   private implicit val messages: Messages = stubMessages()
 
   ".apply" - {
-
     "must contain the expected rows (minimal set)" in {
       val viewModel = CheckYourAnswersIndividualViewModel.apply(anEmptyAnswer)
-      viewModel.list.rows mustBe empty
+      viewModel.contactDetails.rows mustBe empty
     }
 
     "must contain the expected rows (maximal set)" in {
-      val answers =
-        anEmptyAnswer
-          .set(IndividualEmailAddressPage, "email").success.value
-          .set(CanPhoneIndividualPage, true).success.value
-          .set(IndividualPhoneNumberPage, "phone").success.value
-
+      val answers = aUserAnswers
+        .set(IndividualEmailAddressPage, "email").success.value
+        .set(CanPhoneIndividualPage, true).success.value
+        .set(IndividualPhoneNumberPage, "phone").success.value
       val viewModel = CheckYourAnswersIndividualViewModel.apply(answers)
-      viewModel.list.rows.size mustEqual 3
+
+      viewModel.contactDetails.rows.size mustEqual 3
+      viewModel.yourDetails mustBe None
+    }
+
+    "must contain expected rows when registrationResponse is not present" in {
+      val answers = aUserAnswers.copy(registrationResponse = None)
+        .set(IndividualEmailAddressPage, "email").success.value
+        .set(CanPhoneIndividualPage, true).success.value
+        .set(IndividualPhoneNumberPage, "phone").success.value
+        .set(IndividualNamePage, IndividualName("Homer", "Simpson")).success.value
+        .set(DateOfBirthPage, LocalDate.of(2000, 1, 1)).success.value
+        .set(AddressInUkPage, true).success.value
+        .set(InternationalAddressPage, anInternationalAddress).success.value
+      val viewModel = CheckYourAnswersIndividualViewModel.apply(answers)
+
+      viewModel.contactDetails.rows.size mustEqual 3
+      viewModel.yourDetails.get.rows.size mustEqual 4
     }
   }
 }

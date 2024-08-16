@@ -29,9 +29,15 @@
 
     <p class="govuk-body">@messages("checkYourAnswers.p1.individual")</p>
 
+    @viewModel.yourDetails.map{ yourDetails =>
+        <h2 class="govuk-heading-m">@messages("checkYourAnswers.h2.individual")</h2>
+
+        @govukSummaryList(yourDetails)
+    }
+
     <h2 class="govuk-heading-m">@messages("checkYourAnswers.contactDetails")</h2>
 
-    @govukSummaryList(viewModel.list)
+    @govukSummaryList(viewModel.contactDetails)
 
     <h2 class="govuk-heading-m">@messages("checkYourAnswers.h2")</h2>
 

@@ -16,18 +16,16 @@
 
 package builders
 
-import builders.MatchResponseWithIdBuilder.aMatchResponseWithId
-import models.UserAnswers
-import play.api.libs.json.Json
+import models.{Country, InternationalAddress}
 
-object UserAnswersBuilder {
+object InternationalAddressBuilder {
 
-  val aUserAnswers: UserAnswers = UserAnswers(
-    id = "default-user-answer-id",
-    taxIdentifier = None,
-    registrationResponse = Some(aMatchResponseWithId),
-    data = Json.obj()
+  val anInternationalAddress: InternationalAddress = InternationalAddress(
+    line1 = "Address line 1",
+    line2 = Some("Address line 2"),
+    city = "default-city",
+    region = Some("default-region"),
+    postal = Some("default-postal-code"),
+    country = Country("UK", "United Kingdom")
   )
-
-  val anEmptyAnswer: UserAnswers = aUserAnswers.copy(taxIdentifier = None, registrationResponse = None, data = Json.obj())
 }

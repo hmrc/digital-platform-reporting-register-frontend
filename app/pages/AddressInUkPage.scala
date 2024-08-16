@@ -17,9 +17,11 @@
 package pages
 
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+
+import scala.util.Try
 
 case object AddressInUkPage extends QuestionPage[Boolean] {
 
@@ -31,4 +33,26 @@ case object AddressInUkPage extends QuestionPage[Boolean] {
     case true => routes.UkAddressController.onPageLoad(NormalMode)
     case false => routes.InternationalAddressController.onPageLoad(NormalMode)
   }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+
+  override protected def nextPageCheckMode(answers: UserAnswers): Call = answers.get(this).map {
+    case true =>
+      if (answers.isDefined(UkAddressPage)) {
+        routes.CheckYourAnswersController.onPageLoad()
+      } else {
+        routes.UkAddressController.onPageLoad(CheckMode)
+      }
+    case false =>
+      if (answers.isDefined(InternationalAddressPage)) {
+        routes.CheckYourAnswersController.onPageLoad()
+      } else {
+        routes.InternationalAddressController.onPageLoad(CheckMode)
+      }
+  }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    if (value.contains(true)) {
+      userAnswers.remove(InternationalAddressPage)
+    } else {
+      userAnswers.remove(UkAddressPage)
+    }
 }

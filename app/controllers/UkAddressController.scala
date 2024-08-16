@@ -39,7 +39,6 @@ class UkAddressController @Inject()(sessionRepository: SessionRepository,
   extends FrontendController(mcc) with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-
     val preparedForm = request.userAnswers.get(UkAddressPage) match {
       case None => formProvider()
       case Some(value) => formProvider().fill(value)
@@ -49,14 +48,12 @@ class UkAddressController @Inject()(sessionRepository: SessionRepository,
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-
     formProvider().bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-      value =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(UkAddressPage, value))
-          _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(UkAddressPage.nextPage(mode, updatedAnswers))
+      value => for {
+        updatedAnswers <- Future.fromTry(request.userAnswers.set(UkAddressPage, value))
+        _ <- sessionRepository.set(updatedAnswers)
+      } yield Redirect(UkAddressPage.nextPage(mode, updatedAnswers))
     )
   }
 }

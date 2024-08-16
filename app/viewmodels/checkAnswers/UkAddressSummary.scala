@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, UkAddress, UserAnswers}
 import pages.UkAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -28,21 +28,22 @@ import viewmodels.implicits.*
 
 import scala.language.postfixOps
 
-object UkAddressSummary  {
+object UkAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(UkAddressPage).map {
-      answer =>
-
-      val value =
-        HtmlFormat.escape(answer.line1).toString + "<br/>" +
-        answer.line2.map(HtmlFormat.escape(_).toString + "<br/>").getOrElse("") +
-        HtmlFormat.escape(answer.town).toString + "<br/>" +
-        answer.county.map(HtmlFormat.escape(_).toString).getOrElse("")
+    answers.get(UkAddressPage).map { answer =>
+      val value = Seq(
+        Some(HtmlFormat.escape(answer.line1)),
+        answer.line2.map(HtmlFormat.escape),
+        Some(HtmlFormat.escape(answer.town)),
+        answer.county.map(HtmlFormat.escape),
+        Some(HtmlFormat.escape(answer.postCode)),
+        Some(HtmlFormat.escape(answer.country.name))
+      ).flatten.map(_.toString).mkString("<br/>")
 
       SummaryListRowViewModel(
-        key     = "ukAddress.checkYourAnswersLabel",
-        value   = ValueViewModel(HtmlContent(value)),
+        key = "ukAddress.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(value)),
         actions = Seq(
           ActionItemViewModel("site.change", routes.UkAddressController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("ukAddress.change.hidden"))

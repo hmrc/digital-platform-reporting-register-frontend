@@ -16,55 +16,44 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.IndividualNameFormProvider
-import javax.inject.Inject
 import models.Mode
 import pages.IndividualNamePage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.IndividualNameView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IndividualNameController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      sessionRepository: SessionRepository,
-                                      identify: IdentifierAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
-                                      formProvider: IndividualNameFormProvider,
-                                      val controllerComponents: MessagesControllerComponents,
-                                      view: IndividualNameView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class IndividualNameController @Inject()(sessionRepository: SessionRepository,
+                                         identify: IdentifierAction,
+                                         getData: DataRetrievalAction,
+                                         requireData: DataRequiredAction,
+                                         formProvider: IndividualNameFormProvider,
+                                         view: IndividualNameView
+                                        )(implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  extends FrontendController(mcc) with I18nSupport {
 
-  val form = formProvider()
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    val preparedForm = request.userAnswers.get(IndividualNamePage) match {
+      case None => formProvider()
+      case Some(value) => formProvider().fill(value)
+    }
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-
-      val preparedForm = request.userAnswers.get(IndividualNamePage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualNamePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(IndividualNamePage.nextPage(mode, updatedAnswers))
-      )
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    formProvider().bindFromRequest().fold(
+      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+      value => for {
+        updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualNamePage, value))
+        _ <- sessionRepository.set(updatedAnswers)
+      } yield Redirect(IndividualNamePage.nextPage(mode, updatedAnswers))
+    )
   }
 }
