@@ -18,22 +18,36 @@ package models.pageviews
 
 import models.registration.responses.MatchResponseWithId
 import models.UserAnswers
-import pages.BusinessNamePage
+import pages.{BusinessNameNoUtrPage, BusinessNamePage}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import viewmodels.checkAnswers.*
-final case class CheckYourAnswersOrganisationViewModel(primaryContactList: SummaryList,
+
+final case class CheckYourAnswersOrganisationViewModel(businessDetailList: SummaryList,
+                                                       primaryContactList: SummaryList,
                                                        secondaryContactList: SummaryList,
-                                                       businessName: String)
+                                                       businessName: String,
+                                                       hasRegistered: Boolean
+                                                      )
 
 object CheckYourAnswersOrganisationViewModel {
   
   def apply(answers: UserAnswers)(implicit messages: Messages): Option[CheckYourAnswersOrganisationViewModel] = {
-    val name = answers.registrationResponse.flatMap {
+    val name: Option[String] = answers.registrationResponse.flatMap {
       case MatchResponseWithId(_, _, organisationName) => organisationName
       case _ => None
-    } orElse answers.get(BusinessNamePage)
-    
+    } orElse answers.get(BusinessNamePage) match {
+      case None => answers.get(BusinessNameNoUtrPage)
+      case Some(value) => Some(value)
+    }
+
+    val businessDetailList = SummaryList(rows = Seq(
+      BusinessNameNoUtrSummary.row(answers),
+      HasBusinessTradingNameSummary.row(answers),
+      BusinessEnterTradingNameSummary.row(answers),
+      BusinessAddressSummary.row(answers)
+    ).flatten)
+
     val primaryContactList = SummaryList(rows = Seq(
       PrimaryContactNameSummary.row(answers),
       PrimaryContactEmailAddressSummary.row(answers),
@@ -49,6 +63,9 @@ object CheckYourAnswersOrganisationViewModel {
       SecondaryContactPhoneNumberSummary.row(answers)
     ).flatten)
     
-    name.map(n => CheckYourAnswersOrganisationViewModel(primaryContactList, secondaryContactList, n))
+    name.map {
+      val hasRegistered = answers.registrationResponse.isDefined
+      CheckYourAnswersOrganisationViewModel(businessDetailList, primaryContactList, secondaryContactList, _, hasRegistered)
+    }
   }
 }

@@ -30,6 +30,7 @@ error.summary.title = There is a problem
 
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
+checkYourAnswers.businessDetails = Business details
 checkYourAnswers.primaryContact = First contact
 checkYourAnswers.contactDetails = Contact details
 checkYourAnswers.secondaryContact = Second contact
@@ -376,15 +377,18 @@ businessNameNoUtr.title = What is the registered name of your business?
 businessNameNoUtr.heading = What is the registered name of your business?
 businessNameNoUtr.error.required = Enter your business name
 businessNameNoUtr.error.length = Business name must be 105 characters or less
+businessNameNoUtr.checkYourAnswersLabel = Business name
 
 hasBusinessTradingName.title = Does your business trade under a different name?
 hasBusinessTradingName.heading = Does your business trade under a different name?
 hasBusinessTradingName.error.required = Select yes if your business trades under a different name
+hasBusinessTradingName.checkYourAnswersLabel = Do you trade under a different name?
 
 businessEnterTradingName.title = What is the trading name of your business?
 businessEnterTradingName.heading = What is the trading name of your business?
 businessEnterTradingName.error.required = Enter your trading name
 businessEnterTradingName.error.length = Trading name must be 80 characters or less
+businessEnterTradingName.checkYourAnswersLabel = Trading name
 
 businessAddress.title = What is the main address of your business?
 businessAddress.heading = What is the main address of your business?
@@ -402,6 +406,7 @@ businessAddress.error.addressLine2.length = Address line 2 must be 35 characters
 businessAddress.error.city.length = City must be 35 characters or less
 businessAddress.error.region.length = Region must be 35 characters or less
 businessAddress.error.postalCode.length = Postal or zip code must be 10 characters or less
+businessAddress.checkYourAnswersLabel = Address
 
 businessDetailsDoNotMatch.title = The details you entered did not match our records
 businessDetailsDoNotMatch.heading = The details you entered did not match our records

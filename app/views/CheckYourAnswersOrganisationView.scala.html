@@ -29,6 +29,14 @@
 
     <p class="govuk-body">@messages("checkYourAnswers.p1.organisation", viewModel.businessName)</p>
 
+    @if(!viewModel.hasRegistered) {
+
+        <h2 class="govuk-heading-m">@messages("checkYourAnswers.businessDetails")</h2>
+
+        @govukSummaryList(viewModel.businessDetailList)
+
+    }
+
     <h2 class="govuk-heading-m">@messages("checkYourAnswers.primaryContact")</h2>
 
     @govukSummaryList(viewModel.primaryContactList)
