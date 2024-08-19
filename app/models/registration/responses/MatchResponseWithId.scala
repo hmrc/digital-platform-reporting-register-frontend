@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 
 final case class MatchResponseWithId(safeId: String,
                                      address: Address,
-                                     organisationName: Option[String]) extends RegistrationResponse
+                                     organisationName: Option[String]) extends MatchResponse
 
 object MatchResponseWithId {
 

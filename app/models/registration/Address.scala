@@ -16,6 +16,7 @@
 
 package models.registration
 
+import models.{BusinessAddress, InternationalAddress, UkAddress}
 import play.api.libs.json.{Json, OFormat}
 
 final case class Address(addressLine1: String,
@@ -28,5 +29,32 @@ final case class Address(addressLine1: String,
 object Address {
 
   implicit lazy val format: OFormat[Address] = Json.format
+
+  def apply(businessAddress: BusinessAddress): Address = Address(
+    addressLine1 = businessAddress.addressLine1,
+    addressLine2 = businessAddress.addressLine2,
+    addressLine3 = Some(businessAddress.city),
+    addressLine4 = businessAddress.region,
+    postalCode = businessAddress.postalCode,
+    countryCode = businessAddress.country.code,
+  )
+
+  def fromUkAddress(address: UkAddress): Address = Address(
+    addressLine1 = address.line1,
+    addressLine2 = address.line2,
+    addressLine3 = Some(address.town),
+    addressLine4 = address.county,
+    postalCode = Some(address.postCode),
+    countryCode = address.country.code
+  )
+
+  def fromInternationalAddress(address: InternationalAddress): Address = Address(
+    addressLine1 = address.line1,
+    addressLine2 = address.line2,
+    addressLine3 = Some(address.city),
+    addressLine4 = address.region,
+    postalCode = address.postal,
+    countryCode = address.country.code
+  )
 }
 

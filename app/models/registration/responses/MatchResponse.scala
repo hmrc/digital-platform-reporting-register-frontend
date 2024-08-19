@@ -16,11 +16,6 @@
 
 package models.registration.responses
 
-import play.api.libs.json.{Json, OFormat}
-
-final case class MatchResponseWithoutId(safeId: String) extends MatchResponse
-
-object MatchResponseWithoutId {
-  
-  implicit lazy val format: OFormat[MatchResponseWithoutId] = Json.format
+trait MatchResponse extends RegistrationResponse {
+  def safeId: String
 }

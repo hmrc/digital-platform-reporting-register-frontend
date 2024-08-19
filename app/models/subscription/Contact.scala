@@ -16,6 +16,7 @@
 
 package models.subscription
 
+import models.{IndividualName, SoleTraderName}
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 
@@ -46,6 +47,16 @@ final case class Individual(firstName: String, lastName: String)
 
 object Individual {
   implicit lazy val format: OFormat[Individual] = Json.format
+
+  def apply(individualName: IndividualName): Individual = Individual(
+    firstName = individualName.firstName,
+    lastName = individualName.lastName
+  )
+
+  def apply(soleTraderName: SoleTraderName): Individual = Individual(
+    firstName = soleTraderName.firstName,
+    lastName = soleTraderName.lastName
+  )
 }
 
 final case class OrganisationContact(organisation: Organisation,

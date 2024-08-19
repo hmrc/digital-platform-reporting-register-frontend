@@ -17,8 +17,10 @@
 @import models.pageviews.CheckYourAnswersIndividualViewModel
 
 @this(
-        layout: templates.Layout,
-        govukSummaryList: GovukSummaryList
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukSummaryList: GovukSummaryList,
+    govukButton: GovukButton
 )
 
 @(viewModel: CheckYourAnswersIndividualViewModel)(implicit request: Request[_], messages: Messages)
@@ -42,4 +44,8 @@
     <h2 class="govuk-heading-m">@messages("checkYourAnswers.h2")</h2>
 
     <p class="govuk-body">@messages("checkYourAnswers.p2")</p>
+
+    @formHelper(action = routes.CheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
+        @govukButton(ButtonViewModel(messages("checkYourAnswers.button")))
+    }
 }

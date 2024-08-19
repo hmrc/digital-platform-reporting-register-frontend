@@ -18,6 +18,10 @@ package models.subscription.responses
 
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
+import uk.gov.hmrc.crypto.Sensitive.SensitiveString
+import uk.gov.hmrc.crypto.json.JsonEncryption
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+
 
 sealed trait SubscriptionResponse
 
@@ -31,6 +35,24 @@ object SubscriptionResponse {
       case x: SubscribedResponse => Json.toJsObject(x)(SubscribedResponse.format)
       case x: AlreadySubscribedResponse => Json.toJsObject(x)(AlreadySubscribedResponse.writes)
     }
+  }
+
+  def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[SubscriptionResponse] = {
+
+    implicit val sensitiveFormat: Format[SensitiveString] =
+      JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)
+
+    val encryptedReads: Reads[SubscriptionResponse] =
+      (__ \ "encrypted").read[SensitiveString].map(x => Json.parse(x.decryptedValue).as[SubscriptionResponse])
+
+    val encryptedWrites: OWrites[SubscriptionResponse] = new OWrites[SubscriptionResponse] {
+      override def writes(o: SubscriptionResponse): JsObject =
+        Json.obj(
+          "encrypted" -> SensitiveString(Json.stringify(Json.toJsObject(o)))
+        )
+    }
+
+    OFormat(encryptedReads, encryptedWrites)
   }
 }
 
