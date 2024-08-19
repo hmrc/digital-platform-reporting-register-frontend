@@ -43,13 +43,12 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
   }
 
   private def showIndividual(implicit request: DataRequest[AnyContent]) = {
-    val viewModel = CheckYourAnswersIndividualViewModel.apply(request.userAnswers)
+    val viewModel = CheckYourAnswersIndividualViewModel(request.userAnswers)
     Ok(individualView(viewModel))
   }
-    
+
   private def showOrganisation(implicit request: DataRequest[AnyContent]) =
-    CheckYourAnswersOrganisationViewModel
-      .apply(request.userAnswers)
+    CheckYourAnswersOrganisationViewModel(request.userAnswers)
       .map(viewModel => Ok(organisationView(viewModel)))
       .getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
 }

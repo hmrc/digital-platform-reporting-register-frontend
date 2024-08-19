@@ -16,16 +16,18 @@
 
 package builders
 
-import models.{Country, InternationalAddress}
+import models.{BusinessAddress, Country}
 
-object InternationalAddressBuilder {
+object BusinessAddressBuilder {
 
-  val anInternationalAddress: InternationalAddress = InternationalAddress(
-    line1 = "default-address-line1",
-    line2 = None,
+  val aBusinessAddress: BusinessAddress = BusinessAddress(
+    addressLine1 = "default-address-line1",
+    addressLine2 = None,
     city = "default-city",
-    region = Some("default-region"),
-    postal = Some("default-postal-code"),
+    region = None,
+    postalCode = None,
     country = Country("US", "United States")
   )
+
+  val anyBusinessAddress: BusinessAddress = aBusinessAddress
 }

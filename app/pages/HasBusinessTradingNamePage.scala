@@ -17,9 +17,11 @@
 package pages
 
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import play.api.libs.json.JsPath
 import play.api.mvc.Call
+
+import scala.util.{Success, Try}
 
 case object HasBusinessTradingNamePage extends QuestionPage[Boolean] {
 
@@ -31,4 +33,16 @@ case object HasBusinessTradingNamePage extends QuestionPage[Boolean] {
     case true => routes.BusinessEnterTradingNameController.onPageLoad(NormalMode)
     case false => routes.BusinessAddressController.onPageLoad(NormalMode)
   }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+
+  override protected def nextPageCheckMode(answers: UserAnswers): Call = answers.get(this).map {
+    case true => answers.get(BusinessEnterTradingNamePage)
+      .map(_ => routes.CheckYourAnswersController.onPageLoad())
+      .getOrElse(routes.BusinessEnterTradingNameController.onPageLoad(CheckMode))
+    case false => routes.CheckYourAnswersController.onPageLoad()
+  }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = value match {
+    case Some(false) => userAnswers.remove(BusinessEnterTradingNamePage)
+    case _ => Success(userAnswers)
+  }
 }
