@@ -21,11 +21,13 @@ import models.registration.Address
 object AddressBuilder {
 
   val anAddress: Address = Address(
-    addressLine1 = "Address line 1",
-    addressLine2 = Some("Address line 2"),
-    addressLine3 = Some("Address line 3"),
-    addressLine4 = Some("Address line 4"),
+    addressLine1 = "default-address-line1",
+    addressLine2 = Some("default-address-line2"),
+    addressLine3 = Some("default-address-line3"),
+    addressLine4 = Some("default-address-line4"),
     postalCode = None,
     countryCode = "UK"
   )
+
+  val anyAddress: Address = anAddress
 }

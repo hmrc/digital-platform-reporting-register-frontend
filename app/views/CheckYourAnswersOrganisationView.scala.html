@@ -29,13 +29,19 @@
 
     <p class="govuk-body">@messages("checkYourAnswers.p1.organisation", viewModel.businessName)</p>
 
+    @viewModel.businessDetails.map { yourDetails =>
+        <h2 class="govuk-heading-m">@messages("checkYourAnswers.h2.organisation")</h2>
+
+        @govukSummaryList(yourDetails)
+    }
+
     <h2 class="govuk-heading-m">@messages("checkYourAnswers.primaryContact")</h2>
 
-    @govukSummaryList(viewModel.primaryContactList)
+    @govukSummaryList(viewModel.primaryContact)
 
     <h2 class="govuk-heading-m">@messages("checkYourAnswers.secondaryContact")</h2>
 
-    @govukSummaryList(viewModel.secondaryContactList)
+    @govukSummaryList(viewModel.secondaryContact)
 
     <h2 class="govuk-heading-m">@messages("checkYourAnswers.h2")</h2>
 

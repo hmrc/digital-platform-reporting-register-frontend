@@ -18,24 +18,36 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.AddressInUkPage
+import pages.BusinessAddressPage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object AddressInUkSummary {
+import scala.language.postfixOps
+
+
+object BusinessAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddressInUkPage).map { answer =>
-      val value = if (answer) "site.yes" else "site.no"
+    answers.get(BusinessAddressPage).map { answer =>
+      val value = Seq(
+        Some(HtmlFormat.escape(answer.addressLine1)),
+        answer.addressLine2.map(HtmlFormat.escape),
+        Some(HtmlFormat.escape(answer.city)),
+        answer.region.map(HtmlFormat.escape),
+        answer.postalCode.map(HtmlFormat.escape),
+        Some(HtmlFormat.escape(answer.country.name))
+      ).flatten.map(_.toString).mkString("<br/>")
 
       SummaryListRowViewModel(
-        key = "addressInUk.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        key = "businessAddress.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(value)),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.AddressInUkController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("addressInUk.change.hidden"))
+          ActionItemViewModel("site.change", routes.BusinessAddressController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("businessAddress.change.hidden"))
         )
       )
     }

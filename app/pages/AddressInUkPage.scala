@@ -35,24 +35,16 @@ case object AddressInUkPage extends QuestionPage[Boolean] {
   }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 
   override protected def nextPageCheckMode(answers: UserAnswers): Call = answers.get(this).map {
-    case true =>
-      if (answers.isDefined(UkAddressPage)) {
-        routes.CheckYourAnswersController.onPageLoad()
-      } else {
-        routes.UkAddressController.onPageLoad(CheckMode)
-      }
-    case false =>
-      if (answers.isDefined(InternationalAddressPage)) {
-        routes.CheckYourAnswersController.onPageLoad()
-      } else {
-        routes.InternationalAddressController.onPageLoad(CheckMode)
-      }
+    case true => answers.get(UkAddressPage)
+      .map(_ => routes.CheckYourAnswersController.onPageLoad())
+      .getOrElse(routes.UkAddressController.onPageLoad(CheckMode))
+    case false => answers.get(InternationalAddressPage)
+      .map(_ => routes.CheckYourAnswersController.onPageLoad())
+      .getOrElse(routes.InternationalAddressController.onPageLoad(CheckMode))
   }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if (value.contains(true)) {
-      userAnswers.remove(InternationalAddressPage)
-    } else {
-      userAnswers.remove(UkAddressPage)
-    }
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] = value match {
+    case Some(true) => userAnswers.remove(InternationalAddressPage)
+    case _ => userAnswers.remove(UkAddressPage)
+  }
 }

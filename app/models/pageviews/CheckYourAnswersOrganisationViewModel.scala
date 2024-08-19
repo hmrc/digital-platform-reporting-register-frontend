@@ -16,42 +16,50 @@
 
 package models.pageviews
 
-import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId}
 import models.UserAnswers
+import models.registration.responses.MatchResponseWithId
 import pages.*
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import viewmodels.checkAnswers.*
-final case class CheckYourAnswersOrganisationViewModel(primaryContactList: SummaryList,
-                                                       secondaryContactList: SummaryList,
+
+final case class CheckYourAnswersOrganisationViewModel(primaryContact: SummaryList,
+                                                       secondaryContact: SummaryList,
+                                                       businessDetails: Option[SummaryList],
                                                        businessName: String)
 
 object CheckYourAnswersOrganisationViewModel {
 
   def apply(answers: UserAnswers)(implicit messages: Messages): Option[CheckYourAnswersOrganisationViewModel] = {
-    def getOrgNameWithoutId = answers.get(BusinessEnterTradingNamePage) orElse answers.get(BusinessNameNoUtrPage)
-
-    val name = answers.registrationResponse.flatMap {
+    val businessName = answers.registrationResponse.flatMap {
       case MatchResponseWithId(_, _, organisationName) => organisationName
-      case MatchResponseWithoutId(_) => getOrgNameWithoutId
       case _ => None
-    } orElse getOrgNameWithoutId orElse answers.get(BusinessNamePage)
+    } orElse answers.get(BusinessNameNoUtrPage)
 
-    val primaryContactList = SummaryList(rows = Seq(
+    val primaryContact = SummaryList(rows = Seq(
       PrimaryContactNameSummary.row(answers),
       PrimaryContactEmailAddressSummary.row(answers),
       CanPhonePrimaryContactSummary.row(answers),
       PrimaryContactPhoneNumberSummary.row(answers)
     ).flatten)
 
-    val secondaryContactList = SummaryList(rows = Seq(
+    val secondaryContact = SummaryList(rows = Seq(
       HasSecondaryContactSummary.row(answers),
       SecondaryContactNameSummary.row(answers),
       SecondaryContactEmailAddressSummary.row(answers),
       CanPhoneSecondaryContactSummary.row(answers),
       SecondaryContactPhoneNumberSummary.row(answers)
     ).flatten)
-    
-    name.map(n => CheckYourAnswersOrganisationViewModel(primaryContactList, secondaryContactList, n))
+
+    val businessDetails = answers.registrationResponse match
+      case Some(value) => None
+      case None => Some(SummaryList(rows = Seq(
+        BusinessNameNoUtrSummary.row(answers),
+        HasBusinessTradingNameSummary.row(answers),
+        BusinessEnterTradingNameSummary.row(answers),
+        BusinessAddressSummary.row(answers)
+      ).flatten))
+
+    businessName.map(CheckYourAnswersOrganisationViewModel(primaryContact, secondaryContact, businessDetails, _))
   }
 }

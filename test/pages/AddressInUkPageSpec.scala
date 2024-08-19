@@ -69,19 +69,19 @@ class AddressInUkPageSpec extends AnyFreeSpec with Matchers with TryValues with 
         }
       }
     }
+  }
 
-    ".cleanup" - {
-      "must remove International address when the answer is yes" in {
-        val initialAnswers = anEmptyAnswer.set(InternationalAddressPage, anInternationalAddress).success.value
-        val result = initialAnswers.set(AddressInUkPage, true).success.value
-        result.get(InternationalAddressPage) must not be defined
-      }
+  ".cleanup" - {
+    "must remove International address when the answer is yes" in {
+      val initialAnswers = anEmptyAnswer.set(InternationalAddressPage, anInternationalAddress).success.value
+      val result = initialAnswers.set(AddressInUkPage, true).success.value
+      result.get(InternationalAddressPage) must not be defined
+    }
 
-      "must not remove UK Address when answer is no" in {
-        val initialAnswers = anEmptyAnswer.set(UkAddressPage, aUkAddress).success.value
-        val result = initialAnswers.set(AddressInUkPage, false).success.value
-        result.get(UkAddressPage) must not be defined
-      }
+    "must not remove UK Address when answer is no" in {
+      val initialAnswers = anEmptyAnswer.set(UkAddressPage, aUkAddress).success.value
+      val result = initialAnswers.set(AddressInUkPage, false).success.value
+      result.get(UkAddressPage) must not be defined
     }
   }
 }
