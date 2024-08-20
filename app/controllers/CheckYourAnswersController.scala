@@ -17,22 +17,37 @@
 package controllers
 
 import com.google.inject.Inject
+import connectors.{RegistrationConnector, SubscriptionConnector}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.BusinessType.*
+import models.{NormalMode, UserAnswers}
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
+import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
+import models.registration.responses as registrationResponses
+import models.registration.responses.RegistrationResponse
 import models.requests.DataRequest
-import pages.BusinessTypePage
+import models.subscription.requests.SubscriptionRequest
+import models.subscription.responses as subscriptionResponses
+import models.subscription.responses.SubscriptionResponse
+import pages.{BusinessTypePage, CheckYourAnswersPage}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.libs.json.Json
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.{CheckYourAnswersIndividualView, CheckYourAnswersOrganisationView}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            getData: DataRetrievalAction,
                                            requireData: DataRequiredAction,
                                            individualView: CheckYourAnswersIndividualView,
-                                           organisationView: CheckYourAnswersOrganisationView)
-                                          (implicit mcc: MessagesControllerComponents)
+                                           organisationView: CheckYourAnswersOrganisationView,
+                                           registrationConnector: RegistrationConnector,
+                                           subscriptionConnector: SubscriptionConnector,
+                                           sessionRepository: SessionRepository)
+                                          (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
@@ -41,6 +56,59 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       case _ => showOrganisation(implicitly)
     }.getOrElse(showOrganisation(implicitly))
   }
+
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    getRegistrationResponse(request.userAnswers).flatMap {
+      case response: registrationResponses.AlreadySubscribedResponse =>
+        val answersWithRegistration = request.userAnswers.copy(registrationResponse = Some(response))
+        Future.successful(Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithRegistration)))
+
+      case _: registrationResponses.NoMatchResponse =>
+        Future.failed(new Exception("Registration response is No Match")) //TODO: Improve this exception
+
+      case matchResponse: registrationResponses.MatchResponse =>
+        val answersWithRegistration = request.userAnswers.copy(registrationResponse = Some(matchResponse))
+
+        subscribe(matchResponse.safeId, answersWithRegistration).flatMap { subscriptionResponse =>
+          val answersWithSubscription =
+            answersWithRegistration.copy(
+              subscriptionResponse = Some(subscriptionResponse),
+              data = Json.obj()
+            )
+
+          sessionRepository.set(answersWithSubscription).map { _ =>
+            Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithSubscription))
+          }
+        }
+    }
+  }
+
+  private def getRegistrationResponse(answers: UserAnswers)(implicit request: Request[_]): Future[RegistrationResponse] =
+    answers.registrationResponse
+      .map(x => Future.successful(x))
+      .getOrElse {
+        answers.get(BusinessTypePage).map {
+          case Individual | SoleTrader =>
+            IndividualWithoutId.build(answers)
+              .fold(
+                errors => Future.failed(Exception(s"Unable to build a registration request for an individual, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
+                request => registrationConnector.register(request)
+              )
+          case _ =>
+            OrganisationWithoutId.build(answers)
+              .fold(
+                errors => Future.failed(Exception(s"Unable to build a registration request for an organisation, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
+                request => registrationConnector.register(request)
+              )
+        }.getOrElse(Future.failed(Exception("Could not find an answer for BusinessType when trying to build a registration request")))
+      }
+
+  private def subscribe(safeId: String, answers: UserAnswers)(implicit request: Request[_]): Future[SubscriptionResponse] =
+    SubscriptionRequest.build(safeId, answers)
+      .fold(
+        errors => Future.failed(Exception(s"Unable to build a subscription request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
+        request => subscriptionConnector.subscribe(request)
+      )
 
   private def showIndividual(implicit request: DataRequest[AnyContent]) = {
     val viewModel = CheckYourAnswersIndividualViewModel(request.userAnswers)

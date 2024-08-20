@@ -18,7 +18,9 @@
 
 @this(
     layout: templates.Layout,
-    govukSummaryList: GovukSummaryList
+    formHelper: FormWithCSRF,
+    govukSummaryList: GovukSummaryList,
+    govukButton: GovukButton
 )
 
 @(viewModel: CheckYourAnswersOrganisationViewModel)(implicit request: Request[_], messages: Messages)
@@ -46,5 +48,9 @@
     <h2 class="govuk-heading-m">@messages("checkYourAnswers.h2")</h2>
 
     <p class="govuk-body">@messages("checkYourAnswers.p2")</p>
+
+    @formHelper(action = routes.CheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
+        @govukButton(ButtonViewModel(messages("checkYourAnswers.button")))
+    }
 }
 

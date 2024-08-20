@@ -16,8 +16,13 @@
 
 package models.registration.requests
 
+import cats.data.*
+import cats.implicits.*
+import models.UserAnswers
 import models.registration.Address
+import pages.{AddressInUkPage, DateOfBirthPage, IndividualNamePage, InternationalAddressPage, UkAddressPage}
 import play.api.libs.json.{Json, OWrites}
+import queries.Query
 
 import java.time.LocalDate
 
@@ -32,4 +37,19 @@ final case class IndividualWithoutId(
 object IndividualWithoutId {
   
   implicit lazy val writes: OWrites[IndividualWithoutId] = Json.writes
+
+  def build(answers: UserAnswers): EitherNec[Query, IndividualWithoutId] =
+    (
+      answers.getEither(IndividualNamePage),
+      answers.getEither(DateOfBirthPage),
+      getAddress(answers)
+    ).parMapN { (name, dateOfBirth, address) =>
+      IndividualWithoutId(name.firstName, name.lastName, dateOfBirth, address)
+    }
+
+  private def getAddress(answers: UserAnswers): EitherNec[Query, Address] =
+    answers.getEither(AddressInUkPage).flatMap {
+      case true => answers.getEither(UkAddressPage).map(Address.fromUkAddress)
+      case false => answers.getEither(InternationalAddressPage).map(Address.fromInternationalAddress)
+    }
 }

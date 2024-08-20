@@ -16,12 +16,25 @@
 
 package models.registration.requests
 
+import cats.data.*
+import cats.implicits.*
 import models.registration.Address
+import models.{BusinessAddress, UserAnswers}
+import pages.{BusinessAddressPage, BusinessNameNoUtrPage}
 import play.api.libs.json.{Json, OWrites}
+import queries.Query
 
 final case class OrganisationWithoutId(name: String, address: Address) extends RegistrationRequest
 
 object OrganisationWithoutId {
-  
+
   implicit lazy val writes: OWrites[OrganisationWithoutId] = Json.writes
+
+  def build(answers: UserAnswers): EitherNec[Query, OrganisationWithoutId] =
+    (
+      answers.getEither(BusinessNameNoUtrPage),
+      answers.getEither(BusinessAddressPage)
+    ).parMapN { (name, businessAddress) =>
+      OrganisationWithoutId(name, Address(businessAddress))
+    }
 }
