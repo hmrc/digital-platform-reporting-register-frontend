@@ -19,12 +19,13 @@ package models.pageviews
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.RegistrationConfirmationFormProvider
 import models.RegistrationType.ThirdParty
+import models.subscription.requests.SubscriptionRequest
 import models.subscription.responses.SubscribedResponse
-import models.{NormalMode, RegistrationType, UserAnswers}
-import org.scalatest.TryValues.convertTryToSuccessOrFailure
+import models.subscription.{Individual, IndividualContact}
+import models.{IndividualName, NormalMode, RegistrationType, SubscriptionDetails, UserAnswers}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import pages.{PrimaryContactEmailAddressPage, RegistrationConfirmationPage, RegistrationTypePage, SecondaryContactEmailAddressPage}
+import pages.RegistrationConfirmationPage
 
 trait SetupForRegistrationConfirmation {
   protected lazy val fakeAnswers: UserAnswers =
@@ -36,16 +37,26 @@ trait SetupForRegistrationConfirmation {
                               secondaryEmail: Option[String],
                               registrationType: RegistrationType
                             ): UserAnswers = {
-    val answers = anEmptyAnswer.copy(subscriptionResponse = Some(SubscribedResponse(dprsUserId)))
-      .set(PrimaryContactEmailAddressPage, primaryEmail).success.value
-      .set(RegistrationTypePage, registrationType).success.value
-
-    secondaryEmail.map(
-      answers.set(SecondaryContactEmailAddressPage, _).success.value
-    ).getOrElse(
-      answers
+    anEmptyAnswer.copy(
+      subscriptionDetails = Some(SubscriptionDetails(
+        subscriptionResponse = SubscribedResponse(dprsUserId),
+        subscriptionRequest = SubscriptionRequest(
+          "",
+          false,
+          None,
+          getContact(primaryEmail),
+          secondaryEmail.map(e => getContact(e))
+        ),
+        registrationType = registrationType
+      ))
     )
   }
+
+  private def getContact(email: String) = IndividualContact(
+    Individual(IndividualName("", "")),
+    email,
+    None
+  )
 }
 
 class RegistrationConfirmationViewModelSpec extends AnyFreeSpec with Matchers with SetupForRegistrationConfirmation {

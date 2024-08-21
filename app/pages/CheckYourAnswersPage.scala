@@ -20,8 +20,7 @@ import controllers.routes
 import models.BusinessType.{Individual, SoleTrader}
 import models.registration.responses as registrationResponses
 import models.subscription.responses as subscriptionResponses
-import models.{SubscriptionDetails, UserAnswers}
-import models.{NormalMode, UserAnswers}
+import models.{NormalMode, SubscriptionDetails, UserAnswers}
 import play.api.mvc.Call
 
 case object CheckYourAnswersPage extends Page {

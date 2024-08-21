@@ -31,7 +31,7 @@ class RegistrationConfirmationPageSpec extends SpecBase {
         RegistrationConfirmationPage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
       }
       "must go to Index if answer is false" in {
-        val answers = anEmptyAnswer.set(RegistrationConfirmationPage, true).success.value
+        val answers = anEmptyAnswer.set(RegistrationConfirmationPage, false).success.value
         RegistrationConfirmationPage.nextPage(NormalMode, answers) mustEqual routes.IndexController.onPageLoad()
       }
       "must go to error page if answer absent" in {

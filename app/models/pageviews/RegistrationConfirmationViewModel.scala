@@ -17,10 +17,11 @@
 package models.pageviews
 
 import models.RegistrationType.ThirdParty
-import models.{Mode, UserAnswers}
-import pages.{IndividualEmailAddressPage, PrimaryContactEmailAddressPage, RegistrationConfirmationPage, RegistrationTypePage, SecondaryContactEmailAddressPage}
-import play.api.data.Form
 import models.subscription.responses.{AlreadySubscribedResponse, SubscribedResponse, SubscriptionResponse}
+import models.subscription.{Contact, IndividualContact, OrganisationContact}
+import models.{Mode, UserAnswers}
+import pages.*
+import play.api.data.Form
 
 case class RegistrationConfirmationViewModel(
                                               mode: Mode,
@@ -35,9 +36,14 @@ case class RegistrationConfirmationViewModel(
 object RegistrationConfirmationViewModel {
 
   def apply(mode: Mode, userAnswers: UserAnswers, form: Form[Boolean], isPrivateBeta: Boolean): Option[RegistrationConfirmationViewModel] = {
-    val dprsUserId = userAnswers.subscriptionResponse match {
-      case Some(value) => value match {
-        case SubscribedResponse(dprsId) => Some(dprsId)
+    val details = userAnswers.subscriptionDetails
+
+    val subscriptionRequest = details.map(_.subscriptionRequest)
+    val subscriptionResponse = details.map(_.subscriptionResponse)
+
+    val dprsUserId = subscriptionResponse match {
+      case Some(response) => response match {
+        case SubscribedResponse(dprsUserId) => Some(dprsUserId)
         case AlreadySubscribedResponse() => None
       }
       case None => None
@@ -45,10 +51,9 @@ object RegistrationConfirmationViewModel {
 
     dprsUserId.map { dprsUserId =>
       val optAnswerValue = userAnswers.get(RegistrationConfirmationPage)
-      val primaryEmail = userAnswers.get(PrimaryContactEmailAddressPage)
-        .fold(userAnswers.get(IndividualEmailAddressPage).getOrElse(""))(identity)
-      val secondaryEmail = userAnswers.get(SecondaryContactEmailAddressPage)
-      val isThirdParty = userAnswers.get(RegistrationTypePage).contains(ThirdParty)
+      val primaryEmail = subscriptionRequest.flatMap(r => getEmail(Some(r.primaryContact))).getOrElse("")
+      val secondaryEmail = subscriptionRequest.flatMap(r => getEmail(r.secondaryContact))
+      val isThirdParty = details.map(_.registrationType).contains(ThirdParty)
 
       RegistrationConfirmationViewModel(
         mode = mode,
@@ -61,4 +66,10 @@ object RegistrationConfirmationViewModel {
       )
     }
   }
+  
+  private def getEmail(contact: Option[Contact]): Option[String] =
+    contact.map {
+      case IndividualContact(_, email, _) => email
+      case OrganisationContact(_, email, _) => email
+    }
 }
