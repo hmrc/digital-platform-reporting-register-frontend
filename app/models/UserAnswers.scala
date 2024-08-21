@@ -19,7 +19,6 @@ package models
 import cats.data.{EitherNec, NonEmptyChain}
 import cats.implicits.*
 import models.registration.responses.RegistrationResponse
-import models.subscription.responses.SubscriptionResponse
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 import queries.{Gettable, Query, Settable}
@@ -34,7 +33,7 @@ import scala.util.{Failure, Success, Try}
 final case class UserAnswers(id: String,
                              taxIdentifier: Option[TaxIdentifier],
                              registrationResponse: Option[RegistrationResponse] = None,
-                             subscriptionResponse: Option[SubscriptionResponse] = None,
+                             subscriptionDetails: Option[SubscriptionDetails] = None,
                              data: JsObject = Json.obj(),
                              lastUpdated: Instant = Instant.now) {
 
@@ -87,7 +86,7 @@ object UserAnswers {
       (
         (__ \ "_id").read[String] and
           (__ \ "registrationResponse").readNullable[RegistrationResponse](RegistrationResponse.encryptedFormat) and
-          (__ \ "subscriptionResponse").readNullable[SubscriptionResponse](SubscriptionResponse.encryptedFormat) and
+          (__ \ "subscriptionDetails").readNullable[SubscriptionDetails](SubscriptionDetails.encryptedFormat) and
           (__ \ "data").read[SensitiveString] and
           (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
         )((id, registrationResponse, subscriptionResponse, data, lastUpdated) =>
@@ -98,10 +97,10 @@ object UserAnswers {
       (
         (__ \ "_id").write[String] and
           (__ \ "registrationResponse").writeNullable[RegistrationResponse](RegistrationResponse.encryptedFormat) and
-          (__ \ "subscriptionResponse").writeNullable[SubscriptionResponse](SubscriptionResponse.encryptedFormat) and
+          (__ \ "subscriptionDetails").writeNullable[SubscriptionDetails](SubscriptionDetails.encryptedFormat) and
           (__ \ "data").write[SensitiveString] and
           (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-        )(ua => (ua.id, ua.registrationResponse, ua.subscriptionResponse, SensitiveString(Json.stringify(ua.data)), ua.lastUpdated))
+        )(ua => (ua.id, ua.registrationResponse, ua.subscriptionDetails, SensitiveString(Json.stringify(ua.data)), ua.lastUpdated))
 
     OFormat(encryptedReads, encryptedWrites)
   }
@@ -113,7 +112,7 @@ object UserAnswers {
     (
       (__ \ "_id").read[String] and
         (__ \ "registrationResponse").readNullable[RegistrationResponse] and
-        (__ \ "subscriptionResponse").readNullable[SubscriptionResponse] and
+        (__ \ "subscriptionDetails").readNullable[SubscriptionDetails] and
         (__ \ "data").read[JsObject] and
         (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
       )(UserAnswers.apply(_, None, _, _, _, _))
@@ -126,10 +125,10 @@ object UserAnswers {
     (
       (__ \ "_id").write[String] and
         (__ \ "registrationResponse").writeNullable[RegistrationResponse] and
-        (__ \ "subscriptionResponse").writeNullable[SubscriptionResponse] and
+        (__ \ "subscriptionDetails").writeNullable[SubscriptionDetails] and
         (__ \ "data").write[JsObject] and
         (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-      )(ua => (ua.id, ua.registrationResponse, ua.subscriptionResponse, ua.data, ua.lastUpdated))
+      )(ua => (ua.id, ua.registrationResponse, ua.subscriptionDetails, ua.data, ua.lastUpdated))
   }
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)

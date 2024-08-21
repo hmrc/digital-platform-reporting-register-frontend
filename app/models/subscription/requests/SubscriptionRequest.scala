@@ -32,7 +32,7 @@ final case class SubscriptionRequest(safeId: String,
                                      secondaryContact: Option[Contact])
 
 object SubscriptionRequest {
-  implicit lazy val writes: OWrites[SubscriptionRequest] = Json.format
+  implicit lazy val format: OFormat[SubscriptionRequest] = Json.format
 
   def build(safeId: String, answers: UserAnswers): EitherNec[Query, SubscriptionRequest] =
     (
