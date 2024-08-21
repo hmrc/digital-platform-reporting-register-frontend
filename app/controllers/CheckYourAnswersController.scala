@@ -20,15 +20,13 @@ import com.google.inject.Inject
 import connectors.{RegistrationConnector, SubscriptionConnector}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.BusinessType.*
-import models.{NormalMode, RegistrationType, SubscriptionDetails, UserAnswers}
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
 import models.registration.responses as registrationResponses
 import models.registration.responses.RegistrationResponse
 import models.requests.DataRequest
 import models.subscription.requests.SubscriptionRequest
-import models.subscription.responses as subscriptionResponses
-import models.subscription.responses.SubscriptionResponse
+import models.{NormalMode, RegistrationType, SubscriptionDetails, UserAnswers}
 import pages.{BusinessTypePage, CheckYourAnswersPage, RegistrationTypePage}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json

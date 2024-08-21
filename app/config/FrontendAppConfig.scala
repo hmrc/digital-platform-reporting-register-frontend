@@ -54,4 +54,6 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
   val dataEncryptionEnabled: Boolean = configuration.get[Boolean]("features.use-encryption")
+
+  val isPrivateBeta: Boolean = configuration.getOptional("features.private-beta").getOrElse(false)
 }
