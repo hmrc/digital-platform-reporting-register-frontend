@@ -397,7 +397,7 @@ hasBusinessTradingName.error.required = Select yes if your business trades under
 
 businessEnterTradingName.title = What is the trading name of your business?
 businessEnterTradingName.heading = What is the trading name of your business?
-businessEnterTradingName.checkYourAnswersLabel = Business trading name
+businessEnterTradingName.checkYourAnswersLabel = Trading name
 businessEnterTradingName.change.hidden = your trading name
 businessEnterTradingName.error.required = Enter your trading name
 businessEnterTradingName.error.length = Trading name must be 80 characters or less
