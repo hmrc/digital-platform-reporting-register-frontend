@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import connectors.{RegistrationConnector, SubscriptionConnector}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.BusinessType.*
-import models.{NormalMode, UserAnswers}
+import models.{NormalMode, RegistrationType, SubscriptionDetails, UserAnswers}
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
 import models.registration.responses as registrationResponses
@@ -29,7 +29,7 @@ import models.requests.DataRequest
 import models.subscription.requests.SubscriptionRequest
 import models.subscription.responses as subscriptionResponses
 import models.subscription.responses.SubscriptionResponse
-import pages.{BusinessTypePage, CheckYourAnswersPage}
+import pages.{BusinessTypePage, CheckYourAnswersPage, RegistrationTypePage}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -64,15 +64,15 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
         Future.successful(Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithRegistration)))
 
       case _: registrationResponses.NoMatchResponse =>
-        Future.failed(new Exception("Registration response is No Match")) //TODO: Improve this exception
+        Future.failed(new Exception("Registration response is No Match"))
 
       case matchResponse: registrationResponses.MatchResponse =>
         val answersWithRegistration = request.userAnswers.copy(registrationResponse = Some(matchResponse))
 
-        subscribe(matchResponse.safeId, answersWithRegistration).flatMap { subscriptionResponse =>
+        subscribe(matchResponse.safeId, answersWithRegistration).flatMap { subscriptionDetails =>
           val answersWithSubscription =
             answersWithRegistration.copy(
-              subscriptionResponse = Some(subscriptionResponse),
+              subscriptionDetails = Some(subscriptionDetails),
               data = Json.obj()
             )
 
@@ -103,11 +103,17 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
         }.getOrElse(Future.failed(Exception("Could not find an answer for BusinessType when trying to build a registration request")))
       }
 
-  private def subscribe(safeId: String, answers: UserAnswers)(implicit request: Request[_]): Future[SubscriptionResponse] =
+  private def subscribe(safeId: String, answers: UserAnswers)(implicit request: Request[_]): Future[SubscriptionDetails] =
     SubscriptionRequest.build(safeId, answers)
       .fold(
         errors => Future.failed(Exception(s"Unable to build a subscription request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
-        request => subscriptionConnector.subscribe(request)
+        request =>
+          subscriptionConnector
+            .subscribe(request)
+            .map { response =>
+              val registrationType = answers.get(RegistrationTypePage).getOrElse(RegistrationType.ThirdParty)
+              SubscriptionDetails(response, request, registrationType)
+            }
       )
 
   private def showIndividual(implicit request: DataRequest[AnyContent]) = {

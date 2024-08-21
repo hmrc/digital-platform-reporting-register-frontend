@@ -24,7 +24,7 @@ import builders.UkAddressBuilder.aUkAddress
 import builders.UserAnswersBuilder.aUserAnswers
 import connectors.{RegistrationConnector, SubscriptionConnector}
 import models.BusinessType.*
-import models.{BusinessType, IndividualName, NormalMode, SoleTraderName}
+import models.{BusinessType, IndividualName, NormalMode, RegistrationType, SoleTraderName, SubscriptionDetails}
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.Address
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
@@ -203,6 +203,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
           val answers =
             emptyUserAnswers
               .copy(registrationResponse = Some(registrationResponse))
+              .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
               .set(BusinessTypePage, BusinessType.SoleTrader).success.value
               .set(RegisteredInUkPage, true).success.value
               .set(IndividualEmailAddressPage, "email").success.value
@@ -212,7 +213,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
           val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "email", None)
           val expectedSubscriptionRequest = SubscriptionRequest("safeId", true, None, expectedContact, None)
           val subscriptionResponse = SubscribedResponse("dprsId")
-          val expectedFinalAnswers = answers.copy(data = Json.obj(), subscriptionResponse = Some(subscriptionResponse))
+          val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.PlatformOperator)
+          val expectedFinalAnswers = answers.copy(data = Json.obj(), subscriptionDetails = Some(subscriptionDetails))
 
           when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionResponse))
           when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
@@ -325,10 +327,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "email", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
               val subscriptionResponse = SubscribedResponse("dprsId")
+              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty)
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),
-                subscriptionResponse = Some(subscriptionResponse)
+                subscriptionDetails = Some(subscriptionDetails)
               )
 
               when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
@@ -457,10 +460,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               val expectedContact = OrganisationContact(models.subscription.Organisation("contact name"), "email", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
               val subscriptionResponse = SubscribedResponse("dprsId")
+              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty)
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),
-                subscriptionResponse = Some(subscriptionResponse)
+                subscriptionDetails = Some(subscriptionDetails)
               )
 
               when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
