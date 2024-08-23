@@ -35,7 +35,7 @@ case object CheckYourAnswersPage extends Page {
 
       case _ =>
         answers.subscriptionDetails.map {
-          case SubscriptionDetails(subscriptionResponses.AlreadySubscribedResponse(), _, _) =>
+          case SubscriptionDetails(subscriptionResponses.AlreadySubscribedResponse(), _, _, _) =>
             alreadySubscribedRoute(answers)
 
           case _ =>
@@ -44,8 +44,12 @@ case object CheckYourAnswersPage extends Page {
     }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 
   private def alreadySubscribedRoute(answers: UserAnswers): Call =
-    answers.get(BusinessTypePage).map {
-      case Individual | SoleTrader => routes.IndividualAlreadyRegisteredController.onPageLoad()
-      case _ => routes.BusinessAlreadyRegisteredController.onPageLoad()
-    }.getOrElse(routes.BusinessAlreadyRegisteredController.onPageLoad())
+    answers.subscriptionDetails match {
+      case Some(details) =>
+        details.businessType.map {
+          case Individual | SoleTrader => routes.IndividualAlreadyRegisteredController.onPageLoad()
+          case _ => routes.BusinessAlreadyRegisteredController.onPageLoad()
+        }.getOrElse(routes.BusinessAlreadyRegisteredController.onPageLoad())
+      case None => routes.JourneyRecoveryController.onPageLoad()
+    }
 }

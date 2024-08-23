@@ -110,7 +110,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
             .subscribe(request)
             .map { response =>
               val registrationType = answers.get(RegistrationTypePage).getOrElse(RegistrationType.ThirdParty)
-              SubscriptionDetails(response, request, registrationType)
+              SubscriptionDetails(response, request, registrationType, answers.get(BusinessTypePage))
             }
       )
 

@@ -47,7 +47,8 @@ trait SetupForRegistrationConfirmation {
           getContact(primaryEmail),
           secondaryEmail.map(e => getContact(e))
         ),
-        registrationType = registrationType
+        registrationType = registrationType,
+        businessType = None
       ))
     )
   }

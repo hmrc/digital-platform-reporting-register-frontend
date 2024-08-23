@@ -22,12 +22,9 @@ import models.NormalMode
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.SecondaryContactPhoneNumberPage
-import play.api.i18n.Messages
-import play.api.test.Helpers.stubMessages
 
 class SecondaryContactPhoneNumberViewModelSpec extends AnyFreeSpec with Matchers {
 
-  private implicit val msgs: Messages = stubMessages()
   private val anyName = "name"
   private val anyMode = NormalMode
   private val formProvider = new SecondaryContactPhoneNumberFormProvider()

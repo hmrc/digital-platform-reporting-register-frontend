@@ -26,7 +26,8 @@ import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 final case class SubscriptionDetails(subscriptionResponse: SubscriptionResponse,
                                      subscriptionRequest: SubscriptionRequest,
-                                     registrationType: RegistrationType)
+                                     registrationType: RegistrationType,
+                                     businessType: Option[BusinessType])
 
 object SubscriptionDetails {
 
