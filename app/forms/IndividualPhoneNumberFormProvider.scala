@@ -16,18 +16,19 @@
 
 package forms
 
-import forms.common.PhoneNumberMapping
+import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.i18n.Messages
 
 import javax.inject.Inject
 
-class IndividualPhoneNumberFormProvider @Inject() extends PhoneNumberMapping {
+class IndividualPhoneNumberFormProvider @Inject() extends Mappings {
 
   def apply()(implicit messages: Messages): Form[String] = Form(
-    "value" -> phoneNumber(
-      requiredKey = "individualPhoneNumber.error.required",
-      formatKey = "individualPhoneNumber.error.format"
-    )
+    "value" -> text("individualPhoneNumber.error.required")
+      .verifying(firstError(
+        maxLength(24, "individualPhoneNumber.error.length"),
+        validPhoneNumber("individualPhoneNumber.error.format")
+      ))
   )
 }

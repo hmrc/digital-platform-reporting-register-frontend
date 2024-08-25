@@ -26,6 +26,7 @@ class IndividualPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
   private implicit val msgs: Messages = stubMessages()
   private val requiredKey = "individualPhoneNumber.error.required"
+  val lengthKey = "individualPhoneNumber.error.length"
   private val formatKey = "individualPhoneNumber.error.format"
 
   private val underTest = new IndividualPhoneNumberFormProvider()()
@@ -47,6 +48,11 @@ class IndividualPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
     "must fail to bind an invalid phone number" in {
       underTest.bind(Map(fieldName -> "invalid")).error("value").value.message mustEqual formatKey
+    }
+
+    "must fail to bind phone numbers longer than 24 characters" in {
+      val result = underTest.bind(Map(fieldName -> "+44 7777 777777 ext. 1234"))
+      result.error("value").value.message mustEqual lengthKey
     }
   }
 }
