@@ -17,12 +17,13 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import forms.common.Validation
 import play.api.data.FormError
 
 class UkPostCodeFormProviderSpec extends StringFieldBehaviours {
 
   private val requiredKey = "ukPostCode.error.required"
-  private val lengthKey = "ukPostCode.error.length"
+  private val formatKey = "ukPostCode.error.format"
   private val maxLength = 8
 
   private val form = new UkPostCodeFormProvider()()
@@ -33,14 +34,14 @@ class UkPostCodeFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      ukPostcodeGen
     )
 
-    behave like fieldWithMaxLength(
+    behave like fieldThatDoesNotBindInvalidData(
       form,
       fieldName,
-      maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.ukPostcodePattern.toString))
     )
 
     behave like mandatoryField(

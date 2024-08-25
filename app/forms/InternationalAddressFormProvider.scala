@@ -16,11 +16,12 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.common.Validation
 
+import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import models.{Country, InternationalAddress}
 
 class InternationalAddressFormProvider @Inject() extends Mappings {
@@ -28,16 +29,31 @@ class InternationalAddressFormProvider @Inject() extends Mappings {
    def apply(): Form[InternationalAddress] = Form(
      mapping(
       "line1" -> text("internationalAddress.error.line1.required")
-        .verifying(maxLength(35, "internationalAddress.error.line1.length")),
+        .verifying(firstError(
+          maxLength(35, "internationalAddress.error.line1.length"),
+          regexp(Validation.textInputPattern.toString, "internationalAddress.error.line1.format")
+        )),
       "line2" -> optional(text("")
-        .verifying(maxLength(35, "internationalAddress.error.line2.length"))),
+        .verifying(firstError(
+          maxLength(35, "internationalAddress.error.line2.length"),
+          regexp(Validation.textInputPattern.toString, "internationalAddress.error.line2.format")
+        ))),
       "city" -> text("internationalAddress.error.city.required")
-        .verifying(maxLength(35, "internationalAddress.error.city.length")),
-       "region" -> optional(text("")
-         .verifying(maxLength(35, "internationalAddress.error.region.length"))),
-       "postal" -> optional(text("")
-         .verifying(maxLength(10, "internationalAddress.error.postal.length"))),
-       "country" -> text("internationalAddress.error.country.required")
+        .verifying(firstError(
+          maxLength(35, "internationalAddress.error.city.length"),
+          regexp(Validation.textInputPattern.toString, "internationalAddress.error.city.format")
+        )),
+      "region" -> optional(text("")
+        .verifying(firstError(
+          maxLength(35, "internationalAddress.error.region.length"),
+          regexp(Validation.textInputPattern.toString, "internationalAddress.error.region.format")
+        ))),
+      "postal" -> optional(text("")
+        .verifying(firstError(
+          maxLength(10, "internationalAddress.error.postal.length"),
+          regexp(Validation.textInputPattern.toString, "internationalAddress.error.postal.format")
+        ))),
+      "country" -> text("internationalAddress.error.country.required")
          .verifying("internationalAddress.error.country.required", value => Country.internationalCountries.exists(_.code == value))
          .transform[Country](value => Country.internationalCountries.find(_.code == value).get, _.code)
     )(InternationalAddress.apply)(x => Some((x.line1, x.line2, x.city, x.region, x.postal, x.country)))

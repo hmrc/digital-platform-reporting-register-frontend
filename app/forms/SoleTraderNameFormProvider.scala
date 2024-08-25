@@ -16,11 +16,12 @@
 
 package forms
 
-import javax.inject.Inject
+import forms.common.Validation
 
+import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
-import play.api.data.Forms._
+import play.api.data.Forms.*
 import models.SoleTraderName
 
 class SoleTraderNameFormProvider @Inject() extends Mappings {
@@ -28,9 +29,15 @@ class SoleTraderNameFormProvider @Inject() extends Mappings {
    def apply(): Form[SoleTraderName] = Form(
      mapping(
       "firstName" -> text("soleTraderName.error.firstName.required")
-        .verifying(maxLength(35, "soleTraderName.error.firstName.length")),
+        .verifying(firstError(
+          maxLength(35, "soleTraderName.error.firstName.length"),
+          regexp(Validation.textInputPattern.toString, "soleTraderName.error.firstName.format")
+        )),
       "lastName" -> text("soleTraderName.error.lastName.required")
-        .verifying(maxLength(35, "soleTraderName.error.lastName.length"))
+        .verifying(firstError(
+          maxLength(35, "soleTraderName.error.lastName.length"),
+          regexp(Validation.textInputPattern.toString, "soleTraderName.error.lastName.format")
+        ))
     )(SoleTraderName.apply)(x => Some((x.firstName, x.lastName)))
    )
  }

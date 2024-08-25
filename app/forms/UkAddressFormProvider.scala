@@ -16,7 +16,7 @@
 
 package forms
 
-import forms.common.UkPostCode
+import forms.common.{UkPostCode, Validation}
 import models.{Country, UkAddress}
 import play.api.data.Form
 import play.api.data.Forms.*
@@ -28,14 +28,26 @@ class UkAddressFormProvider @Inject() extends UkPostCode {
   def apply(): Form[UkAddress] = Form(
     mapping(
       "line1" -> text("ukAddress.error.line1.required")
-        .verifying(maxLength(35, "ukAddress.error.line1.length")),
+        .verifying(firstError(
+          maxLength(35, "ukAddress.error.line1.length"),
+          regexp(Validation.textInputPattern.toString, "ukAddress.error.line1.format")
+        )),
       "line2" -> optional(text("")
-        .verifying(maxLength(35, "ukAddress.error.line2.length"))),
+        .verifying(firstError(
+          maxLength(35, "ukAddress.error.line2.length"),
+          regexp(Validation.textInputPattern.toString, "ukAddress.error.line2.format")
+        ))),
       "town" -> text("ukAddress.error.town.required")
-        .verifying(maxLength(35, "ukAddress.error.town.length")),
+        .verifying(firstError(
+          maxLength(35, "ukAddress.error.town.length"),
+          regexp(Validation.textInputPattern.toString, "ukAddress.error.town.format")
+        )),
       "county" -> optional(text("")
-        .verifying(maxLength(35, "ukAddress.error.county.length"))),
-      "postCode" -> ukPostCode("ukAddress.error.postCode.required", "ukAddress.error.postCode.length"),
+        .verifying(firstError(
+          maxLength(35, "ukAddress.error.county.length"),
+          regexp(Validation.textInputPattern.toString, "ukAddress.error.county.format")
+        ))),
+      "postCode" -> ukPostCode("ukAddress.error.postCode.required", "ukAddress.error.postCode.format"),
       "country" -> text("ukAddress.error.country.required")
         .verifying("ukAddress.error.country.required", value => Country.ukCountries.exists(_.code == value))
         .transform[Country](value => Country.ukCountries.find(_.code == value).get, _.code)

@@ -25,6 +25,6 @@ class UkPostCodeFormProvider @Inject() extends UkPostCode {
 
   def apply(): Form[String] =
     Form(
-      "value" -> ukPostCode("ukPostCode.error.required", "ukPostCode.error.length")
+      "value" -> ukPostCode("ukPostCode.error.required", "ukPostCode.error.format")
     )
 }

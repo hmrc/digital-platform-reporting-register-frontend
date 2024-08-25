@@ -17,12 +17,14 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import forms.common.Validation
 import play.api.data.FormError
 
 class BusinessEnterTradingNameFormProviderSpec extends StringFieldBehaviours {
 
   private val requiredKey = "businessEnterTradingName.error.required"
   private val lengthKey = "businessEnterTradingName.error.length"
+  private val formatKey = "businessEnterTradingName.error.format"
   private val maxLength = 80
 
   private val underTest = new BusinessEnterTradingNameFormProvider()()
@@ -33,7 +35,14 @@ class BusinessEnterTradingNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       underTest,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      underTest,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(

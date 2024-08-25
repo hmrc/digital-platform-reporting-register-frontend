@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.common.Validation
 import forms.mappings.Mappings
 import models.{BusinessAddress, Country}
 import play.api.data.Form
@@ -28,15 +29,30 @@ class BusinessAddressFormProvider @Inject() extends Mappings {
   def apply(): Form[BusinessAddress] = Form(
     mapping(
       "addressLine1" -> text("businessAddress.error.addressLine1.required")
-        .verifying(maxLength(35, "businessAddress.error.addressLine1.length")),
+        .verifying(firstError(
+          maxLength(35, "businessAddress.error.addressLine1.length"),
+          regexp(Validation.textInputPattern.toString, "businessAddress.error.addressLine1.format")
+        )),
       "addressLine2" -> optional(text("")
-        .verifying(maxLength(35, "businessAddress.error.addressLine2.length"))),
+        .verifying(firstError(
+          maxLength(35, "businessAddress.error.addressLine2.length"),
+          regexp(Validation.textInputPattern.toString, "businessAddress.error.addressLine2.format")
+        ))),
       "city" -> text("businessAddress.error.city.required")
-        .verifying(maxLength(35, "businessAddress.error.city.length")),
+        .verifying(firstError(
+          maxLength(35, "businessAddress.error.city.length"),
+          regexp(Validation.textInputPattern.toString, "businessAddress.error.city.format")
+        )),
       "region" -> optional(text("")
-        .verifying(maxLength(35, "businessAddress.error.region.length"))),
+        .verifying(firstError(
+          maxLength(35, "businessAddress.error.region.length"),
+          regexp(Validation.textInputPattern.toString, "businessAddress.error.region.format")
+        ))),
       "postalCode" -> optional(text("")
-        .verifying(maxLength(10, "businessAddress.error.postalCode.length"))),
+        .verifying(firstError(
+          maxLength(10, "businessAddress.error.postalCode.length"),
+          regexp(Validation.textInputPattern.toString, "businessAddress.error.postalCode.format")
+        ))),
       "country" -> text("businessAddress.error.country.required")
         .verifying("businessAddress.error.country.required", value => Country.nonUkInternationalCountries.exists(_.code == value))
         .transform[Country](value => Country.nonUkInternationalCountries.find(_.code == value).get, _.code)

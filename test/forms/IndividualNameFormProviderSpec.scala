@@ -17,6 +17,7 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import forms.common.Validation
 import play.api.data.FormError
 
 class IndividualNameFormProviderSpec extends StringFieldBehaviours {
@@ -27,12 +28,20 @@ class IndividualNameFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "firstName"
     val requiredKey = "individualName.error.firstName.required"
     val lengthKey = "individualName.error.firstName.length"
+    val formatKey = "individualName.error.firstName.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(
@@ -53,12 +62,20 @@ class IndividualNameFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "lastName"
     val requiredKey = "individualName.error.lastName.required"
     val lengthKey = "individualName.error.lastName.length"
+    val formatKey = "individualName.error.lastName.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(
