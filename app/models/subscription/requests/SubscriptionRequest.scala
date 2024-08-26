@@ -25,7 +25,7 @@ import pages.*
 import play.api.libs.json.*
 import queries.Query
 
-final case class SubscriptionRequest(safeId: String,
+final case class SubscriptionRequest(id: String,
                                      gbUser: Boolean,
                                      tradingName: Option[String],
                                      primaryContact: Contact,
