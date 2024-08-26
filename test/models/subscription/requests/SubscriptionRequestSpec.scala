@@ -509,7 +509,7 @@ class SubscriptionRequestSpec extends AnyFreeSpec
         phone = None,
       )
       val expected = SubscriptionRequest(
-        safeId = "any-safe-id",
+        id = "any-safe-id",
         gbUser = true,
         tradingName = None,
         primaryContact = organisationContact,
