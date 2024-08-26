@@ -17,6 +17,7 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import forms.common.Validation
 import play.api.data.FormError
 import org.scalacheck.Gen
 import models.Country
@@ -30,12 +31,20 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "line1"
     val requiredKey = "internationalAddress.error.line1.required"
     val lengthKey = "internationalAddress.error.line1.length"
+    val formatKey = "internationalAddress.error.line1.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(
@@ -56,12 +65,20 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "line2"
     val lengthKey = "internationalAddress.error.line2.length"
+    val formatKey = "internationalAddress.error.line2.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(
@@ -77,12 +94,20 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "city"
     val requiredKey = "internationalAddress.error.city.required"
     val lengthKey = "internationalAddress.error.city.length"
+    val formatKey = "internationalAddress.error.city.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(
@@ -103,12 +128,20 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "region"
     val lengthKey = "internationalAddress.error.region.length"
+    val formatKey = "internationalAddress.error.region.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(
@@ -123,12 +156,20 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "postal"
     val lengthKey = "internationalAddress.error.postal.length"
+    val formatKey = "internationalAddress.error.postal.format"
     val maxLength = 10
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(

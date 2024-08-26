@@ -21,6 +21,6 @@ import play.api.data.Mapping
 
 class UkPostCode extends Mappings {
 
-  def ukPostCode(requiredKey: String, lengthKey: String): Mapping[String] =
-    text(requiredKey).verifying(maxLength(8, lengthKey))
+  def ukPostCode(requiredKey: String, formatKey: String): Mapping[String] =
+    text(requiredKey).verifying(regexp(Validation.ukPostcodePattern.toString, formatKey))
 }

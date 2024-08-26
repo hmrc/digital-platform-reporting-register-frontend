@@ -38,11 +38,11 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
   private val country = Country.ukCountries.head
   private lazy val ukAddressRoute = routes.UkAddressController.onPageLoad(NormalMode).url
   private val validUkAddress = UkAddress(
-    "## Some Street",
+    "line 1",
     None,
-    "Miasto",
-    Some("Narnia"),
-    "??## #??",
+    "town",
+    Some("county"),
+    "AA1 1AA",
     country
   )
   private val userAnswers = emptyUserAnswers.set(UkAddressPage, validUkAddress).success.value
@@ -135,7 +135,7 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(POST, ukAddressRoute)
-          .withFormUrlEncodedBody(("line1", "value 1"), ("line2", "value 2"))
+          .withFormUrlEncodedBody(("line1", "value 1"), ("town", "value 2"), ("postCode", "AA1 1AA"))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

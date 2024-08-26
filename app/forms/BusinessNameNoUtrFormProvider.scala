@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.common.Validation
 import forms.mappings.Mappings
 import play.api.data.Form
 
@@ -25,6 +26,9 @@ class BusinessNameNoUtrFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] = Form(
     "value" -> text("businessNameNoUtr.error.required")
-      .verifying(maxLength(105, "businessNameNoUtr.error.length"))
+      .verifying(firstError(
+        maxLength(105, "businessNameNoUtr.error.length"),
+        regexp(Validation.textInputPattern.toString, "businessNameNoUtr.error.format")
+      ))
   )
 }

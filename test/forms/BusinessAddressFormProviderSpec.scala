@@ -17,6 +17,7 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import forms.common.Validation
 import models.Country
 import org.scalacheck.Gen
 import play.api.data.FormError
@@ -29,14 +30,22 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "addressLine1"
     val requiredKey = "businessAddress.error.addressLine1.required"
     val lengthKey = "businessAddress.error.addressLine1.length"
+    val formatKey = "businessAddress.error.addressLine1.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
     )
 
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
+    )
+    
     behave like fieldWithMaxLength(
       form,
       fieldName,
@@ -54,12 +63,20 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
   ".addressLine2" - {
     val fieldName = "addressLine2"
     val lengthKey = "businessAddress.error.addressLine2.length"
+    val formatKey = "businessAddress.error.addressLine2.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(
@@ -74,12 +91,20 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "city"
     val requiredKey = "businessAddress.error.city.required"
     val lengthKey = "businessAddress.error.city.length"
+    val formatKey = "businessAddress.error.city.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(
@@ -99,12 +124,20 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
   ".region" - {
     val fieldName = "region"
     val lengthKey = "businessAddress.error.region.length"
+    val formatKey = "businessAddress.error.region.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(
@@ -118,12 +151,20 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
   ".postalCode" - {
     val fieldName = "postalCode"
     val lengthKey = "businessAddress.error.postalCode.length"
+    val formatKey = "businessAddress.error.postalCode.format"
     val maxLength = 10
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(

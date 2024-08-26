@@ -26,6 +26,7 @@ class SecondaryContactPhoneNumberFormProviderSpec extends StringFieldBehaviours 
 
   private implicit val msgs: Messages = stubMessages()
   private val requiredKey = "secondaryContactPhoneNumber.error.required"
+  private val lengthKey = "secondaryContactPhoneNumber.error.length"
   private val formatKey = "secondaryContactPhoneNumber.error.format"
   private val anyName = "name"
 
@@ -48,6 +49,11 @@ class SecondaryContactPhoneNumberFormProviderSpec extends StringFieldBehaviours 
 
     "must fail to bind an invalid phone number" in {
       underTest.bind(Map(fieldName -> "invalid")).error("value").value.message mustEqual formatKey
+    }
+
+    "must fail to bind phone numbers longer than 24 characters" in {
+      val result = underTest.bind(Map(fieldName -> "+44 7777 777777 ext. 1234"))
+      result.error("value").value.message mustEqual lengthKey
     }
   }
 }
