@@ -134,7 +134,7 @@ trait Generators extends ModelGenerators {
     }
   }
 
-  def safeNameInputs: Gen[Char] = Gen.oneOf(
+  def safeTextInputs: Gen[Char] = Gen.oneOf(
     Gen.alphaChar,
     Gen.const('-'),
     Gen.const(' '),
@@ -142,6 +142,8 @@ trait Generators extends ModelGenerators {
     Gen.const('\''),
     Gen.const('.'),
     Gen.const(','),
+    Gen.const('_'),
+    Gen.const('&'),
     Gen.oneOf('À' to 'Å'),
     Gen.oneOf('Ç' to 'Ö'),
     Gen.oneOf('Ø' to 'Ý'),
@@ -165,7 +167,7 @@ trait Generators extends ModelGenerators {
   def safeTextInputsWithMaxLength(length: Int): Gen[String] =
     (for {
       length <- Gen.choose(1, length)
-      chars <- Gen.listOfN(length, safeNameInputs)
+      chars <- Gen.listOfN(length, safeTextInputs)
     } yield chars.mkString).suchThat(_.trim.nonEmpty)
 
   def unsafeTextInputsWithMaxLength(maxLength: Int): Gen[String] = (for {
