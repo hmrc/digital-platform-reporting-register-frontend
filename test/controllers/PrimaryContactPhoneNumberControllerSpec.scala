@@ -24,7 +24,6 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{PrimaryContactNamePage, PrimaryContactPhoneNumberPage}
-import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -35,7 +34,6 @@ import scala.concurrent.Future
 
 class PrimaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  private implicit val msgs: Messages = stubMessages()
   private lazy val primaryContactPhoneNumberRoute = routes.PrimaryContactPhoneNumberController.onPageLoad(NormalMode).url
   private val anyName = "name"
   private val baseAnswers = emptyUserAnswers.set(PrimaryContactNamePage, anyName).success.value

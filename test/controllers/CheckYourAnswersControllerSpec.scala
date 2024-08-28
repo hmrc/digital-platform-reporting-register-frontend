@@ -213,7 +213,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
           val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "email", None)
           val expectedSubscriptionRequest = SubscriptionRequest("safeId", true, None, expectedContact, None)
           val subscriptionResponse = SubscribedResponse("dprsId")
-          val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.PlatformOperator)
+          val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.PlatformOperator, Some(BusinessType.SoleTrader))
           val expectedFinalAnswers = answers.copy(data = Json.obj(), subscriptionDetails = Some(subscriptionDetails))
 
           when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionResponse))
@@ -327,7 +327,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "email", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
               val subscriptionResponse = SubscribedResponse("dprsId")
-              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty)
+              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty, Some(BusinessType.SoleTrader))
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),
@@ -460,7 +460,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               val expectedContact = OrganisationContact(models.subscription.Organisation("contact name"), "email", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
               val subscriptionResponse = SubscribedResponse("dprsId")
-              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty)
+              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty, Some(BusinessType.LimitedCompany))
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),

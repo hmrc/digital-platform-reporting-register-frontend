@@ -48,7 +48,7 @@ class SubscriptionDetailsSpec extends AnyFreeSpec with Matchers {
       
       val request = SubscriptionRequest("safeId", true, None, IndividualContact(Individual("first", "last"), "email", None), None)
       val response = SubscribedResponse("dprsId")
-      val subscriptionDetails = SubscriptionDetails(response, request, RegistrationType.PlatformOperator)
+      val subscriptionDetails = SubscriptionDetails(response, request, RegistrationType.PlatformOperator, None)
       
       val json = Json.toJson(subscriptionDetails)(SubscriptionDetails.encryptedFormat(implicitly))
       json.as[SubscriptionDetails](SubscriptionDetails.encryptedFormat(implicitly)) mustEqual subscriptionDetails
