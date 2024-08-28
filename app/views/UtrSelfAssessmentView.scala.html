@@ -48,12 +48,15 @@
             ))
         </p>
 
+        <h2 class="govuk-heading-m">@messages("utrSelfAssessment.h2")</h2>
+
         @govukInput(
             InputViewModel(
                 field = form("value"),
                 label = LabelViewModel(messages("utrSelfAssessment.heading")).withCssClass("govuk-visually-hidden")
             )
             .withWidth(Full)
+            .withHint(HintViewModel(content = messages("utrSelfAssessment.hint")))
         )
 
         @govukButton(
