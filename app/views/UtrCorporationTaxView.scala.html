@@ -48,12 +48,15 @@
             ))
         </p>
 
+        <h2 class="govuk-heading-m">@messages("utrCorporationTax.h2")</h2>
+
         @govukInput(
             InputViewModel(
                 field = form("value"),
                 label = LabelViewModel(messages("utrCorporationTax.heading")).withCssClass("govuk-visually-hidden")
             )
             .withWidth(Full)
+            .withHint(HintViewModel(content = messages("utrCorporationTax.hint")))
         )
 
         @govukButton(
