@@ -43,7 +43,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
   "IndividualPhoneNumber Controller" - {
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, individualPhoneNumberRoute)
@@ -57,7 +57,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = emptyUserAnswers.set(IndividualPhoneNumberPage, "07777777777").success.value
+      val userAnswers = minimalUserAnswers.set(IndividualPhoneNumberPage, "07777777777").success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
@@ -76,7 +76,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
         .build()
 
@@ -86,12 +86,12 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndividualPhoneNumberPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual IndividualPhoneNumberPage.nextPage(NormalMode, minimalUserAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, individualPhoneNumberRoute)

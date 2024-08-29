@@ -34,34 +34,37 @@ import scala.concurrent.{ExecutionContext, Future}
 class RegistrationConfirmationController @Inject()(sessionRepository: SessionRepository,
                                         identify: IdentifierAction,
                                         getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
                                         formProvider: RegistrationConfirmationFormProvider,
                                         appConfig: FrontendAppConfig,
                                         view: RegistrationConfirmationView)
                                         (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    showPage(
-      RegistrationConfirmationViewModel(mode, request.userAnswers, formProvider(), appConfig.isPrivateBeta),
-      model => Ok(view(model))
-    )
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
+    request.userAnswers.map { answers =>
+      showPage(
+        RegistrationConfirmationViewModel(mode, answers, formProvider(), appConfig.isPrivateBeta),
+        model => Ok(view(model))
+      )
+    }.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(showPage(
-        RegistrationConfirmationViewModel(mode, request.userAnswers, formWithErrors, appConfig.isPrivateBeta),
-        model => BadRequest(view(model))
-      )),
-      value =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(RegistrationConfirmationPage, value))
-          _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(RegistrationConfirmationPage.nextPage(mode, updatedAnswers))
-    )
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+    request.userAnswers.map { answers =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(showPage(
+          RegistrationConfirmationViewModel(mode, answers, formWithErrors, appConfig.isPrivateBeta),
+          model => BadRequest(view(model))
+        )),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(answers.set(RegistrationConfirmationPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(RegistrationConfirmationPage.nextPage(mode, updatedAnswers))
+      )
+    }.getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
   }
-
+  
   private def showPage(model: Option[RegistrationConfirmationViewModel], page: RegistrationConfirmationViewModel => Result) =
     model match {
       case Some(value) => page(value)

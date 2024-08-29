@@ -19,6 +19,7 @@ package controllers.actions
 import javax.inject.Inject
 import controllers.routes
 import models.requests.{DataRequest, OptionalDataRequest}
+import play.api.libs.json.Json
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
 
@@ -29,7 +30,13 @@ class DataRequiredActionImpl @Inject()(implicit val executionContext: ExecutionC
   override protected def refine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] = {
 
     request.userAnswers
-      .map(data => Future.successful(Right(DataRequest(request.request, request.userId, request.taxIdentifier, data))))
+      .map { userAnswers =>
+        if (userAnswers.data == Json.obj()) {
+          Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+        } else {
+          Future.successful(Right(DataRequest(request.request, request.userId, request.taxIdentifier, userAnswers)))
+        }
+      }
       .getOrElse(Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad()))))
   }
 }

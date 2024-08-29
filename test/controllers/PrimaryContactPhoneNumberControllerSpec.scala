@@ -36,7 +36,7 @@ class PrimaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar
 
   private lazy val primaryContactPhoneNumberRoute = routes.PrimaryContactPhoneNumberController.onPageLoad(NormalMode).url
   private val anyName = "name"
-  private val baseAnswers = emptyUserAnswers.set(PrimaryContactNamePage, anyName).success.value
+  private val baseAnswers = minimalUserAnswers.set(PrimaryContactNamePage, anyName).success.value
   private val form = new PrimaryContactPhoneNumberFormProvider()(anyName)
 
   "PrimaryContactPhoneNumber Controller" - {

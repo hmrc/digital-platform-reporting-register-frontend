@@ -36,7 +36,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
 
   private lazy val secondaryContactEmailAddressRoute = routes.SecondaryContactEmailAddressController.onPageLoad(NormalMode).url
   private val anyName = "name"
-  private val baseAnswers = emptyUserAnswers.set(SecondaryContactNamePage, anyName).success.value
+  private val baseAnswers = minimalUserAnswers.set(SecondaryContactNamePage, anyName).success.value
   private val form = new SecondaryContactEmailAddressFormProvider()(anyName)
 
   "SecondaryContactEmailAddress Controller" - {

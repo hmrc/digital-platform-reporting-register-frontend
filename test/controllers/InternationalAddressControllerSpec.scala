@@ -40,13 +40,13 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
 
   val country = Country.internationalCountries.head
   val address = InternationalAddress("Testing Lane", None, "New York", None, None, country)
-  val userAnswers = emptyUserAnswers.set(InternationalAddressPage, address).success.value
+  val userAnswers = minimalUserAnswers.set(InternationalAddressPage, address).success.value
 
   "InternationalAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, internationalAddressRoute)
@@ -95,13 +95,13 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual InternationalAddressPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual InternationalAddressPage.nextPage(NormalMode, minimalUserAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request =

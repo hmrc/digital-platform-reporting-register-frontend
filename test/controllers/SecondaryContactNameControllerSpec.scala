@@ -38,7 +38,7 @@ class SecondaryContactNameControllerSpec extends SpecBase with MockitoSugar {
   private val form = new SecondaryContactNameFormProvider()()
 
   private lazy val secondaryContactNameRoute = routes.SecondaryContactNameController.onPageLoad(NormalMode).url
-  private val baseAnswers = emptyUserAnswers.set(RegistrationTypePage, ThirdParty).success.value
+  private val baseAnswers = minimalUserAnswers.set(RegistrationTypePage, ThirdParty).success.value
   
   "SecondaryContactName Controller" - {
     "must return OK and the correct view for a GET" in {

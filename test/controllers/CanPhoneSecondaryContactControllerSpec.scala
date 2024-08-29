@@ -38,7 +38,7 @@ class CanPhoneSecondaryContactControllerSpec extends SpecBase with MockitoSugar 
   private val anyName = "name"
   private val anyBoolean = true
   private val baseAnswers =
-    emptyUserAnswers
+    minimalUserAnswers
       .set(SecondaryContactNamePage, anyName).success.value
       .set(CanPhoneSecondaryContactPage, anyBoolean).success.value
   private val form = new CanPhoneSecondaryContactFormProvider()(anyName)

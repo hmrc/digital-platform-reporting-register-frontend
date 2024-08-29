@@ -107,7 +107,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
       "for an organisation when the registration response is a match with Id containing an organisation name" in {
         val anyName = "name"
-        val answers = emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithId("safe", anyAddress, Some(anyName))))
+        val answers = minimalUserAnswers.copy(registrationResponse = Some(MatchResponseWithId("safe", anyAddress, Some(anyName))))
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
         running(application) {
@@ -122,7 +122,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
       }
 
       "for an organisation when the registration response is a match without Id containing " in {
-        val answers = emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
+        val answers = minimalUserAnswers.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
           .set(BusinessNameNoUtrPage, "business name").get
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
@@ -153,7 +153,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
       "if business type has not been answered" - {
         "and there is no registration response" in {
-          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+          val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
           running(application) {
             val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
@@ -165,7 +165,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
         }
 
         "and the registration response is a match response with Id with no organisation name" in {
-          val answers = emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithId("safe", anyAddress, None)))
+          val answers = minimalUserAnswers.copy(registrationResponse = Some(MatchResponseWithId("safe", anyAddress, None)))
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
@@ -178,7 +178,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
         }
 
         "and the registration response is not a match response with Id" in {
-          val answers = emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
+          val answers = minimalUserAnswers.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
@@ -201,7 +201,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
           val registrationResponse = MatchResponseWithId("safeId", anyAddress, None)
 
           val answers =
-            emptyUserAnswers
+            minimalUserAnswers
               .copy(registrationResponse = Some(registrationResponse))
               .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
               .set(BusinessTypePage, BusinessType.SoleTrader).success.value
@@ -247,7 +247,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
           val registrationResponse = models.registration.responses.AlreadySubscribedResponse()
 
-          val answers = emptyUserAnswers.copy(registrationResponse = Some(registrationResponse))
+          val answers = minimalUserAnswers.copy(registrationResponse = Some(registrationResponse))
 
           val application =
             applicationBuilder(userAnswers = Some(answers))
@@ -277,7 +277,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
           val registrationResponse = models.registration.responses.NoMatchResponse()
 
-          val answers = emptyUserAnswers.copy(registrationResponse = Some(registrationResponse))
+          val answers = minimalUserAnswers.copy(registrationResponse = Some(registrationResponse))
 
           val application =
             applicationBuilder(userAnswers = Some(answers))
@@ -312,7 +312,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               val registrationResponse = MatchResponseWithId("safeId", anyAddress, None)
 
               val answers =
-                emptyUserAnswers
+                minimalUserAnswers
                   .set(BusinessTypePage, BusinessType.SoleTrader).success.value
                   .set(RegisteredInUkPage, false).success.value
                   .set(IndividualNamePage, IndividualName("first", "last")).success.value
@@ -327,7 +327,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "email", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
               val subscriptionResponse = SubscribedResponse("dprsId")
-              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty, Some(BusinessType.SoleTrader))
+              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.PlatformOperator, Some(BusinessType.SoleTrader))
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),
@@ -365,7 +365,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
             val registrationResponse = models.registration.responses.AlreadySubscribedResponse()
 
             val answers =
-              emptyUserAnswers
+              minimalUserAnswers
                 .set(BusinessTypePage, BusinessType.SoleTrader).success.value
                 .set(RegisteredInUkPage, false).success.value
                 .set(IndividualNamePage, IndividualName("first", "last")).success.value
@@ -404,7 +404,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
             val registrationResponse = models.registration.responses.NoMatchResponse()
 
             val answers =
-              emptyUserAnswers
+              minimalUserAnswers
                 .set(BusinessTypePage, BusinessType.SoleTrader).success.value
                 .set(RegisteredInUkPage, false).success.value
                 .set(IndividualNamePage, IndividualName("first", "last")).success.value
@@ -445,7 +445,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               val registrationResponse = MatchResponseWithId("safeId", anyAddress, None)
 
               val answers =
-                emptyUserAnswers
+                minimalUserAnswers
                   .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
                   .set(RegisteredInUkPage, false).success.value
                   .set(BusinessNameNoUtrPage, "name").success.value
@@ -460,7 +460,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               val expectedContact = OrganisationContact(models.subscription.Organisation("contact name"), "email", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
               val subscriptionResponse = SubscribedResponse("dprsId")
-              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty, Some(BusinessType.LimitedCompany))
+              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.PlatformOperator, Some(BusinessType.LimitedCompany))
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),
@@ -498,7 +498,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
             val registrationResponse = models.registration.responses.AlreadySubscribedResponse()
 
             val answers =
-              emptyUserAnswers
+              minimalUserAnswers
                 .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
                 .set(RegisteredInUkPage, false).success.value
                 .set(BusinessNameNoUtrPage, "name").success.value
@@ -536,7 +536,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
             val registrationResponse = models.registration.responses.NoMatchResponse()
 
             val answers =
-              emptyUserAnswers
+              minimalUserAnswers
                 .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
                 .set(RegisteredInUkPage, false).success.value
                 .set(BusinessNameNoUtrPage, "name").success.value

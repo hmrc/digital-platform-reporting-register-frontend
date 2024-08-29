@@ -43,7 +43,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
       for (businessType <- Seq(LimitedCompany, AssociationOrTrust)) {
         s"for a ${businessType.toString}" in {
           val form = formProvider(businessType)
-          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
+          val answers = minimalUserAnswers.set(BusinessTypePage, businessType).success.value
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
@@ -60,7 +60,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
       for (businessType <- Seq(Llp, Partnership)) {
         s"for a ${businessType.toString}" in {
           val form = formProvider(businessType)
-          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
+          val answers = minimalUserAnswers.set(BusinessTypePage, businessType).success.value
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
@@ -76,7 +76,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
 
       "for a Sole Trader" in {
         val form = formProvider(SoleTrader)
-        val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
+        val answers = minimalUserAnswers.set(BusinessTypePage, SoleTrader).success.value
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
         running(application) {
@@ -91,7 +91,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET for an Individual" in {
-      val answers = emptyUserAnswers.set(BusinessTypePage, Individual).success.value
+      val answers = minimalUserAnswers.set(BusinessTypePage, Individual).success.value
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
@@ -105,7 +105,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
       val form = formProvider(BusinessType.LimitedCompany)
-      val answers = emptyUserAnswers.set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+      val answers = minimalUserAnswers.set(BusinessTypePage, BusinessType.LimitedCompany).success.value
       val userAnswers = answers.set(HasUtrPage, true).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -121,7 +121,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
       val mockSessionRepository = mock[SessionRepository]
-      val answers = emptyUserAnswers.set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+      val answers = minimalUserAnswers.set(BusinessTypePage, BusinessType.LimitedCompany).success.value
       val application = applicationBuilder(userAnswers = Some(answers))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
         .build()
@@ -142,7 +142,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
       for (businessType <- Seq(LimitedCompany, AssociationOrTrust)) {
         s"for a ${businessType.toString}" in {
           val form = formProvider(businessType)
-          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
+          val answers = minimalUserAnswers.set(BusinessTypePage, businessType).success.value
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
@@ -160,7 +160,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
       for (businessType <- Seq(Llp, Partnership)) {
         s"for a ${businessType.toString}" in {
           val form = formProvider(businessType)
-          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
+          val answers = minimalUserAnswers.set(BusinessTypePage, businessType).success.value
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
@@ -177,7 +177,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
 
       "for a SoleTrader" in {
         val form = formProvider(SoleTrader)
-        val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
+        val answers = minimalUserAnswers.set(BusinessTypePage, SoleTrader).success.value
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
         running(application) {
@@ -193,7 +193,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST for an Individual" in {
-      val answers = emptyUserAnswers.set(BusinessTypePage, Individual).success.value
+      val answers = minimalUserAnswers.set(BusinessTypePage, Individual).success.value
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 
       running(application) {
@@ -218,7 +218,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if business type has not been answered" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasUtrRoute)
@@ -242,7 +242,7 @@ class HasUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST if business type has not been answered" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, hasUtrRoute).withFormUrlEncodedBody(("value", "true"))

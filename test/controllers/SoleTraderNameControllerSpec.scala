@@ -42,13 +42,13 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val soleTraderNameRoute = routes.SoleTraderNameController.onPageLoad(NormalMode).url
 
-  private val userAnswers = emptyUserAnswers.set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
+  private val userAnswers = minimalUserAnswers.set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
 
   "SoleTraderName Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, soleTraderNameRoute)
@@ -86,7 +86,7 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockConnector.register(any())(any())) thenReturn Future.successful(NoMatchResponse())
 
-      val baseAnswers = emptyUserAnswers.set(UtrPage, "123").success.value
+      val baseAnswers = minimalUserAnswers.set(UtrPage, "123").success.value
       
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
@@ -124,7 +124,7 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request =

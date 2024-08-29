@@ -36,7 +36,7 @@ class PrimaryContactEmailAddressControllerSpec extends SpecBase with MockitoSuga
   
   private lazy val primaryContactEmailAddressRoute = routes.PrimaryContactEmailAddressController.onPageLoad(NormalMode).url
   private val anyName = "name"
-  private val baseAnswers = emptyUserAnswers.set(PrimaryContactNamePage, anyName).success.value
+  private val baseAnswers = minimalUserAnswers.set(PrimaryContactNamePage, anyName).success.value
   private val form = new PrimaryContactEmailAddressFormProvider()(anyName)
 
   "PrimaryContactEmailAddress Controller" - {

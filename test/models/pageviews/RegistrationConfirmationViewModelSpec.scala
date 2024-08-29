@@ -23,11 +23,12 @@ import models.subscription.requests.SubscriptionRequest
 import models.subscription.responses.SubscribedResponse
 import models.subscription.{Individual, IndividualContact}
 import models.{IndividualName, NormalMode, RegistrationType, SubscriptionDetails, UserAnswers}
+import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import pages.RegistrationConfirmationPage
+import pages.{RegistrationConfirmationPage, RegistrationTypePage}
 
-trait SetupForRegistrationConfirmation {
+trait SetupForRegistrationConfirmation extends TryValues with OptionValues {
   protected lazy val fakeAnswers: UserAnswers =
     setupAnswers("", "", None, ThirdParty)
 
@@ -50,7 +51,7 @@ trait SetupForRegistrationConfirmation {
         registrationType = registrationType,
         businessType = None
       ))
-    )
+    ).set(RegistrationTypePage, registrationType).success.value
   }
 
   private def getContact(email: String) = IndividualContact(

@@ -45,14 +45,14 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
     "AA1 1AA",
     country
   )
-  private val userAnswers = emptyUserAnswers.set(UkAddressPage, validUkAddress).success.value
+  private val userAnswers = minimalUserAnswers.set(UkAddressPage, validUkAddress).success.value
 
   private def getParam(key: String, value: Option[String]) =
     Seq(value.map(key -> _))
 
   "UkAddress Controller" - {
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, ukAddressRoute)
@@ -83,7 +83,7 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(minimalUserAnswers))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -99,12 +99,12 @@ class UkAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual UkAddressPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual UkAddressPage.nextPage(NormalMode, minimalUserAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, ukAddressRoute)

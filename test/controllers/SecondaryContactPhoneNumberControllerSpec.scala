@@ -36,7 +36,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
   private lazy val secondaryContactPhoneNumberRoute = routes.SecondaryContactPhoneNumberController.onPageLoad(NormalMode).url
   private val anyName = "name"
-  private val baseAnswers = emptyUserAnswers.set(SecondaryContactNamePage, anyName).success.value
+  private val baseAnswers = minimalUserAnswers.set(SecondaryContactNamePage, anyName).success.value
   private val form = new SecondaryContactPhoneNumberFormProvider()(anyName)
 
   "SecondaryContactPhoneNumber Controller" - {

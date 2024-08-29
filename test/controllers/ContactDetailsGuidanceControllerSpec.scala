@@ -27,7 +27,7 @@ class ContactDetailsGuidanceControllerSpec extends SpecBase {
 
   "ContactDetailsGuidance Controller" - {
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.ContactDetailsGuidanceController.onPageLoad().url)
@@ -40,14 +40,14 @@ class ContactDetailsGuidanceControllerSpec extends SpecBase {
     }
     
     "must redirect to the next page for a POST" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, routes.ContactDetailsGuidanceController.onSubmit().url)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual ContactDetailsGuidancePage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual ContactDetailsGuidancePage.nextPage(NormalMode, minimalUserAnswers).url
       }
     }
   }

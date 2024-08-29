@@ -58,7 +58,7 @@ class AnswerExtractorSpec extends SpecBase {
 
     "must pass the answer into the provided block when the answer exists in user answers" in {
 
-      val answers = emptyUserAnswers.set(TestPage, 1).success.value
+      val answers = minimalUserAnswers.set(TestPage, 1).success.value
       implicit val request: DataRequest[AnyContent] = buildRequest(answers)
 
       val controller = new TestController()
@@ -68,7 +68,7 @@ class AnswerExtractorSpec extends SpecBase {
 
     "must redirect to Journey Recovery when the answer does not exist in user answers" in {
 
-      implicit val request: DataRequest[AnyContent] = buildRequest(emptyUserAnswers)
+      implicit val request: DataRequest[AnyContent] = buildRequest(minimalUserAnswers)
 
       val controller = new TestController()
 
@@ -80,7 +80,7 @@ class AnswerExtractorSpec extends SpecBase {
 
     "must pass the answer into the provided block when the answer exists in user answers" in {
 
-      val answers = emptyUserAnswers.set(TestPage, 1).success.value
+      val answers = minimalUserAnswers.set(TestPage, 1).success.value
       implicit val request: DataRequest[AnyContent] = buildRequest(answers)
 
       val controller = new TestController()
@@ -90,7 +90,7 @@ class AnswerExtractorSpec extends SpecBase {
 
     "must redirect to Journey Recovery when the answer does not exist in user answers" in {
 
-      implicit val request: DataRequest[AnyContent] = buildRequest(emptyUserAnswers)
+      implicit val request: DataRequest[AnyContent] = buildRequest(minimalUserAnswers)
 
       val controller = new TestController()
 

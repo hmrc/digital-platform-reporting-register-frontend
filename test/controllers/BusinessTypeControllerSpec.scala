@@ -36,7 +36,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
   private lazy val businessTypeRoute = routes.BusinessTypeController.onPageLoad(NormalMode).url
 
   private val registrationType = RegistrationType.PlatformOperator
-  private val baseAnswers = emptyUserAnswers.set(RegistrationTypePage, registrationType).success.value
+  private val baseAnswers = minimalUserAnswers.set(RegistrationTypePage, registrationType).success.value
   private val formProvider = new BusinessTypeFormProvider()
   private val form = formProvider(registrationType)
 

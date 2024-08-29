@@ -17,11 +17,12 @@
 package base
 
 import controllers.actions.*
-import models.UserAnswers
+import models.{RegistrationType, UserAnswers}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
+import pages.RegistrationTypePage
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
@@ -38,7 +39,8 @@ trait SpecBase
 
   val userAnswersId: String = "id"
 
-  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId, None)
+  val emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId, None)
+  val minimalUserAnswers: UserAnswers = emptyUserAnswers.set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 

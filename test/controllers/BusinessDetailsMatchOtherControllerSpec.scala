@@ -21,7 +21,9 @@ import base.SpecBase
 import builders.AddressBuilder.anAddress
 import builders.UserAnswersBuilder.aUserAnswers
 import helpers.UserAnswerHelper
+import models.RegistrationType
 import models.pageviews.BusinessDetailsMatchOtherViewModel
+import pages.RegistrationTypePage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.BusinessDetailsMatchOtherView
@@ -30,7 +32,11 @@ class BusinessDetailsMatchOtherControllerSpec extends SpecBase with UserAnswerHe
 
   "BusinessDetailsMatchOther Controller" - {
     "must return OK and the correct view for a GET" in {
-      val userAnswers = aUserAnswers.withBusiness("some-business-name", anAddress)
+      val userAnswers =
+        aUserAnswers
+          .withBusiness("some-business-name", anAddress)
+          .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
+        
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {

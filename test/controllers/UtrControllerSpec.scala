@@ -48,7 +48,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
         s"for a ${businessType.toString}" in {
 
-          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
+          val answers = minimalUserAnswers.set(BusinessTypePage, businessType).success.value
 
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
@@ -71,7 +71,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
         s"for a ${businessType.toString}" in {
 
-          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
+          val answers = minimalUserAnswers.set(BusinessTypePage, businessType).success.value
 
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
@@ -92,7 +92,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
         val form = formProvider("utrSelfAssessment")
 
-        val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
+        val answers = minimalUserAnswers.set(BusinessTypePage, SoleTrader).success.value
 
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
@@ -113,7 +113,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
       val form = formProvider("utrSelfAssessment")
 
-      val answers = emptyUserAnswers
+      val answers = minimalUserAnswers
         .set(BusinessTypePage, SoleTrader).success.value
         .set(UtrPage, utr).success.value
 
@@ -138,7 +138,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(minimalUserAnswers))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -150,7 +150,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual UtrPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual UtrPage.nextPage(NormalMode, minimalUserAnswers).url
       }
     }
 
@@ -158,7 +158,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
       val form = formProvider("utrSelfAssessment")
 
-      val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
+      val answers = minimalUserAnswers.set(BusinessTypePage, SoleTrader).success.value
 
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 

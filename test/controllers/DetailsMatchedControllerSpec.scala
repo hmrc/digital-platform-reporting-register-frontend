@@ -34,7 +34,7 @@ class DetailsMatchedControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(minimalUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.DetailsMatchedController.onPageLoad().url)
@@ -53,7 +53,7 @@ class DetailsMatchedControllerSpec extends SpecBase with MockitoSugar {
       val mockSessionRepository = mock[SessionRepository]
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(minimalUserAnswers))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -64,7 +64,7 @@ class DetailsMatchedControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DetailsMatchedPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual DetailsMatchedPage.nextPage(NormalMode, minimalUserAnswers).url
       }
     }
   }
