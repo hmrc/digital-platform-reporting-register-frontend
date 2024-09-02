@@ -20,6 +20,7 @@ import com.google.inject.Inject
 import connectors.{RegistrationConnector, SubscriptionConnector}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.BusinessType.*
+import models.audit.AuditEventModel
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
 import models.registration.responses as registrationResponses
@@ -32,6 +33,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import repositories.SessionRepository
+import services.AuditService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.{CheckYourAnswersIndividualView, CheckYourAnswersOrganisationView}
 
@@ -44,6 +46,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                            organisationView: CheckYourAnswersOrganisationView,
                                            registrationConnector: RegistrationConnector,
                                            subscriptionConnector: SubscriptionConnector,
+                                           auditService: AuditService,
                                            sessionRepository: SessionRepository)
                                           (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
@@ -68,11 +71,11 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
         val answersWithRegistration = request.userAnswers.copy(registrationResponse = Some(matchResponse))
 
         subscribe(matchResponse.safeId, answersWithRegistration).flatMap { subscriptionDetails =>
-          val answersWithSubscription =
-            answersWithRegistration.copy(
-              subscriptionDetails = Some(subscriptionDetails),
-              data = Json.obj()
-            )
+          auditService.sendAudit(AuditEventModel(request.userAnswers))
+          val answersWithSubscription = answersWithRegistration.copy(
+            subscriptionDetails = Some(subscriptionDetails),
+            data = Json.obj()
+          )
 
           sessionRepository.set(answersWithSubscription).map { _ =>
             Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithSubscription))
