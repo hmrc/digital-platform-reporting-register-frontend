@@ -16,21 +16,27 @@
 
 package models.registration.requests
 
-import play.api.libs.json.{Json, JsObject, OWrites}
+import play.api.libs.json.{JsObject, Json, OFormat, OWrites}
 
 trait RegistrationRequest
 
 object RegistrationRequest {
-  
+
   implicit lazy val writes: OWrites[RegistrationRequest] = new OWrites[RegistrationRequest] {
-    
+
     override def writes(o: RegistrationRequest): JsObject =
       o match {
         case x: IndividualWithNino => Json.toJsObject(x)(IndividualWithNino.writes)
-        case x: IndividualWithUtr  => Json.toJsObject(x)(IndividualWithUtr.writes)
+        case x: IndividualWithUtr => Json.toJsObject(x)(IndividualWithUtr.writes)
         case x: OrganisationWithUtr => Json.toJsObject(x)(OrganisationWithUtr.writes)
         case x: IndividualWithoutId => Json.toJsObject(x)(IndividualWithoutId.writes)
         case x: OrganisationWithoutId => Json.toJsObject(x)(OrganisationWithoutId.writes)
       }
   }
+}
+
+case class ContactDetails(emailAddress: String, phoneNumber: Option[String])
+
+object ContactDetails {
+  implicit val format: OFormat[ContactDetails] = Json.format[ContactDetails]
 }

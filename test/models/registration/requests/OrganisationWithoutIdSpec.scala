@@ -17,12 +17,13 @@
 package models.registration.requests
 
 import builders.BusinessAddressBuilder.aBusinessAddress
+import builders.ContactDetailsBuilder.aContactDetails
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import models.registration.Address
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{EitherValues, OptionValues, TryValues}
-import pages.{BusinessAddressPage, BusinessNameNoUtrPage}
+import pages.{BusinessAddressPage, BusinessNameNoUtrPage, CanPhonePrimaryContactPage, PrimaryContactEmailAddressPage, PrimaryContactNamePage}
 
 class OrganisationWithoutIdSpec extends AnyFreeSpec
   with Matchers
@@ -34,13 +35,22 @@ class OrganisationWithoutIdSpec extends AnyFreeSpec
     val answers = aUserAnswers
       .set(BusinessNameNoUtrPage, "some-business-name").success.value
       .set(BusinessAddressPage, aBusinessAddress).success.value
+      .set(PrimaryContactNamePage, "name").success.value
+      .set(PrimaryContactEmailAddressPage, aContactDetails.emailAddress).success.value
+      .set(CanPhonePrimaryContactPage, false).success.value
 
     val result = OrganisationWithoutId.build(answers)
-    result.value mustEqual OrganisationWithoutId("some-business-name", Address(aBusinessAddress))
+    result.value mustEqual OrganisationWithoutId("some-business-name", Address(aBusinessAddress), aContactDetails)
   }
 
   "must fail to build from user answers and report all errors when mandatory data is missing" in {
     val result = OrganisationWithoutId.build(anEmptyAnswer)
-    result.left.value.toChain.toList must contain theSameElementsAs Seq(BusinessNameNoUtrPage, BusinessAddressPage)
+    result.left.value.toChain.toList must contain theSameElementsAs Seq(
+      BusinessNameNoUtrPage,
+      BusinessAddressPage,
+      PrimaryContactNamePage,
+      PrimaryContactEmailAddressPage,
+      CanPhonePrimaryContactPage
+    )
   }
 }

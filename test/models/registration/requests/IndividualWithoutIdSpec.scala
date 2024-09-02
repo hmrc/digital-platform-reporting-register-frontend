@@ -16,6 +16,7 @@
 
 package models.registration.requests
 
+import builders.ContactDetailsBuilder.aContactDetails
 import cats.data.*
 import models.registration.Address
 import models.{Country, IndividualName, InternationalAddress, UkAddress, UserAnswers}
@@ -50,10 +51,12 @@ class IndividualWithoutIdSpec
           .set(DateOfBirthPage, aDateOfBirth).success.value
           .set(AddressInUkPage, true).success.value
           .set(UkAddressPage, aUkAddress).success.value
+          .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
+          .set(CanPhoneIndividualPage, false).success.value
 
       val result = IndividualWithoutId.build(answers)
       val expectedAddress = Address("line 1", Some("line 2"), Some("town"), Some("county"), Some("postcode"), aUkCountry.code)
-      result.value mustEqual IndividualWithoutId("first", "last", aDateOfBirth, expectedAddress)
+      result.value mustEqual IndividualWithoutId("first", "last", aDateOfBirth, expectedAddress, aContactDetails)
     }
 
     "must build from user answers when questions have been answered with an international address" in {
@@ -64,10 +67,12 @@ class IndividualWithoutIdSpec
           .set(DateOfBirthPage, aDateOfBirth).success.value
           .set(AddressInUkPage, false).success.value
           .set(InternationalAddressPage, anInternationalAddress).success.value
+          .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
+          .set(CanPhoneIndividualPage, false).success.value
 
       val result = IndividualWithoutId.build(answers)
       val expectedAddress = Address("line 1", Some("line 2"), Some("city"), Some("region"), Some("postcode"), anInternationalCountry.code)
-      result.value mustEqual IndividualWithoutId("first", "last", aDateOfBirth, expectedAddress)
+      result.value mustEqual IndividualWithoutId("first", "last", aDateOfBirth, expectedAddress, aContactDetails)
     }
 
     "must fail to build from user answers and report all errors when mandatory data is missing" in {
@@ -75,7 +80,13 @@ class IndividualWithoutIdSpec
       val answers = UserAnswers("id", None)
 
       val result = IndividualWithoutId.build(answers)
-      result.left.value.toChain.toList must contain theSameElementsAs Seq(IndividualNamePage, DateOfBirthPage, AddressInUkPage)
+      result.left.value.toChain.toList must contain theSameElementsAs Seq(
+        IndividualNamePage,
+        DateOfBirthPage,
+        AddressInUkPage,
+        IndividualEmailAddressPage,
+        CanPhoneIndividualPage
+      )
     }
 
     "must fail to build from user answers and report all errors when UK address is missing" in {
@@ -87,7 +98,11 @@ class IndividualWithoutIdSpec
           .set(AddressInUkPage, true).success.value
 
       val result = IndividualWithoutId.build(answers)
-      result.left.value.toChain.toList must contain only UkAddressPage
+      result.left.value.toChain.toList must contain theSameElementsAs Seq(
+        UkAddressPage,
+        IndividualEmailAddressPage,
+        CanPhoneIndividualPage
+      )
     }
 
     "must fail to build from user answers and report all errors when international address is missing" in {
@@ -99,7 +114,11 @@ class IndividualWithoutIdSpec
           .set(AddressInUkPage, false).success.value
 
       val result = IndividualWithoutId.build(answers)
-      result.left.value.toChain.toList must contain only InternationalAddressPage
+      result.left.value.toChain.toList must contain theSameElementsAs Seq(
+        InternationalAddressPage,
+        IndividualEmailAddressPage,
+        CanPhoneIndividualPage
+      )
     }
   }
 }

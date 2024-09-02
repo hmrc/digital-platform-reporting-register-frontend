@@ -16,6 +16,7 @@
 
 package connectors
 
+import builders.ContactDetailsBuilder.aContactDetails
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import models.registration.Address
 import models.registration.requests.*
@@ -40,17 +41,15 @@ class RegistrationConnectorSpec
     new GuiceApplicationBuilder()
       .configure("microservice.services.digital-platform-reporting.port" -> wireMockPort)
       .build()
-    
+
   private lazy val connector = app.injector.instanceOf[RegistrationConnector]
-  
+
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
-  
+
   ".register" - {
-
     "must return a registration response when the server returns OK" in {
-
       val address = Address("line 1", None, None, None, None, "GB")
-      val request = OrganisationWithoutId("name", address)
+      val request = OrganisationWithoutId("name", address, aContactDetails)
       val response = MatchResponseWithoutId("safeId")
 
       wireMockServer.stubFor(
@@ -64,7 +63,6 @@ class RegistrationConnectorSpec
     }
 
     "must return a `no match` response when the server returns NOT_FOUND" in {
-
       val request = OrganisationWithUtr("utr", None)
       val response = NoMatchResponse()
 
@@ -79,7 +77,6 @@ class RegistrationConnectorSpec
     }
 
     "must return an `already subscribed` response when the server returns CONFLICT" in {
-
       val request = OrganisationWithUtr("utr", None)
       val response = AlreadySubscribedResponse()
 
@@ -94,9 +91,8 @@ class RegistrationConnectorSpec
     }
 
     "must return a failed future when the server returns an error" in {
-
       val address = Address("line 1", None, None, None, None, "GB")
-      val request = OrganisationWithoutId("name", address)
+      val request = OrganisationWithoutId("name", address, aContactDetails)
 
       wireMockServer.stubFor(
         post(urlMatching("/digital-platform-reporting/register"))
