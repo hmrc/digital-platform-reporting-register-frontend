@@ -29,6 +29,8 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.WireMockSupport
 
+import java.time.Instant
+
 class SubscriptionConnectorSpec
   extends AnyFreeSpec
     with Matchers
@@ -46,12 +48,10 @@ class SubscriptionConnectorSpec
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
 
   ".subscribe" - {
-
     "must return a subscription response when the server returns OK" in {
-
       val contact = OrganisationContact(Organisation("name"), "email", None)
       val request = SubscriptionRequest("safe", true, None, contact, None)
-      val response = SubscribedResponse("DPRS123")
+      val response = SubscribedResponse("DPRS123", Instant.parse("2024-03-17T09:30:47Z"))
 
       wireMockServer.stubFor(
         post(urlMatching("/digital-platform-reporting/subscribe"))
@@ -63,9 +63,8 @@ class SubscriptionConnectorSpec
 
       result mustEqual response
     }
-    
-    "must return Already Subscribed when the server returns CONFLICT" in {
 
+    "must return Already Subscribed when the server returns CONFLICT" in {
       val contact = OrganisationContact(Organisation("name"), "email", None)
       val request = SubscriptionRequest("safe", true, None, contact, None)
 
@@ -79,9 +78,8 @@ class SubscriptionConnectorSpec
 
       result mustEqual AlreadySubscribedResponse()
     }
-    
-    "must return a failed future when the server returns an error" in {
 
+    "must return a failed future when the server returns an error" in {
       val contact = OrganisationContact(Organisation("name"), "email", None)
       val request = SubscriptionRequest("safe", true, None, contact, None)
 

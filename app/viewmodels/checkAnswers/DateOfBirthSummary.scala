@@ -21,25 +21,23 @@ import models.{CheckMode, UserAnswers}
 import pages.DateOfBirthPage
 import play.api.i18n.{Lang, Messages}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import utils.DateTimeFormats.dateTimeFormat
-import viewmodels.govuk.summarylist._
-import viewmodels.implicits._
+import utils.DateTimeFormats.dateFormat
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
 
-object DateOfBirthSummary  {
+object DateOfBirthSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(DateOfBirthPage).map {
-      answer =>
+    answers.get(DateOfBirthPage).map { answer =>
+      implicit val lang: Lang = messages.lang
 
-        implicit val lang: Lang = messages.lang
-
-        SummaryListRowViewModel(
-          key     = "dateOfBirth.checkYourAnswersLabel",
-          value   = ValueViewModel(answer.format(dateTimeFormat())),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.DateOfBirthController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("dateOfBirth.change.hidden"))
-          )
+      SummaryListRowViewModel(
+        key = "dateOfBirth.checkYourAnswersLabel",
+        value = ValueViewModel(answer.format(dateFormat())),
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.DateOfBirthController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("dateOfBirth.change.hidden"))
         )
+      )
     }
 }

@@ -20,17 +20,18 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.Json
 
+import java.time.Instant
+
 class SubscriptionResponseSpec extends AnyFreeSpec with Matchers {
 
   "subscription response" - {
-    
     "must serialise / deserialise a subscribed response" in {
-      val response = SubscribedResponse("DPRS123")
+      val response = SubscribedResponse("DPRS123", Instant.now())
       val json = Json.toJson[SubscriptionResponse](response)
       val result = json.as[SubscriptionResponse]
       result mustEqual response
     }
-    
+
     "must serialise / deserialise an already subscribed response" in {
       val response = AlreadySubscribedResponse()
       val json = Json.toJson[SubscriptionResponse](response)

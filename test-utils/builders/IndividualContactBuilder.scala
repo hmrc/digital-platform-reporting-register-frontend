@@ -16,24 +16,14 @@
 
 package builders
 
-import builders.MatchResponseWithIdBuilder.aMatchResponseWithId
-import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
-import models.UserAnswers
-import play.api.libs.json.Json
+import builders.IndividualBuilder.anIndividual
+import models.subscription.IndividualContact
 
-object UserAnswersBuilder {
+object IndividualContactBuilder {
 
-  val aUserAnswers: UserAnswers = UserAnswers(
-    id = "default-user-answer-id",
-    taxIdentifier = None,
-    registrationResponse = Some(aMatchResponseWithId),
-    subscriptionDetails = Some(aSubscriptionDetails),
-    data = Json.obj()
+  val anIndividualContact: IndividualContact = IndividualContact(
+    individual = anIndividual,
+    email = "default.email@example.com",
+    phone = None
   )
-
-  val anEmptyAnswer: UserAnswers = aUserAnswers.copy(
-    taxIdentifier = None,
-    registrationResponse = None,
-    subscriptionDetails = None,
-    data = Json.obj())
 }

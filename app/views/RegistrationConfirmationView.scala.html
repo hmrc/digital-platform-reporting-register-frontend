@@ -42,19 +42,26 @@
             content = messages("registrationConfirmation.panel.p1", viewModel.dprsUserId)
         ))
 
+        <p class="govuk-body">
+            @{viewModel.businessName
+                .map(messages("registrationConfirmation.organisation.p1.0", _))
+                .getOrElse(messages("registrationConfirmation.person.p1.0"))}
+            @messages("registrationConfirmation.p1.1", viewModel.subscribedDateTime)
+        </p>
+
         @if(viewModel.isPrivateBeta) {
             @govukWarning(WarningText(
                 iconFallbackText = Some("Warning"),
                 content = messages("registrationConfirmation.privateBeta.warning")
             ))
 
-            <p class="govuk-body">@messages("registrationConfirmation.p1.0")</p>
+            <p class="govuk-body">@messages("registrationConfirmation.p2.0")</p>
         } else {
             <p class="govuk-body">
                 @{
                     viewModel.secondaryEmail match {
-                        case Some(email) => messages("registrationConfirmation.p1.1", viewModel.primaryEmail, email)
-                        case None        => messages("registrationConfirmation.p1.2", viewModel.primaryEmail)
+                        case Some(email) => messages("registrationConfirmation.p2.1", viewModel.primaryEmail, email)
+                        case None        => messages("registrationConfirmation.p2.2", viewModel.primaryEmail)
                     }
                 }
             </p>
@@ -63,9 +70,9 @@
 
             <p class="govuk-body">
                 @if(viewModel.isThirdParty) {
-                    @messages("registrationConfirmation.p3.1")
+                    @messages("registrationConfirmation.thirdParty.p3")
                 } else {
-                    @messages("registrationConfirmation.p3.2")
+                    @messages("registrationConfirmation.organisation.p3")
                 }
             </p>
 

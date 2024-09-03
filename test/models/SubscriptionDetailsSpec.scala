@@ -16,17 +16,26 @@
 
 package models
 
+import builders.AddressBuilder.anAddress
+import builders.SubscriptionRequestBuilder.aSubscriptionRequest
+import builders.UserAnswersBuilder.aUserAnswers
+import models.BusinessType.*
+import models.RegistrationType.{PlatformOperator, ThirdParty}
+import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId, NoMatchResponse}
 import models.subscription.requests.SubscriptionRequest
 import models.subscription.responses.SubscribedResponse
 import models.subscription.{Individual, IndividualContact}
 import org.scalactic.source.Position
+import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import pages.{BusinessNameNoUtrPage, BusinessTypePage, IsThisYourBusinessPage, RegistrationTypePage}
 import play.api.Configuration
 import play.api.libs.json.Json
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, SymmetricCryptoFactory}
 
 import java.security.SecureRandom
+import java.time.Instant
 import java.util.Base64
 
 class SubscriptionDetailsSpec extends AnyFreeSpec with Matchers {
@@ -41,17 +50,121 @@ class SubscriptionDetailsSpec extends AnyFreeSpec with Matchers {
 
   private implicit val crypto: Encrypter with Decrypter =
     SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
-    
+
   "Subscription Details" - {
-    
     "must serialise/deserialise to/from JSON with encrypted formats" in {
-      
       val request = SubscriptionRequest("safeId", true, None, IndividualContact(Individual("first", "last"), "email", None), None)
-      val response = SubscribedResponse("dprsId")
-      val subscriptionDetails = SubscriptionDetails(response, request, RegistrationType.PlatformOperator, None)
-      
+      val response = SubscribedResponse("dprsId", Instant.now())
+      val subscriptionDetails = SubscriptionDetails(response, request, RegistrationType.PlatformOperator, None, None)
+
       val json = Json.toJson(subscriptionDetails)(SubscriptionDetails.encryptedFormat(implicitly))
       json.as[SubscriptionDetails](SubscriptionDetails.encryptedFormat(implicitly)) mustEqual subscriptionDetails
+    }
+
+    "must correctly create SubscriptionDetails when MatchResponseWithID" in {
+      val registrationResponse = MatchResponseWithId("safeId", anAddress, Some("Testing 1 Ltd"))
+      val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
+      val request = aSubscriptionRequest
+      val userAnswers = aUserAnswers
+        .copy(registrationResponse = Some(registrationResponse))
+        .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
+        .set(BusinessTypePage, BusinessType.AssociationOrTrust).success.value
+      val subscriptionDetails = SubscriptionDetails(response, request, PlatformOperator, Some(AssociationOrTrust), Some("Testing 1 Ltd"))
+
+      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+    }
+
+    "must correctly create SubscriptionDetails when MatchResponseWithoutID" in {
+      val registrationResponse = MatchResponseWithoutId("safeId")
+      val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
+      val request = aSubscriptionRequest
+      val userAnswers = aUserAnswers
+        .copy(registrationResponse = Some(registrationResponse))
+        .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
+        .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+        .set(BusinessNameNoUtrPage, "Testing 2 Ltd").success.value
+      val subscriptionDetails = SubscriptionDetails(response, request, PlatformOperator, Some(LimitedCompany), Some("Testing 2 Ltd"))
+
+      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+    }
+
+    "must correctly create SubscriptionDetails when RegistrationType is ThirdParty Individual" in {
+      val registrationResponse = MatchResponseWithoutId("safeId")
+      val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
+      val request = aSubscriptionRequest
+      val userAnswers = aUserAnswers
+        .copy(registrationResponse = Some(registrationResponse))
+        .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
+        .set(BusinessTypePage, BusinessType.Individual).success.value
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Individual), None)
+
+      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+    }
+
+    "must correctly create SubscriptionDetails when RegistrationType is ThirdParty Sole Trader" in {
+      val registrationResponse = MatchResponseWithoutId("safeId")
+      val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
+      val request = aSubscriptionRequest
+      val userAnswers = aUserAnswers
+        .copy(registrationResponse = Some(registrationResponse))
+        .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
+        .set(BusinessTypePage, BusinessType.SoleTrader).success.value
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.SoleTrader), None)
+
+      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+    }
+
+    "must correctly create SubscriptionDetails when RegistrationType is ThirdParty but not Individual MatchResponseWithoutId" in {
+      val registrationResponse = MatchResponseWithoutId("safeId")
+      val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
+      val request = aSubscriptionRequest
+      val userAnswers = aUserAnswers
+        .copy(registrationResponse = Some(registrationResponse))
+        .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
+        .set(BusinessTypePage, BusinessType.Partnership).success.value
+        .set(BusinessNameNoUtrPage, "Testing 3 Ltd").success.value
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Partnership), Some("Testing 3 Ltd"))
+
+      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+    }
+
+    "must correctly create SubscriptionDetails when RegistrationType is ThirdParty but not Individual MatchResponseWithId" in {
+      val registrationResponse = MatchResponseWithId("safeId", anAddress, Some("Testing 4 Ltd"))
+      val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
+      val request = aSubscriptionRequest
+      val userAnswers = aUserAnswers
+        .copy(registrationResponse = Some(registrationResponse))
+        .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
+        .set(BusinessTypePage, BusinessType.Llp).success.value
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Llp), Some("Testing 4 Ltd"))
+
+      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+    }
+
+    "must correctly create SubscriptionDetails when Auto-matched enrollment" in {
+      val registrationResponse = MatchResponseWithId("safeId", anAddress, Some("Testing 5 Ltd"))
+      val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
+      val request = aSubscriptionRequest
+      val userAnswers = aUserAnswers
+        .copy(registrationResponse = Some(registrationResponse))
+        .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
+        .set(IsThisYourBusinessPage, true).success.value
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, None, Some("Testing 5 Ltd"))
+
+      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+    }
+
+    "must correctly create SubscriptionDetails when registrationResponse is not a Match" in {
+      val registrationResponse = NoMatchResponse()
+      val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
+      val request = aSubscriptionRequest
+      val userAnswers = aUserAnswers
+        .copy(registrationResponse = Some(registrationResponse))
+        .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
+        .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+      val subscriptionDetails = SubscriptionDetails(response, request, PlatformOperator, Some(LimitedCompany), None)
+
+      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
     }
   }
 }

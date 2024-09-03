@@ -27,8 +27,8 @@ import models.registration.responses as registrationResponses
 import models.registration.responses.RegistrationResponse
 import models.requests.DataRequest
 import models.subscription.requests.SubscriptionRequest
-import models.{NormalMode, RegistrationType, SubscriptionDetails, UserAnswers}
-import pages.{BusinessTypePage, CheckYourAnswersPage, RegistrationTypePage}
+import models.{NormalMode, SubscriptionDetails, UserAnswers}
+import pages.{BusinessTypePage, CheckYourAnswersPage}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -112,8 +112,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
           subscriptionConnector
             .subscribe(request)
             .map { response =>
-              val registrationType = answers.get(RegistrationTypePage).getOrElse(RegistrationType.ThirdParty)
-              SubscriptionDetails(response, request, registrationType, answers.get(BusinessTypePage))
+              SubscriptionDetails(response, request, answers)
             }
       )
 
