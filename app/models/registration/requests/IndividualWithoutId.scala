@@ -20,36 +20,49 @@ import cats.data.*
 import cats.implicits.*
 import models.UserAnswers
 import models.registration.Address
-import pages.{AddressInUkPage, DateOfBirthPage, IndividualNamePage, InternationalAddressPage, UkAddressPage}
+import pages.*
 import play.api.libs.json.{Json, OWrites}
 import queries.Query
 
 import java.time.LocalDate
 
-
-final case class IndividualWithoutId(
-                                      firstName: String,
-                                      lastName: String,
-                                      dateOfBirth: LocalDate,
-                                      address: Address
+final case class IndividualWithoutId(firstName: String,
+                                     lastName: String,
+                                     dateOfBirth: LocalDate,
+                                     address: Address,
+                                     contactDetails: ContactDetails
                                     ) extends RegistrationRequest
 
 object IndividualWithoutId {
-  
+
   implicit lazy val writes: OWrites[IndividualWithoutId] = Json.writes
 
   def build(answers: UserAnswers): EitherNec[Query, IndividualWithoutId] =
     (
       answers.getEither(IndividualNamePage),
       answers.getEither(DateOfBirthPage),
-      getAddress(answers)
-    ).parMapN { (name, dateOfBirth, address) =>
-      IndividualWithoutId(name.firstName, name.lastName, dateOfBirth, address)
+      getAddress(answers),
+      answers.getEither(IndividualEmailAddressPage),
+      getPhoneNumber(answers)
+    ).parMapN { (name, dateOfBirth, address, email, phone) =>
+      IndividualWithoutId(
+        name.firstName,
+        name.lastName,
+        dateOfBirth,
+        address,
+        ContactDetails(email, phone)
+      )
     }
 
   private def getAddress(answers: UserAnswers): EitherNec[Query, Address] =
     answers.getEither(AddressInUkPage).flatMap {
       case true => answers.getEither(UkAddressPage).map(Address.fromUkAddress)
       case false => answers.getEither(InternationalAddressPage).map(Address.fromInternationalAddress)
+    }
+
+  private def getPhoneNumber(answers: UserAnswers): EitherNec[Query, Option[String]] =
+    answers.getEither(CanPhoneIndividualPage).flatMap {
+      case true => answers.getEither(IndividualPhoneNumberPage).map(Some(_))
+      case false => Right(None)
     }
 }

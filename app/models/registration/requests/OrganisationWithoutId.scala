@@ -20,11 +20,16 @@ import cats.data.*
 import cats.implicits.*
 import models.registration.Address
 import models.{BusinessAddress, UserAnswers}
-import pages.{BusinessAddressPage, BusinessNameNoUtrPage}
+import pages.*
 import play.api.libs.json.{Json, OWrites}
 import queries.Query
 
-final case class OrganisationWithoutId(name: String, address: Address) extends RegistrationRequest
+import scala.util.Right
+
+final case class OrganisationWithoutId(name: String,
+                                       address: Address,
+                                       contactDetails: ContactDetails
+                                      ) extends RegistrationRequest
 
 object OrganisationWithoutId {
 
@@ -33,8 +38,17 @@ object OrganisationWithoutId {
   def build(answers: UserAnswers): EitherNec[Query, OrganisationWithoutId] =
     (
       answers.getEither(BusinessNameNoUtrPage),
-      answers.getEither(BusinessAddressPage)
-    ).parMapN { (name, businessAddress) =>
-      OrganisationWithoutId(name, Address(businessAddress))
+      answers.getEither(BusinessAddressPage),
+      answers.getEither(PrimaryContactNamePage),
+      answers.getEither(PrimaryContactEmailAddressPage),
+      getPhoneNumber(answers)
+    ).parMapN { (name, businessAddress, contactName, email, phone) =>
+      OrganisationWithoutId(name, Address(businessAddress), ContactDetails(email, phone))
+    }
+
+  private def getPhoneNumber(answers: UserAnswers): EitherNec[Query, Option[String]] =
+    answers.getEither(CanPhonePrimaryContactPage).flatMap {
+      case true => answers.getEither(PrimaryContactPhoneNumberPage).map(Some(_))
+      case false => Right(None)
     }
 }

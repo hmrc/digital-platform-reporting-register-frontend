@@ -20,6 +20,7 @@ import base.SpecBase
 import builders.AddressBuilder
 import builders.AddressBuilder.anyAddress
 import builders.BusinessAddressBuilder.aBusinessAddress
+import builders.ContactDetailsBuilder.aContactDetails
 import builders.UkAddressBuilder.aUkAddress
 import builders.UserAnswersBuilder.aUserAnswers
 import connectors.{RegistrationConnector, SubscriptionConnector}
@@ -306,12 +307,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
                 .set(DateOfBirthPage, aDateOfBirth).success.value
                 .set(AddressInUkPage, true).success.value
                 .set(UkAddressPage, aUkAddress).success.value
-                .set(IndividualEmailAddressPage, "email").success.value
+                .set(IndividualEmailAddressPage, "some.email@example.com").success.value
                 .set(CanPhoneIndividualPage, false).success.value
                 .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
 
-              val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress))
-              val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "email", None)
+              val contactDetails = aContactDetails.copy(emailAddress = "some.email@example.com")
+              val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress), contactDetails)
+              val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "some.email@example.com", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
               val subscriptionResponse = SubscribedResponse("dprsId")
               val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty, Some(BusinessType.SoleTrader))
@@ -358,7 +360,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               .set(DateOfBirthPage, aDateOfBirth).success.value
               .set(AddressInUkPage, true).success.value
               .set(UkAddressPage, aUkAddress).success.value
-            val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress))
+              .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
+              .set(CanPhoneIndividualPage, false).success.value
+
+            val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress), aContactDetails)
             val expectedFinalAnswers = answers.copy(registrationResponse = Some(registrationResponse))
 
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
@@ -393,7 +398,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               .set(DateOfBirthPage, aDateOfBirth).success.value
               .set(AddressInUkPage, true).success.value
               .set(UkAddressPage, aUkAddress).success.value
-            val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress))
+              .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
+              .set(CanPhoneIndividualPage, false).success.value
+
+            val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress), aContactDetails)
 
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
 
@@ -428,12 +436,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
                 .set(HasBusinessTradingNamePage, false).success.value
                 .set(BusinessAddressPage, aBusinessAddress).success.value
                 .set(PrimaryContactNamePage, "contact name").success.value
-                .set(PrimaryContactEmailAddressPage, "email").success.value
+                .set(PrimaryContactEmailAddressPage, aContactDetails.emailAddress).success.value
                 .set(CanPhonePrimaryContactPage, false).success.value
                 .set(HasSecondaryContactPage, false).success.value
+                .set(PrimaryContactEmailAddressPage, aContactDetails.emailAddress).success.value
 
-              val expectedRegistrationRequest = OrganisationWithoutId("name", Address.apply(aBusinessAddress))
-              val expectedContact = OrganisationContact(models.subscription.Organisation("contact name"), "email", None)
+              val expectedRegistrationRequest = OrganisationWithoutId("name", Address.apply(aBusinessAddress), aContactDetails)
+              val expectedContact = OrganisationContact(models.subscription.Organisation("contact name"), aContactDetails.emailAddress, None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
               val subscriptionResponse = SubscribedResponse("dprsId")
               val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty, Some(BusinessType.LimitedCompany))
@@ -480,7 +489,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               .set(BusinessNameNoUtrPage, "name").success.value
               .set(HasBusinessTradingNamePage, false).success.value
               .set(BusinessAddressPage, aBusinessAddress).success.value
-            val expectedRegistrationRequest = OrganisationWithoutId("name", Address.apply(aBusinessAddress))
+              .set(PrimaryContactNamePage, "name").success.value
+              .set(PrimaryContactEmailAddressPage, aContactDetails.emailAddress).success.value
+              .set(CanPhonePrimaryContactPage, false).success.value
+
+            val expectedRegistrationRequest = OrganisationWithoutId("name", Address.apply(aBusinessAddress), aContactDetails)
             val expectedFinalAnswers = answers.copy(registrationResponse = Some(registrationResponse))
 
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
@@ -514,7 +527,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               .set(BusinessNameNoUtrPage, "name").success.value
               .set(HasBusinessTradingNamePage, false).success.value
               .set(BusinessAddressPage, aBusinessAddress).success.value
-            val expectedRegistrationRequest = OrganisationWithoutId("name", Address.apply(aBusinessAddress))
+              .set(PrimaryContactNamePage, "name").success.value
+              .set(PrimaryContactEmailAddressPage, aContactDetails.emailAddress).success.value
+              .set(CanPhonePrimaryContactPage, false).success.value
+
+            val expectedRegistrationRequest = OrganisationWithoutId("name", Address.apply(aBusinessAddress), aContactDetails)
 
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
 
