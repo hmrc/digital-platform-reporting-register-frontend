@@ -46,7 +46,7 @@ class AddressSpec extends AnyFreeSpec with Matchers {
         addressLine2 = aUkAddress.line2,
         addressLine3 = Some(aUkAddress.town),
         addressLine4 = aUkAddress.county,
-        postalCode = Some(aUkAddress.postCode),
+        postalCode = aUkAddress.postCode,
         countryCode = aUkAddress.country.code
       )
     }

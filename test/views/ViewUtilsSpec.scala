@@ -44,7 +44,7 @@ class ViewUtilsSpec extends AnyFreeSpec {
         Some(line2),
         None,
         Some(city),
-        Some(postal),
+        postal,
         country.code
       )
 
@@ -70,7 +70,7 @@ class ViewUtilsSpec extends AnyFreeSpec {
         Some(line2),
         city,
         None,
-        Some(postal),
+        postal,
         country
       )
 

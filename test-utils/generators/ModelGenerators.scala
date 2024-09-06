@@ -39,7 +39,7 @@ trait ModelGenerators {
         addressLine2 <- arbitrary[Option[String]]
         city <- arbitrary[String]
         region <- arbitrary[Option[String]]
-        postalCode <- arbitrary[Option[String]]
+        postalCode <- arbitrary[String]
         country <- Gen.oneOf(Country.nonUkInternationalCountries)
       } yield BusinessAddress(addressLine1, addressLine2, city, region, postalCode, country)
     }
@@ -63,7 +63,7 @@ trait ModelGenerators {
         line2 <- arbitrary[Option[String]]
         city <- arbitrary[String]
         region <- arbitrary[Option[String]]
-        postal <- arbitrary[Option[String]]
+        postal <- arbitrary[String]
         country <- Gen.oneOf(Country.internationalCountries)
       } yield InternationalAddress(line1, line2, city, region, postal, country)
     }

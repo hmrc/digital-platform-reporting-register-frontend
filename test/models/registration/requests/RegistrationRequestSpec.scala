@@ -70,7 +70,7 @@ class RegistrationRequestSpec extends AnyFreeSpec with Matchers {
     }
 
     "must write an individual" in {
-      val address = Address("line 1", None, None, None, None, "GB")
+      val address = Address("line 1", None, None, None, "postcode", "GB")
       val contactDetails = aContactDetails.copy(emailAddress = "some.email@example.com", phoneNumber = Some("1234"))
       val request: RegistrationRequest = IndividualWithoutId("first", "last", LocalDate.of(2000, 1, 2), address, contactDetails)
       val json = Json.toJson(request)
@@ -81,6 +81,7 @@ class RegistrationRequestSpec extends AnyFreeSpec with Matchers {
         "dateOfBirth" -> "2000-01-02",
         "address" -> Json.obj(
           "addressLine1" -> "line 1",
+          "postalCode" -> "postcode",
           "countryCode" -> "GB"
         ),
         "contactDetails" -> Json.obj(
@@ -92,7 +93,7 @@ class RegistrationRequestSpec extends AnyFreeSpec with Matchers {
 
     "must write an organisation" in {
       val contactDetails = aContactDetails.copy(emailAddress = "some.email@example.com", phoneNumber = None)
-      val address = Address("line 1", None, None, None, None, "GB")
+      val address = Address("line 1", None, None, None, "postcode", "GB")
       val request: RegistrationRequest = OrganisationWithoutId("name", address, contactDetails)
       val json = Json.toJson(request)
 
@@ -100,6 +101,7 @@ class RegistrationRequestSpec extends AnyFreeSpec with Matchers {
         "name" -> "name",
         "address" -> Json.obj(
           "addressLine1" -> "line 1",
+          "postalCode" -> "postcode",
           "countryCode" -> "GB"
         ),
         "contactDetails" -> Json.obj(

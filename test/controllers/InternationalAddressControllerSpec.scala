@@ -39,7 +39,7 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
   lazy val internationalAddressRoute = routes.InternationalAddressController.onPageLoad(NormalMode).url
 
   val country = Country.internationalCountries.head
-  val address = InternationalAddress("Testing Lane", None, "New York", None, None, country)
+  val address = InternationalAddress("Testing Lane", None, "New York", None, "Test PostCode", country)
   val userAnswers = emptyUserAnswers.set(InternationalAddressPage, address).success.value
 
   "InternationalAddress Controller" - {
@@ -90,7 +90,7 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, internationalAddressRoute)
-            .withFormUrlEncodedBody(("line1", "Testing Lane"), ("city", "New York"),("country", country.code))
+            .withFormUrlEncodedBody(("line1", "Testing Lane"), ("city", "New York"),("postal", "postCode" ),("country", country.code))
 
         val result = route(application, request).value
 

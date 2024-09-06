@@ -48,11 +48,11 @@ class BusinessAddressFormProvider @Inject() extends Mappings {
           maxLength(35, "businessAddress.error.region.length"),
           regexp(Validation.textInputPattern.toString, "businessAddress.error.region.format")
         ))),
-      "postalCode" -> optional(text("")
+      "postalCode" -> text("businessAddress.error.postalCode.required")
         .verifying(firstError(
           maxLength(10, "businessAddress.error.postalCode.length"),
           regexp(Validation.textInputPattern.toString, "businessAddress.error.postalCode.format")
-        ))),
+        )),
       "country" -> text("businessAddress.error.country.required")
         .verifying("businessAddress.error.country.required", value => Country.nonUkInternationalCountries.exists(_.code == value))
         .transform[Country](value => Country.nonUkInternationalCountries.find(_.code == value).get, _.code)

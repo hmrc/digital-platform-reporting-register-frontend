@@ -36,7 +36,7 @@ class RegistrationTypePageSpec extends AnyFreeSpec with Matchers with TryValues 
         
         "must go to Is This Your Business" in {
           
-          val address = Address("line 1", None, None, None, None, "GB")
+          val address = Address("line 1", None, None, None, "postcode", "GB")
           val registrationResponse = MatchResponseWithId("safeId", address, Some("name"))
           val answers = emptyAnswers.copy(registrationResponse = Some(registrationResponse))
 

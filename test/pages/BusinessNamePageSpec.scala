@@ -28,7 +28,7 @@ class BusinessNamePageSpec extends AnyFreeSpec with Matchers with TryValues with
 
   ".nextPage" - {
     val emptyAnswers = UserAnswers("id", None)
-    val address = Address("line 1", None, None, None, None, "GB")
+    val address = Address("line 1", None, None, None, "postcode", "GB")
     val noResponseAnswer = emptyAnswers.copy(registrationResponse = Some(NoMatchResponse()))
 
     "in Normal Mode" - {

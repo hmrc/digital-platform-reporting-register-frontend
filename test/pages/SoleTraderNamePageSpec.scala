@@ -27,7 +27,7 @@ import org.scalatest.{OptionValues, TryValues}
 class SoleTraderNamePageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
   ".nextPage" - {
     val emptyAnswers = UserAnswers("id", None)
-    val address = Address("line 1", None, None, None, None, "GB")
+    val address = Address("line 1", None, None, None, "postcode", "GB")
     val noResponseAnswer = emptyAnswers.copy(registrationResponse = Some(NoMatchResponse()))
 
     "in Normal Mode" - {

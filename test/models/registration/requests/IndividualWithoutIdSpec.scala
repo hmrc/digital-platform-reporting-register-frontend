@@ -41,7 +41,7 @@ class IndividualWithoutIdSpec
     val aUkCountry = Country.ukCountries.head
     val anInternationalCountry = Country.internationalCountries.head
     val aUkAddress = UkAddress("line 1", Some("line 2"), "town", Some("county"), "postcode", aUkCountry)
-    val anInternationalAddress = InternationalAddress("line 1", Some("line 2"), "city", Some("region"), Some("postcode"), anInternationalCountry)
+    val anInternationalAddress = InternationalAddress("line 1", Some("line 2"), "city", Some("region"), "postcode", anInternationalCountry)
 
     "must build from user answers when questions have been answered with a UK address" in {
 
@@ -55,7 +55,7 @@ class IndividualWithoutIdSpec
           .set(CanPhoneIndividualPage, false).success.value
 
       val result = IndividualWithoutId.build(answers)
-      val expectedAddress = Address("line 1", Some("line 2"), Some("town"), Some("county"), Some("postcode"), aUkCountry.code)
+      val expectedAddress = Address("line 1", Some("line 2"), Some("town"), Some("county"), "postcode", aUkCountry.code)
       result.value mustEqual IndividualWithoutId("first", "last", aDateOfBirth, expectedAddress, aContactDetails)
     }
 
@@ -71,7 +71,7 @@ class IndividualWithoutIdSpec
           .set(CanPhoneIndividualPage, false).success.value
 
       val result = IndividualWithoutId.build(answers)
-      val expectedAddress = Address("line 1", Some("line 2"), Some("city"), Some("region"), Some("postcode"), anInternationalCountry.code)
+      val expectedAddress = Address("line 1", Some("line 2"), Some("city"), Some("region"), "postcode", anInternationalCountry.code)
       result.value mustEqual IndividualWithoutId("first", "last", aDateOfBirth, expectedAddress, aContactDetails)
     }
 

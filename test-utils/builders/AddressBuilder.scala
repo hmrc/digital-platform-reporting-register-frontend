@@ -25,7 +25,7 @@ object AddressBuilder {
     addressLine2 = Some("default-address-line2"),
     addressLine3 = Some("default-address-line3"),
     addressLine4 = Some("default-address-line4"),
-    postalCode = None,
+    postalCode = "default-postcode",
     countryCode = "UK"
   )
 

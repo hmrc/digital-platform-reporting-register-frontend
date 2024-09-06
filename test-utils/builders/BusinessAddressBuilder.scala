@@ -25,7 +25,7 @@ object BusinessAddressBuilder {
     addressLine2 = None,
     city = "default-city",
     region = None,
-    postalCode = None,
+    postalCode = "default-postcode",
     country = Country("US", "United States")
   )
 

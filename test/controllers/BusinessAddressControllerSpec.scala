@@ -82,7 +82,7 @@ class BusinessAddressControllerSpec extends SpecBase with MockitoSugar with Gene
 
       running(application) {
         val request = FakeRequest(POST, businessAddressRoute)
-          .withFormUrlEncodedBody(("addressLine1", "value 1"), ("city", "value 2"), ("country", "US"))
+          .withFormUrlEncodedBody(("addressLine1", "value 1"), ("city", "value 2"), ("postalCode", "postcode"), ("country", "US"))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
