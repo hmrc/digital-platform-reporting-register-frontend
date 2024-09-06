@@ -17,8 +17,11 @@
 package models
 
 import cats.implicits.*
+import models.BusinessType.{Individual, SoleTrader}
+import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId}
 import models.subscription.requests.SubscriptionRequest
 import models.subscription.responses.SubscriptionResponse
+import pages.{BusinessNameNoUtrPage, BusinessTypePage, RegistrationTypePage}
 import play.api.libs.json.*
 import uk.gov.hmrc.crypto.Sensitive.SensitiveString
 import uk.gov.hmrc.crypto.json.JsonEncryption
@@ -27,11 +30,40 @@ import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 final case class SubscriptionDetails(subscriptionResponse: SubscriptionResponse,
                                      subscriptionRequest: SubscriptionRequest,
                                      registrationType: RegistrationType,
-                                     businessType: Option[BusinessType])
+                                     businessType: Option[BusinessType],
+                                     businessName: Option[String])
 
 object SubscriptionDetails {
 
   implicit lazy val format: OFormat[SubscriptionDetails] = Json.format
+
+  def apply(response: SubscriptionResponse, request: SubscriptionRequest, userAnswers: UserAnswers): SubscriptionDetails = {
+    val registrationType = userAnswers.get(RegistrationTypePage).getOrElse(RegistrationType.ThirdParty)
+    val businessName = getBusinessName(userAnswers)
+
+    SubscriptionDetails(
+      subscriptionResponse = response,
+      subscriptionRequest = request,
+      registrationType = registrationType,
+      businessType = userAnswers.get(BusinessTypePage),
+      businessName = businessName
+    )
+  }
+
+  private def getBusinessName(userAnswers: UserAnswers): Option[String] =
+    userAnswers.get(BusinessTypePage).flatMap {
+      case Individual | SoleTrader => None
+      case _ => userAnswers.registrationResponse.flatMap {
+        case x: MatchResponseWithId => x.organisationName
+        case x: MatchResponseWithoutId => userAnswers.get(BusinessNameNoUtrPage)
+        case _ => None
+      }
+    }.orElse {
+      userAnswers.registrationResponse.flatMap {
+        case x: MatchResponseWithId => x.organisationName
+        case _ => None
+      }
+    }
 
   def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[SubscriptionDetails] = {
 

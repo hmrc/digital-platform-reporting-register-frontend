@@ -16,16 +16,17 @@
 
 package builders
 
+import builders.SubscribedResponseBuilder.aSubscribedResponse
 import builders.SubscriptionRequestBuilder.aSubscriptionRequest
-import models.subscription.responses.SubscribedResponse
 import models.{RegistrationType, SubscriptionDetails}
 
 object SubscriptionDetailsBuilder {
 
   val aSubscriptionDetails: SubscriptionDetails = SubscriptionDetails(
-    subscriptionResponse = SubscribedResponse("default-dprs-id"),
+    subscriptionResponse = aSubscribedResponse,
     subscriptionRequest = aSubscriptionRequest,
     registrationType = RegistrationType.PlatformOperator,
-    businessType = None
+    businessType = None,
+    businessName = None
   )
 }

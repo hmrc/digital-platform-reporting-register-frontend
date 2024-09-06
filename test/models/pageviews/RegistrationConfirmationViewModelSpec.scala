@@ -16,105 +16,93 @@
 
 package models.pageviews
 
-import builders.UserAnswersBuilder.anEmptyAnswer
+import builders.OrganisationContactBuilder.anOrganisationContact
+import builders.SubscribedResponseBuilder.aSubscribedResponse
+import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
+import builders.SubscriptionRequestBuilder.aSubscriptionRequest
+import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import forms.RegistrationConfirmationFormProvider
 import models.RegistrationType.ThirdParty
-import models.subscription.requests.SubscriptionRequest
-import models.subscription.responses.SubscribedResponse
-import models.subscription.{Individual, IndividualContact}
-import models.{IndividualName, NormalMode, RegistrationType, SubscriptionDetails, UserAnswers}
+import models.{BusinessType, NormalMode, RegistrationType, SubscriptionDetails}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.RegistrationConfirmationPage
 
-trait SetupForRegistrationConfirmation {
-  protected lazy val fakeAnswers: UserAnswers =
-    setupAnswers("", "", None, ThirdParty)
+import java.time.Instant
 
-  protected def setupAnswers(
-                              dprsUserId: String,
-                              primaryEmail: String,
-                              secondaryEmail: Option[String],
-                              registrationType: RegistrationType
-                            ): UserAnswers = {
-    anEmptyAnswer.copy(
-      subscriptionDetails = Some(SubscriptionDetails(
-        subscriptionResponse = SubscribedResponse(dprsUserId),
-        subscriptionRequest = SubscriptionRequest(
-          "",
-          false,
-          None,
-          getContact(primaryEmail),
-          secondaryEmail.map(e => getContact(e))
-        ),
-        registrationType = registrationType,
-        businessType = None
-      ))
-    )
-  }
-
-  private def getContact(email: String) = IndividualContact(
-    Individual(IndividualName("", "")),
-    email,
-    None
-  )
-}
-
-class RegistrationConfirmationViewModelSpec extends AnyFreeSpec with Matchers with SetupForRegistrationConfirmation {
+class RegistrationConfirmationViewModelSpec extends AnyFreeSpec with Matchers {
 
   private val anyMode = NormalMode
   private val formProvider = new RegistrationConfirmationFormProvider()
+  private val isPrivateBeta = false
+  private val subscribedResponse = aSubscribedResponse.copy(dprsId = "some-dprs-id", Instant.parse("2024-03-17T09:30:47Z"))
+  private val subscriptionRequest = aSubscriptionRequest.copy(primaryContact = anOrganisationContact.copy(email = "primary.email@example.com"))
+  private val subscriptionDetails = aSubscriptionDetails.copy(
+    subscriptionResponse = subscribedResponse,
+    subscriptionRequest = subscriptionRequest,
+    registrationType = RegistrationType.ThirdParty,
+    businessName = Some("some-business-name")
+  )
 
   private val underTest = RegistrationConfirmationViewModel
-  private val isPrivateBeta = false
 
   ".apply(...)" - {
     "must return ViewModel with pre-filled form when RegistrationConfirmationPage answer available" in {
       val form = formProvider()
       val anyBoolean = true
-      val userAnswers = fakeAnswers.set(RegistrationConfirmationPage, anyBoolean).get
+
+      val userAnswers = aUserAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
+        .set(RegistrationConfirmationPage, anyBoolean).get
 
       underTest.apply(anyMode, userAnswers, form, isPrivateBeta) mustBe
         Some(RegistrationConfirmationViewModel(
           mode = anyMode,
           form = form.fill(anyBoolean),
-          dprsUserId = "",
-          primaryEmail = "",
+          dprsUserId = "some-dprs-id",
+          subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
+          primaryEmail = "primary.email@example.com",
           secondaryEmail = None,
           isThirdParty = true,
-          isPrivateBeta = isPrivateBeta
+          isPrivateBeta = isPrivateBeta,
+          businessName = Some("some-business-name")
         ))
     }
 
     "must return ViewModel without pre-filled form when RegistrationConfirmationPage answer not available" in {
-      val emptyForm = formProvider()
-      val userAnswers = fakeAnswers.remove(RegistrationConfirmationPage).get
+      val form = formProvider()
+      val userAnswers = aUserAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
+        .remove(RegistrationConfirmationPage).get
 
-      underTest.apply(anyMode, userAnswers, emptyForm, isPrivateBeta) mustBe
+      underTest.apply(anyMode, userAnswers, form, isPrivateBeta) mustBe
         Some(RegistrationConfirmationViewModel(
           mode = anyMode,
-          form = emptyForm,
-          dprsUserId = "",
-          primaryEmail = "",
+          form = form,
+          dprsUserId = "some-dprs-id",
+          subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
+          primaryEmail = "primary.email@example.com",
           secondaryEmail = None,
           isThirdParty = true,
-          isPrivateBeta = isPrivateBeta
+          isPrivateBeta = isPrivateBeta,
+          businessName = Some("some-business-name")
         ))
     }
 
     "must return ViewModel with pre-filled form with errors, when the form has errors" in {
       val formWithErrors = formProvider().bind(Map(RegistrationConfirmationPage.toString -> "unknown-value"))
-      val userAnswers = fakeAnswers.remove(RegistrationConfirmationPage).get
+      val userAnswers = aUserAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
+        .remove(RegistrationConfirmationPage).get
 
       underTest.apply(anyMode, userAnswers, formWithErrors, isPrivateBeta) mustBe
         Some(RegistrationConfirmationViewModel(
           mode = anyMode,
           form = formWithErrors,
-          dprsUserId = "",
-          primaryEmail = "",
+          dprsUserId = "some-dprs-id",
+          subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
+          primaryEmail = "primary.email@example.com",
           secondaryEmail = None,
           isThirdParty = true,
-          isPrivateBeta = isPrivateBeta
+          isPrivateBeta = isPrivateBeta,
+          businessName = Some("some-business-name")
         ))
     }
 

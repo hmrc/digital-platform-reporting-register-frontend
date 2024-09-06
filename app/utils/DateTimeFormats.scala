@@ -23,15 +23,15 @@ import java.util.Locale
 
 object DateTimeFormats {
 
-  private val dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
+  private val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
-  private val localisedDateTimeFormatters = Map(
-    "en" -> dateTimeFormatter,
-    "cy" -> dateTimeFormatter.withLocale(new Locale("cy"))
+  private val localisedDateFormatters = Map(
+    "en" -> dateFormatter,
+    "cy" -> dateFormatter.withLocale(new Locale("cy"))
   )
 
-  def dateTimeFormat()(implicit lang: Lang): DateTimeFormatter = {
-    localisedDateTimeFormatters.getOrElse(lang.code, dateTimeFormatter)
+  def dateFormat()(implicit lang: Lang): DateTimeFormatter = {
+    localisedDateFormatters.getOrElse(lang.code, dateFormatter)
   }
 
   val dateTimeHintFormat: DateTimeFormatter =

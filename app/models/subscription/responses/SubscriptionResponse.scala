@@ -22,6 +22,8 @@ import uk.gov.hmrc.crypto.Sensitive.SensitiveString
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
+import java.time.Instant
+
 
 sealed trait SubscriptionResponse
 
@@ -56,7 +58,7 @@ object SubscriptionResponse {
   }
 }
 
-final case class SubscribedResponse(dprsId: String) extends SubscriptionResponse
+final case class SubscribedResponse(dprsId: String, subscribedDateTime: Instant) extends SubscriptionResponse
 
 object SubscribedResponse {
   implicit lazy val format: OFormat[SubscribedResponse] = Json.format

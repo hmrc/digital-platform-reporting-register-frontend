@@ -21,6 +21,7 @@ import builders.AddressBuilder
 import builders.AddressBuilder.anyAddress
 import builders.BusinessAddressBuilder.aBusinessAddress
 import builders.ContactDetailsBuilder.aContactDetails
+import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
 import builders.UkAddressBuilder.aUkAddress
 import builders.UserAnswersBuilder.aUserAnswers
 import connectors.{RegistrationConnector, SubscriptionConnector}
@@ -31,7 +32,6 @@ import models.registration.Address
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
 import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId}
 import models.subscription.requests.SubscriptionRequest
-import models.subscription.responses.SubscribedResponse
 import models.subscription.{IndividualContact, OrganisationContact}
 import models.{BusinessType, IndividualName, NormalMode, RegistrationType, SoleTraderName, SubscriptionDetails}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -51,7 +51,7 @@ import services.AuditService
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import views.html.{CheckYourAnswersIndividualView, CheckYourAnswersOrganisationView}
 
-import java.time.LocalDate
+import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
 class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
@@ -213,20 +213,19 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
           val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "email", None)
           val expectedSubscriptionRequest = SubscriptionRequest("safeId", true, None, expectedContact, None)
-          val subscriptionResponse = SubscribedResponse("dprsId")
-          val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.PlatformOperator, Some(BusinessType.SoleTrader))
+          val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, businessType = Some(BusinessType.SoleTrader))
           val expectedFinalAnswers = answers.copy(data = Json.obj(), subscriptionDetails = Some(subscriptionDetails))
 
-          when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionResponse))
+          when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionDetails.subscriptionResponse))
           when(mockAuditService.sendAudit(any())(any())).thenReturn(Future.successful(AuditResult.Success))
           when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
           val application = applicationBuilder(userAnswers = Some(answers)).overrides(
-              bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-              bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-              bind[AuditService].toInstance(mockAuditService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
             .build()
 
           running(application) {
@@ -248,11 +247,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
           val registrationResponse = models.registration.responses.AlreadySubscribedResponse()
           val answers = emptyUserAnswers.copy(registrationResponse = Some(registrationResponse))
           val application = applicationBuilder(userAnswers = Some(answers)).overrides(
-              bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-              bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-              bind[AuditService].toInstance(mockAuditService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
             .build()
 
           running(application) {
@@ -274,11 +273,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
           val registrationResponse = models.registration.responses.NoMatchResponse()
           val answers = emptyUserAnswers.copy(registrationResponse = Some(registrationResponse))
           val application = applicationBuilder(userAnswers = Some(answers)).overrides(
-              bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-              bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-              bind[AuditService].toInstance(mockAuditService),
-              bind[SessionRepository].toInstance(mockSessionRepository)
-            )
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
             .build()
 
           running(application) {
@@ -315,8 +314,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress), contactDetails)
               val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "some.email@example.com", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
-              val subscriptionResponse = SubscribedResponse("dprsId")
-              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty, Some(BusinessType.SoleTrader))
+              val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, registrationType = RegistrationType.ThirdParty, businessType = Some(BusinessType.SoleTrader), None)
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),
@@ -324,7 +322,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               )
 
               when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
-              when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionResponse))
+              when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionDetails.subscriptionResponse))
               when(mockAuditService.sendAudit(any())(any())).thenReturn(Future.successful(AuditResult.Success))
               when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -369,11 +367,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
 
             val application = applicationBuilder(userAnswers = Some(answers)).overrides(
-                bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-                bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-                bind[AuditService].toInstance(mockAuditService),
-                bind[SessionRepository].toInstance(mockSessionRepository)
-              )
+              bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+              bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+              bind[AuditService].toInstance(mockAuditService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
               .build()
 
             running(application) {
@@ -406,11 +404,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
 
             val application = applicationBuilder(userAnswers = Some(answers)).overrides(
-                bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-                bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-                bind[AuditService].toInstance(mockAuditService),
-                bind[SessionRepository].toInstance(mockSessionRepository)
-              )
+              bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+              bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+              bind[AuditService].toInstance(mockAuditService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
               .build()
 
             running(application) {
@@ -428,8 +426,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
         "for an organisation" - {
           "must register the user" - {
             "and submit a subscription, record it in user answers, remove the user's data, and redirect to the next page when the registration succeeds" in {
-              val registrationResponse = MatchResponseWithId("safeId", anyAddress, None)
+              val registrationResponse = MatchResponseWithoutId("safeId")
               val answers = emptyUserAnswers
+                .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
                 .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
                 .set(RegisteredInUkPage, false).success.value
                 .set(BusinessNameNoUtrPage, "name").success.value
@@ -444,8 +443,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               val expectedRegistrationRequest = OrganisationWithoutId("name", Address.apply(aBusinessAddress), aContactDetails)
               val expectedContact = OrganisationContact(models.subscription.Organisation("contact name"), aContactDetails.emailAddress, None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
-              val subscriptionResponse = SubscribedResponse("dprsId")
-              val subscriptionDetails = SubscriptionDetails(subscriptionResponse, expectedSubscriptionRequest, RegistrationType.ThirdParty, Some(BusinessType.LimitedCompany))
+              val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, businessType = Some(BusinessType.LimitedCompany), businessName = Some("name"))
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),
@@ -453,7 +451,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
               )
 
               when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
-              when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionResponse))
+              when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionDetails.subscriptionResponse))
               when(mockAuditService.sendAudit(any())(any())).thenReturn(Future.successful(AuditResult.Success))
               when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
@@ -499,11 +497,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
 
             val application = applicationBuilder(userAnswers = Some(answers)).overrides(
-                bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-                bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-                bind[AuditService].toInstance(mockAuditService),
-                bind[SessionRepository].toInstance(mockSessionRepository)
-              )
+              bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+              bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+              bind[AuditService].toInstance(mockAuditService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
               .build()
 
             running(application) {
@@ -536,11 +534,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
 
             val application = applicationBuilder(userAnswers = Some(answers)).overrides(
-                bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-                bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-                bind[AuditService].toInstance(mockAuditService),
-                bind[SessionRepository].toInstance(mockSessionRepository)
-              )
+              bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+              bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+              bind[AuditService].toInstance(mockAuditService),
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
               .build()
 
             running(application) {
