@@ -17,25 +17,119 @@
 package models.audit
 
 import base.SpecBase
-import builders.MatchResponseWithIdBuilder.aMatchResponseWithId
+import builders.AuditEventModelBuilder.anAuditEventModel
+import builders.FailureResponseDataBuilder.aFailureResponseData
+import builders.SubscribedResponseBuilder.aSubscribedResponse
+import builders.SuccessResponseDataBuilder.aSuccessResponseData
 import builders.UserAnswersBuilder.aUserAnswers
+import connectors.SubscriptionConnector.SubscribeFailure
+import models.subscription.responses.AlreadySubscribedResponse
+import play.api.libs.json.Json
+
+import java.time.{LocalDateTime, ZoneId}
 
 class AuditEventModelSpec extends SpecBase {
 
   private val underTest = AuditEventModel
 
-  ".apply" - {
-    "must return Subscription audit event when registration response exists in answers" in {
-      val anyRegistrationResponse = aMatchResponseWithId
-      val answers = aUserAnswers.copy(registrationResponse = Some(anyRegistrationResponse))
+  "Audit event" - {
+    "must serialise correctly with success data" in {
+      val auditEventModel = anAuditEventModel.copy(
+        auditType = "some-audit-type",
+        requestData = Json.obj("type" -> "individual", "utr" -> "123"),
+        responseData = aSuccessResponseData.copy(
+          processedAt = LocalDateTime.of(2001, 1, 1, 2, 30, 23),
+          subscriptionId = "some-subscription-id"
+        )
+      )
 
-      underTest.apply(answers) mustBe AuditEventModel("Subscription", answers.data)
+      Json.toJson(auditEventModel) mustBe Json.obj(
+        "requestData" -> Json.obj("type" -> "individual", "utr" -> "123"),
+        "responseData" -> Json.obj(
+          "statusCode" -> 201,
+          "status" -> "success",
+          "processedAt" -> "2001-01-01T02:30:23",
+          "subscriptionId" -> "some-subscription-id",
+        )
+      )
+    }
+
+    "must serialise correctly with failure data" in {
+      val auditEventModel = anAuditEventModel.copy(
+        auditType = "some-audit-type",
+        requestData = Json.obj("type" -> "individual", "utr" -> "123"),
+        responseData = aFailureResponseData.copy(
+          statusCode = 500,
+          processedAt = LocalDateTime.of(2001, 1, 1, 2, 30, 23),
+          reason = "some-failure-reason"
+        )
+      )
+
+      Json.toJson(auditEventModel) mustBe Json.obj(
+        "requestData" -> Json.obj("type" -> "individual", "utr" -> "123"),
+        "responseData" -> Json.obj(
+          "statusCode" -> 500,
+          "status" -> "failure",
+          "processedAt" -> "2001-01-01T02:30:23",
+          "reason" -> "some-failure-reason"
+        )
+      )
+    }
+  }
+
+  ".apply(userAnswers: UserAnswers, subscribeFailure: SubscribeFailure)" - {
+    "must return Subscription audit event when registration response exists in answers" in {
+      val answers = aUserAnswers.copy(data = Json.obj("type" -> "individual", "utr" -> "123"))
+
+      val expected = AuditEventModel("Subscription", answers.data, aFailureResponseData.copy(statusCode = 422))
+      val result = underTest.apply(answers, SubscribeFailure(422))
+
+      result.auditType mustBe expected.auditType
+      result.requestData mustBe expected.requestData
+      result.responseData.asInstanceOf[FailureResponseData].statusCode mustBe 422
+      result.responseData.asInstanceOf[FailureResponseData].reason mustBe "Duplicate submission"
     }
 
     "must return AutoSubscription audit event when registration response does not exist in answers" in {
-      val answers = aUserAnswers.copy(registrationResponse = None)
+      val answers = aUserAnswers.copy(
+        registrationResponse = None,
+        data = Json.obj("type" -> "individual", "utr" -> "123")
+      )
 
-      underTest.apply(answers) mustBe AuditEventModel("AutoSubscription", answers.data)
+      val expected = AuditEventModel("AutoSubscription", answers.data, aFailureResponseData.copy(statusCode = 500))
+      val result = underTest.apply(answers, SubscribeFailure(500))
+
+      result.auditType mustBe expected.auditType
+      result.requestData mustBe expected.requestData
+      result.responseData.asInstanceOf[FailureResponseData].statusCode mustBe 500
+      result.responseData.asInstanceOf[FailureResponseData].reason mustBe "Error with code: 500"
+    }
+  }
+
+  ".apply(userAnswers: UserAnswers, subscriptionResponse: SubscriptionResponse)" - {
+    "must return Subscription audit event when registration response exists in answers and subscribed response" in {
+      val answers = aUserAnswers.copy(data = Json.obj("type" -> "individual", "utr" -> "123"))
+      val subscribedResponse = aSubscribedResponse.copy(dprsId = "some-dprs-id")
+
+      underTest.apply(answers, subscribedResponse) mustBe AuditEventModel(
+        "Subscription",
+        answers.data,
+        SuccessResponseData(LocalDateTime.ofInstant(subscribedResponse.subscribedDateTime, ZoneId.of("UTC")), "some-dprs-id")
+      )
+    }
+
+    "must return AutoSubscription audit event when registration response does not exist in answers and already subscribed response" in {
+      val answers = aUserAnswers.copy(
+        registrationResponse = None,
+        data = Json.obj("type" -> "individual", "utr" -> "123")
+      )
+      val expected = AuditEventModel("AutoSubscription", answers.data, aFailureResponseData.copy(statusCode = 422))
+      val result = underTest.apply(answers, AlreadySubscribedResponse())
+
+      result.auditType mustBe expected.auditType
+      result.requestData mustBe expected.requestData
+      result.responseData.asInstanceOf[FailureResponseData].statusCode mustBe 422
+      result.responseData.asInstanceOf[FailureResponseData].reason mustBe "Duplicate submission"
     }
   }
 }

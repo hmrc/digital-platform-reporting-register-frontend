@@ -17,6 +17,7 @@
 package controllers
 
 import com.google.inject.Inject
+import connectors.SubscriptionConnector.SubscribeFailure
 import connectors.{RegistrationConnector, SubscriptionConnector}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.BusinessType.*
@@ -27,6 +28,7 @@ import models.registration.responses as registrationResponses
 import models.registration.responses.RegistrationResponse
 import models.requests.DataRequest
 import models.subscription.requests.SubscriptionRequest
+import models.subscription.responses.SubscriptionResponse
 import models.{NormalMode, SubscriptionDetails, UserAnswers}
 import pages.{BusinessTypePage, CheckYourAnswersPage}
 import play.api.i18n.I18nSupport
@@ -71,7 +73,6 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
         val answersWithRegistration = request.userAnswers.copy(registrationResponse = Some(matchResponse))
 
         subscribe(matchResponse.safeId, answersWithRegistration).flatMap { subscriptionDetails =>
-          auditService.sendAudit(AuditEventModel(request.userAnswers))
           val answersWithSubscription = answersWithRegistration.copy(
             subscriptionDetails = Some(subscriptionDetails),
             data = Json.obj()
@@ -89,32 +90,33 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       .map(x => Future.successful(x))
       .getOrElse {
         answers.get(BusinessTypePage).map {
-          case Individual | SoleTrader =>
-            IndividualWithoutId.build(answers)
-              .fold(
-                errors => Future.failed(Exception(s"Unable to build a registration request for an individual, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
-                request => registrationConnector.register(request)
-              )
-          case _ =>
-            OrganisationWithoutId.build(answers)
-              .fold(
-                errors => Future.failed(Exception(s"Unable to build a registration request for an organisation, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
-                request => registrationConnector.register(request)
-              )
+          case Individual | SoleTrader => IndividualWithoutId.build(answers).fold(
+            errors => Future.failed(Exception(s"Unable to build a registration request for an individual, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
+            request => registrationConnector.register(request)
+          )
+          case _ => OrganisationWithoutId.build(answers).fold(
+            errors => Future.failed(Exception(s"Unable to build a registration request for an organisation, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
+            request => registrationConnector.register(request)
+          )
         }.getOrElse(Future.failed(Exception("Could not find an answer for BusinessType when trying to build a registration request")))
       }
 
   private def subscribe(safeId: String, answers: UserAnswers)(implicit request: Request[_]): Future[SubscriptionDetails] =
-    SubscriptionRequest.build(safeId, answers)
-      .fold(
-        errors => Future.failed(Exception(s"Unable to build a subscription request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
-        request =>
-          subscriptionConnector
-            .subscribe(request)
-            .map { response =>
-              SubscriptionDetails(response, request, answers)
-            }
-      )
+    SubscriptionRequest.build(safeId, answers).fold(
+      errors => Future.failed(Exception(s"Unable to build a subscription request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
+      request =>
+        subscriptionConnector
+          .subscribe(request)
+          .map { response =>
+            auditService.sendAudit(AuditEventModel(answers, response))
+            SubscriptionDetails(response, request, answers)
+          }
+          .recover {
+            case error =>
+              auditService.sendAudit(AuditEventModel(answers, error.asInstanceOf[SubscribeFailure]))
+              throw error
+          }
+    )
 
   private def showIndividual(implicit request: DataRequest[AnyContent]) = {
     val viewModel = CheckYourAnswersIndividualViewModel(request.userAnswers)

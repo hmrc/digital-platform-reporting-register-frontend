@@ -17,6 +17,7 @@
 package services
 
 import base.SpecBase
+import builders.SuccessResponseDataBuilder.aSuccessResponseData
 import models.audit.AuditEventModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
@@ -46,7 +47,7 @@ class AuditServiceSpec extends SpecBase
 
   ".sendAudit" - {
     "create extended event and send to auditConnector" in {
-      val event = AuditEventModel(auditType, eventDetails)
+      val event = AuditEventModel(auditType, eventDetails, aSuccessResponseData)
 
       when(mockAuditConnector.sendExtendedEvent(any())(any(), any())).thenReturn(Future.successful(AuditResult.Success))
 

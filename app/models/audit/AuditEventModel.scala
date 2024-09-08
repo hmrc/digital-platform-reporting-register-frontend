@@ -16,15 +16,45 @@
 
 package models.audit
 
+import cats.implicits.*
+import connectors.SubscriptionConnector.SubscribeFailure
 import models.UserAnswers
-import play.api.libs.json.JsObject
+import models.subscription.responses.{AlreadySubscribedResponse, SubscribedResponse, SubscriptionResponse}
+import play.api.libs.json.*
 
-case class AuditEventModel(auditType: String, detail: JsObject)
+import java.time.{Instant, LocalDateTime, ZoneId}
+
+case class AuditEventModel(auditType: String, requestData: JsObject, responseData: ResponseData)
 
 object AuditEventModel {
 
-  def apply(userAnswers: UserAnswers): AuditEventModel = userAnswers.registrationResponse match {
-    case Some(_) => AuditEventModel("Subscription", userAnswers.data)
-    case None => AuditEventModel("AutoSubscription", userAnswers.data)
+  implicit lazy val writes: OWrites[AuditEventModel] = (o: AuditEventModel) => Json.obj(
+    "requestData" -> o.requestData,
+    "responseData" -> o.responseData
+  )
+
+  def apply(userAnswers: UserAnswers, subscribeFailure: SubscribeFailure): AuditEventModel = {
+    val localDateTime = LocalDateTime.ofInstant(Instant.now, ZoneId.of("UTC"))
+    val responseData = subscribeFailure.statusCode match {
+      case 422 => FailureResponseData(422, localDateTime, "Duplicate submission")
+      case _ => FailureResponseData(subscribeFailure.statusCode, localDateTime, subscribeFailure.getMessage())
+    }
+
+    userAnswers.registrationResponse match {
+      case Some(_) => AuditEventModel("Subscription", userAnswers.data, responseData)
+      case None => AuditEventModel("AutoSubscription", userAnswers.data, responseData)
+    }
+  }
+
+  def apply(userAnswers: UserAnswers, subscriptionResponse: SubscriptionResponse): AuditEventModel = {
+    val responseData = subscriptionResponse match {
+      case SubscribedResponse(dprsId, subscribedDateTime) => SuccessResponseData(LocalDateTime.ofInstant(subscribedDateTime, ZoneId.of("UTC")), dprsId)
+      case AlreadySubscribedResponse() => FailureResponseData(422, LocalDateTime.ofInstant(Instant.now, ZoneId.of("UTC")), "Duplicate submission")
+    }
+
+    userAnswers.registrationResponse match {
+      case Some(_) => AuditEventModel("Subscription", userAnswers.data, responseData)
+      case None => AuditEventModel("AutoSubscription", userAnswers.data, responseData)
+    }
   }
 }
