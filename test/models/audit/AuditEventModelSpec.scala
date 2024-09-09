@@ -82,7 +82,7 @@ class AuditEventModelSpec extends SpecBase {
       val answers = aUserAnswers.copy(data = Json.obj("type" -> "individual", "utr" -> "123"))
 
       val expected = AuditEventModel("Subscription", answers.data, aFailureResponseData.copy(statusCode = 422))
-      val result = underTest.apply(answers, SubscribeFailure(422))
+      val result = underTest.apply(false, answers.data, SubscribeFailure(422))
 
       result.auditType mustBe expected.auditType
       result.requestData mustBe expected.requestData
@@ -97,7 +97,7 @@ class AuditEventModelSpec extends SpecBase {
       )
 
       val expected = AuditEventModel("AutoSubscription", answers.data, aFailureResponseData.copy(statusCode = 500))
-      val result = underTest.apply(answers, SubscribeFailure(500))
+      val result = underTest.apply(true, answers.data, SubscribeFailure(500))
 
       result.auditType mustBe expected.auditType
       result.requestData mustBe expected.requestData
@@ -111,7 +111,7 @@ class AuditEventModelSpec extends SpecBase {
       val answers = aUserAnswers.copy(data = Json.obj("type" -> "individual", "utr" -> "123"))
       val subscribedResponse = aSubscribedResponse.copy(dprsId = "some-dprs-id")
 
-      underTest.apply(answers, subscribedResponse) mustBe AuditEventModel(
+      underTest.apply(false, answers.data, subscribedResponse) mustBe AuditEventModel(
         "Subscription",
         answers.data,
         SuccessResponseData(LocalDateTime.ofInstant(subscribedResponse.subscribedDateTime, ZoneId.of("UTC")), "some-dprs-id")
@@ -124,7 +124,7 @@ class AuditEventModelSpec extends SpecBase {
         data = Json.obj("type" -> "individual", "utr" -> "123")
       )
       val expected = AuditEventModel("AutoSubscription", answers.data, aFailureResponseData.copy(statusCode = 422))
-      val result = underTest.apply(answers, AlreadySubscribedResponse())
+      val result = underTest.apply(true, answers.data, AlreadySubscribedResponse())
 
       result.auditType mustBe expected.auditType
       result.requestData mustBe expected.requestData
