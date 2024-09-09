@@ -18,11 +18,11 @@ package services
 
 import base.SpecBase
 import builders.SuccessResponseDataBuilder.aSuccessResponseData
+import config.FrontendAppConfig
 import models.audit.AuditEventModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,13 +37,13 @@ class AuditServiceSpec extends SpecBase
   with DefaultAwaitTimeout {
 
   private val mockAuditConnector = mock[AuditConnector]
-  private val mockConfiguration = mock[Configuration]
+  private val mockAppConfig = mock[FrontendAppConfig]
 
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
   private val auditType = "some-audit-type"
   private val eventDetails = Json.obj("some-key" -> "some-details")
 
-  private val underTest = AuditService(mockAuditConnector, mockConfiguration)
+  private val underTest = AuditService(mockAuditConnector, mockAppConfig)
 
   ".sendAudit" - {
     "create extended event and send to auditConnector" in {
@@ -53,7 +53,7 @@ class AuditServiceSpec extends SpecBase
 
       await(underTest.sendAudit(event)) mustBe AuditResult.Success
 
-      verify(mockConfiguration, times(1)).get[String]("appName")
+      verify(mockAppConfig, times(1)).auditSource
     }
   }
 }

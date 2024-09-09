@@ -16,27 +16,27 @@
 
 package services
 
+import config.FrontendAppConfig
 import models.audit.AuditEventModel
+import play.api.Logging
 import play.api.libs.json.Json
-import play.api.{Configuration, Logging}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
-import uk.gov.hmrc.play.bootstrap.config.AppName
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuditService @Inject()(auditConnector: AuditConnector,
-                             configuration: Configuration)
+                             appConfig: FrontendAppConfig)
                             (implicit ec: ExecutionContext) extends Logging {
 
   def sendAudit[T](event: AuditEventModel)
                   (implicit hc: HeaderCarrier): Future[AuditResult] = {
     val dataEvent = ExtendedDataEvent(
-      auditSource = AppName.fromConfiguration(configuration),
+      auditSource = appConfig.auditSource,
       auditType = event.auditType,
       detail = Json.toJson(event),
       tags = AuditExtensions.auditHeaderCarrier(hc).toAuditTags()
