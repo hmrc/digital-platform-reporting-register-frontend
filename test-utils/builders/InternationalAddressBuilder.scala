@@ -25,7 +25,7 @@ object InternationalAddressBuilder {
     line2 = None,
     city = "default-city",
     region = Some("default-region"),
-    postal = Some("default-postal-code"),
+    postal = "default-postal-code",
     country = Country("US", "United States")
   )
 }

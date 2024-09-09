@@ -43,7 +43,7 @@ object ViewUtils {
       ukAddress.line2,
       Some(ukAddress.town),
       ukAddress.county,
-      Some(ukAddress.postCode),
+      ukAddress.postCode,
       ukAddress.country.code
     ))
 

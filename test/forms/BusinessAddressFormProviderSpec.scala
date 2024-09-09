@@ -150,6 +150,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
   ".postalCode" - {
     val fieldName = "postalCode"
+    val requiredKey = "businessAddress.error.postalCode.required"
     val lengthKey = "businessAddress.error.postalCode.length"
     val formatKey = "businessAddress.error.postalCode.format"
     val maxLength = 10
@@ -172,6 +173,12 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
+    
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
     )
   }
 

@@ -22,7 +22,7 @@ case class BusinessAddress(addressLine1: String,
                            addressLine2: Option[String] = None,
                            city: String,
                            region: Option[String] = None,
-                           postalCode: Option[String] = None,
+                           postalCode: String,
                            country: Country)
 
 object BusinessAddress {

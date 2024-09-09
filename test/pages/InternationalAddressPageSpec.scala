@@ -25,7 +25,7 @@ import org.scalatest.{OptionValues, TryValues}
 class InternationalAddressPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   private val country = Country.internationalCountries.head
-  private val address = InternationalAddress("line 1", None, "city", None, None, country)
+  private val address = InternationalAddress("line 1", None, "city", None, "Postcode", country)
 
   ".nextPage" - {
     val emptyAnswers = UserAnswers("id", None)

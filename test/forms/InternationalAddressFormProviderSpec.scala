@@ -155,6 +155,7 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
   ".postal" - {
 
     val fieldName = "postal"
+    val requiredKey = "internationalAddress.error.postal.required"
     val lengthKey = "internationalAddress.error.postal.length"
     val formatKey = "internationalAddress.error.postal.format"
     val maxLength = 10
@@ -177,6 +178,12 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
     )
   }
 

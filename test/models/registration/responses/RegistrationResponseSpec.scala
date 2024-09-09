@@ -31,7 +31,7 @@ class RegistrationResponseSpec extends AnyFreeSpec with Matchers {
   "registration response" - {
     "must serialise / deserialise" - {
       "a match with Id" in {
-        val response = MatchResponseWithId("safeId", Address("line 1", None, None, None, None, "GB"), None)
+        val response = MatchResponseWithId("safeId", Address("line 1", None, None, None, "postcode", "GB"), None)
         val json = Json.toJson(response)
         val result = json.as[RegistrationResponse]
         result mustEqual response
@@ -72,7 +72,7 @@ class RegistrationResponseSpec extends AnyFreeSpec with Matchers {
         SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
 
       "a match with Id" in {
-        val response = MatchResponseWithId("safeId", Address("line 1", None, None, None, None, "GB"), None)
+        val response = MatchResponseWithId("safeId", Address("line 1", None, None, None, "postcode", "GB"), None)
         val json = Json.toJson(response)(RegistrationResponse.encryptedFormat)
         val result = json.as[RegistrationResponse](RegistrationResponse.encryptedFormat)
 
