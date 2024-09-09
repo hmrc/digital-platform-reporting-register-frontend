@@ -28,7 +28,6 @@ import models.registration.responses as registrationResponses
 import models.registration.responses.RegistrationResponse
 import models.requests.DataRequest
 import models.subscription.requests.SubscriptionRequest
-import models.subscription.responses.SubscriptionResponse
 import models.{NormalMode, SubscriptionDetails, UserAnswers}
 import pages.{BusinessTypePage, CheckYourAnswersPage}
 import play.api.i18n.I18nSupport
@@ -72,7 +71,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
       case matchResponse: registrationResponses.MatchResponse =>
         val answersWithRegistration = request.userAnswers.copy(registrationResponse = Some(matchResponse))
 
-        subscribe(matchResponse.safeId, answersWithRegistration).flatMap { subscriptionDetails =>
+        subscribe(matchResponse.safeId, answersWithRegistration, request.userAnswers).flatMap { subscriptionDetails =>
           val answersWithSubscription = answersWithRegistration.copy(
             subscriptionDetails = Some(subscriptionDetails),
             data = Json.obj()
@@ -101,19 +100,21 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
         }.getOrElse(Future.failed(Exception("Could not find an answer for BusinessType when trying to build a registration request")))
       }
 
-  private def subscribe(safeId: String, answers: UserAnswers)(implicit request: Request[_]): Future[SubscriptionDetails] =
-    SubscriptionRequest.build(safeId, answers).fold(
+  private def subscribe(safeId: String, answersWithRegistration: UserAnswers, originalAnswers: UserAnswers)
+                       (implicit request: Request[_]): Future[SubscriptionDetails] =
+    lazy val isAutoSubscription = originalAnswers.registrationResponse.isEmpty
+    SubscriptionRequest.build(safeId, answersWithRegistration).fold(
       errors => Future.failed(Exception(s"Unable to build a subscription request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
       request =>
         subscriptionConnector
           .subscribe(request)
           .map { response =>
-            auditService.sendAudit(AuditEventModel(answers, response))
-            SubscriptionDetails(response, request, answers)
+            auditService.sendAudit(AuditEventModel(isAutoSubscription, answersWithRegistration.data, response))
+            SubscriptionDetails(response, request, answersWithRegistration)
           }
           .recover {
             case error =>
-              auditService.sendAudit(AuditEventModel(answers, error.asInstanceOf[SubscribeFailure]))
+              auditService.sendAudit(AuditEventModel(isAutoSubscription, answersWithRegistration.data, error.asInstanceOf[SubscribeFailure]))
               throw error
           }
     )

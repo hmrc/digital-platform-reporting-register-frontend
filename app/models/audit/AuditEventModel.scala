@@ -18,7 +18,6 @@ package models.audit
 
 import cats.implicits.*
 import connectors.SubscriptionConnector.SubscribeFailure
-import models.UserAnswers
 import models.subscription.responses.{AlreadySubscribedResponse, SubscribedResponse, SubscriptionResponse}
 import play.api.libs.json.*
 
@@ -33,28 +32,28 @@ object AuditEventModel {
     "responseData" -> o.responseData
   )
 
-  def apply(userAnswers: UserAnswers, subscribeFailure: SubscribeFailure): AuditEventModel = {
+  def apply(isAutoSubscription: Boolean, requestData: JsObject, subscribeFailure: SubscribeFailure): AuditEventModel = {
     val localDateTime = LocalDateTime.ofInstant(Instant.now, ZoneId.of("UTC"))
     val responseData = subscribeFailure.statusCode match {
       case 422 => FailureResponseData(422, localDateTime, "Duplicate submission")
       case _ => FailureResponseData(subscribeFailure.statusCode, localDateTime, subscribeFailure.getMessage())
     }
 
-    userAnswers.registrationResponse match {
-      case Some(_) => AuditEventModel("Subscription", userAnswers.data, responseData)
-      case None => AuditEventModel("AutoSubscription", userAnswers.data, responseData)
-    }
+    if isAutoSubscription then
+      AuditEventModel("AutoSubscription", requestData, responseData)
+    else
+      AuditEventModel("Subscription", requestData, responseData)
   }
 
-  def apply(userAnswers: UserAnswers, subscriptionResponse: SubscriptionResponse): AuditEventModel = {
+  def apply(isAutoSubscription: Boolean, requestData: JsObject, subscriptionResponse: SubscriptionResponse): AuditEventModel = {
     val responseData = subscriptionResponse match {
       case SubscribedResponse(dprsId, subscribedDateTime) => SuccessResponseData(LocalDateTime.ofInstant(subscribedDateTime, ZoneId.of("UTC")), dprsId)
       case AlreadySubscribedResponse() => FailureResponseData(422, LocalDateTime.ofInstant(Instant.now, ZoneId.of("UTC")), "Duplicate submission")
     }
 
-    userAnswers.registrationResponse match {
-      case Some(_) => AuditEventModel("Subscription", userAnswers.data, responseData)
-      case None => AuditEventModel("AutoSubscription", userAnswers.data, responseData)
-    }
+    if isAutoSubscription then
+      AuditEventModel("AutoSubscription", requestData, responseData)
+    else
+      AuditEventModel("Subscription", requestData, responseData)
   }
 }

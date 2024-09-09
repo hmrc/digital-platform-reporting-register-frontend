@@ -237,7 +237,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
             redirectLocation(result).value mustEqual CheckYourAnswersPage.nextPage(NormalMode, expectedFinalAnswers).url
             verify(mockRegistrationConnector, never()).register(any())(any())
             verify(mockSubscriptionConnector, times(1)).subscribe(eqTo(expectedSubscriptionRequest))(any())
-            verify(mockAuditService, times(1)).sendAudit(eqTo(AuditEventModel(answers, aSubscribedResponse)))(any())
+            verify(mockAuditService, times(1)).sendAudit(eqTo(AuditEventModel(false, answers.data, aSubscribedResponse)))(any())
             verify(mockSessionRepository, times(1)).set(eqTo(expectedFinalAnswers))
           }
         }
@@ -341,7 +341,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
                 verify(mockRegistrationConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
                 verify(mockSubscriptionConnector, times(1)).subscribe(eqTo(expectedSubscriptionRequest))(any())
                 val answersWithRegistrationResponse = answers.copy(registrationResponse = Some(registrationResponse))
-                verify(mockAuditService, times(1)).sendAudit(eqTo(AuditEventModel.apply(answersWithRegistrationResponse, aSubscribedResponse)))(any())
+                verify(mockAuditService, times(1)).sendAudit(eqTo(AuditEventModel.apply(true, answersWithRegistrationResponse.data, aSubscribedResponse)))(any())
                 verify(mockSessionRepository, times(1)).set(eqTo(expectedFinalAnswers))
               }
             }
@@ -517,7 +517,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
                 verify(mockRegistrationConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
                 verify(mockSubscriptionConnector, times(1)).subscribe(eqTo(expectedSubscriptionRequest))(any())
                 val answersWithRegistrationResponse = answers.copy(registrationResponse = Some(registrationResponse))
-                verify(mockAuditService, times(1)).sendAudit(eqTo(AuditEventModel.apply(answersWithRegistrationResponse, aSubscribedResponse)))(any())
+                verify(mockAuditService, times(1)).sendAudit(eqTo(AuditEventModel.apply(true, answersWithRegistrationResponse.data, aSubscribedResponse)))(any())
                 verify(mockSessionRepository, times(1)).set(eqTo(expectedFinalAnswers))
               }
             }
