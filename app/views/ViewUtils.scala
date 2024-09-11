@@ -38,24 +38,10 @@ object ViewUtils {
   }
 
   def formatUkAddress(ukAddress: UkAddress): String =
-    formatAddress(Address(
-      ukAddress.line1,
-      ukAddress.line2,
-      Some(ukAddress.town),
-      ukAddress.county,
-      ukAddress.postCode,
-      ukAddress.country.code
-    ))
+    formatAddress(Address.fromUkAddress(ukAddress))
 
   def formatInternationalAddress(internationalAddress: InternationalAddress): String =
-    formatAddress(Address(
-      internationalAddress.line1,
-      internationalAddress.line2,
-      Some(internationalAddress.city),
-      internationalAddress.region,
-      internationalAddress.postal,
-      internationalAddress.country.code
-    ))
+    formatAddress(Address.fromInternationalAddress(internationalAddress))
 
   def formatAddress(address: Address): String = {
     val code = address.countryCode

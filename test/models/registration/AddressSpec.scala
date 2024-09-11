@@ -17,8 +17,8 @@
 package models.registration
 
 import builders.BusinessAddressBuilder.aBusinessAddress
-import builders.UkAddressBuilder.aUkAddress
 import builders.InternationalAddressBuilder.anInternationalAddress
+import builders.UkAddressBuilder.aUkAddress
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
@@ -33,7 +33,7 @@ class AddressSpec extends AnyFreeSpec with Matchers {
         addressLine2 = aBusinessAddress.addressLine2,
         addressLine3 = Some(aBusinessAddress.city),
         addressLine4 = aBusinessAddress.region,
-        postalCode = aBusinessAddress.postalCode,
+        postalCode = Some(aBusinessAddress.postalCode),
         countryCode = aBusinessAddress.country.code
       )
     }
@@ -46,7 +46,7 @@ class AddressSpec extends AnyFreeSpec with Matchers {
         addressLine2 = aUkAddress.line2,
         addressLine3 = Some(aUkAddress.town),
         addressLine4 = aUkAddress.county,
-        postalCode = aUkAddress.postCode,
+        postalCode = Some(aUkAddress.postCode),
         countryCode = aUkAddress.country.code
       )
     }
@@ -59,7 +59,7 @@ class AddressSpec extends AnyFreeSpec with Matchers {
         addressLine2 = anInternationalAddress.line2,
         addressLine3 = Some(anInternationalAddress.city),
         addressLine4 = anInternationalAddress.region,
-        postalCode = anInternationalAddress.postal,
+        postalCode = Some(anInternationalAddress.postal),
         countryCode = anInternationalAddress.country.code
       )
     }

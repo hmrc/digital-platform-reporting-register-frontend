@@ -20,9 +20,9 @@ import builders.ContactDetailsBuilder.aContactDetails
 import cats.data.*
 import models.registration.Address
 import models.{Country, IndividualName, InternationalAddress, UkAddress, UserAnswers}
-import org.scalatest.{EitherValues, OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages.*
 
 import java.time.LocalDate
@@ -55,7 +55,7 @@ class IndividualWithoutIdSpec
           .set(CanPhoneIndividualPage, false).success.value
 
       val result = IndividualWithoutId.build(answers)
-      val expectedAddress = Address("line 1", Some("line 2"), Some("town"), Some("county"), "postcode", aUkCountry.code)
+      val expectedAddress = Address("line 1", Some("line 2"), Some("town"), Some("county"), Some("postcode"), aUkCountry.code)
       result.value mustEqual IndividualWithoutId("first", "last", aDateOfBirth, expectedAddress, aContactDetails)
     }
 
@@ -71,15 +71,14 @@ class IndividualWithoutIdSpec
           .set(CanPhoneIndividualPage, false).success.value
 
       val result = IndividualWithoutId.build(answers)
-      val expectedAddress = Address("line 1", Some("line 2"), Some("city"), Some("region"), "postcode", anInternationalCountry.code)
+      val expectedAddress = Address("line 1", Some("line 2"), Some("city"), Some("region"), Some("postcode"), anInternationalCountry.code)
       result.value mustEqual IndividualWithoutId("first", "last", aDateOfBirth, expectedAddress, aContactDetails)
     }
 
     "must fail to build from user answers and report all errors when mandatory data is missing" in {
-
       val answers = UserAnswers("id", None)
-
       val result = IndividualWithoutId.build(answers)
+
       result.left.value.toChain.toList must contain theSameElementsAs Seq(
         IndividualNamePage,
         DateOfBirthPage,

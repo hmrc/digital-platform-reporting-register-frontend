@@ -16,7 +16,7 @@
 
 package models.registration.responses
 
-import models.registration.Address
+import builders.AddressBuilder.anAddress
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
@@ -31,7 +31,7 @@ class RegistrationResponseSpec extends AnyFreeSpec with Matchers {
   "registration response" - {
     "must serialise / deserialise" - {
       "a match with Id" in {
-        val response = MatchResponseWithId("safeId", Address("line 1", None, None, None, "postcode", "GB"), None)
+        val response = MatchResponseWithId("safeId", anAddress, None)
         val json = Json.toJson(response)
         val result = json.as[RegistrationResponse]
         result mustEqual response
@@ -72,7 +72,7 @@ class RegistrationResponseSpec extends AnyFreeSpec with Matchers {
         SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
 
       "a match with Id" in {
-        val response = MatchResponseWithId("safeId", Address("line 1", None, None, None, "postcode", "GB"), None)
+        val response = MatchResponseWithId("safeId", anAddress, None)
         val json = Json.toJson(response)(RegistrationResponse.encryptedFormat)
         val result = json.as[RegistrationResponse](RegistrationResponse.encryptedFormat)
 

@@ -16,9 +16,8 @@
 
 package connectors
 
-import builders.ContactDetailsBuilder.aContactDetails
+import builders.OrganisationWithoutIdBuilder.anOrganisationWithoutId
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import models.registration.Address
 import models.registration.requests.*
 import models.registration.responses.*
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -48,8 +47,6 @@ class RegistrationConnectorSpec
 
   ".register" - {
     "must return a registration response when the server returns OK" in {
-      val address = Address("line 1", None, None, None, "postcode", "GB")
-      val request = OrganisationWithoutId("name", address, aContactDetails)
       val response = MatchResponseWithoutId("safeId")
 
       wireMockServer.stubFor(
@@ -57,7 +54,7 @@ class RegistrationConnectorSpec
           .willReturn(ok(Json.toJson(response).toString))
       )
 
-      val result = connector.register(request).futureValue
+      val result = connector.register(anOrganisationWithoutId).futureValue
 
       result mustEqual response
     }
@@ -91,15 +88,11 @@ class RegistrationConnectorSpec
     }
 
     "must return a failed future when the server returns an error" in {
-      val address = Address("line 1", None, None, None, "postcode", "GB")
-      val request = OrganisationWithoutId("name", address, aContactDetails)
+      wireMockServer
+        .stubFor(post(urlMatching("/digital-platform-reporting/register"))
+          .willReturn(serverError()))
 
-      wireMockServer.stubFor(
-        post(urlMatching("/digital-platform-reporting/register"))
-          .willReturn(serverError())
-      )
-
-      connector.register(request).failed.futureValue
+      connector.register(anOrganisationWithoutId).failed.futureValue
     }
   }
 }

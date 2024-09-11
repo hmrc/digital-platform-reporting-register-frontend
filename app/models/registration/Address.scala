@@ -23,7 +23,7 @@ final case class Address(addressLine1: String,
                          addressLine2: Option[String],
                          addressLine3: Option[String],
                          addressLine4: Option[String],
-                         postalCode: String,
+                         postalCode: Option[String],
                          countryCode: String)
 
 object Address {
@@ -35,7 +35,7 @@ object Address {
     addressLine2 = businessAddress.addressLine2,
     addressLine3 = Some(businessAddress.city),
     addressLine4 = businessAddress.region,
-    postalCode = businessAddress.postalCode,
+    postalCode = Some(businessAddress.postalCode),
     countryCode = businessAddress.country.code,
   )
 
@@ -44,7 +44,7 @@ object Address {
     addressLine2 = address.line2,
     addressLine3 = Some(address.town),
     addressLine4 = address.county,
-    postalCode = address.postCode,
+    postalCode = Some(address.postCode),
     countryCode = address.country.code
   )
 
@@ -53,7 +53,7 @@ object Address {
     addressLine2 = address.line2,
     addressLine3 = Some(address.city),
     addressLine4 = address.region,
-    postalCode = address.postal,
+    postalCode = Some(address.postal),
     countryCode = address.country.code
   )
 }
