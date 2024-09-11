@@ -16,8 +16,8 @@
 
 package views
 
-import models.{Country, InternationalAddress, UkAddress}
 import models.registration.Address
+import models.{Country, InternationalAddress, UkAddress}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers.mustEqual
 
@@ -25,10 +25,10 @@ class ViewUtilsSpec extends AnyFreeSpec {
 
   "must format an address properly" - {
 
-    val line1   = "   31 Grand Boulevard   "
-    val line2   = ""
-    val city    = "Alabama"
-    val postal  = "AL1"
+    val line1 = "   31 Grand Boulevard   "
+    val line2 = ""
+    val city = "Alabama"
+    val postal = "AL1"
     val country = Country.ukCountries.head
 
     val expectedResult = Seq(
@@ -44,7 +44,7 @@ class ViewUtilsSpec extends AnyFreeSpec {
         Some(line2),
         None,
         Some(city),
-        postal,
+        Some(postal),
         country.code
       )
 

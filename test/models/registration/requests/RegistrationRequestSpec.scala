@@ -16,9 +16,9 @@
 
 package models.registration.requests
 
+import builders.AddressBuilder.anAddress
 import builders.ContactDetailsBuilder.aContactDetails
 import models.BusinessType
-import models.registration.Address
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.Json
@@ -70,9 +70,8 @@ class RegistrationRequestSpec extends AnyFreeSpec with Matchers {
     }
 
     "must write an individual" in {
-      val address = Address("line 1", None, None, None, "postcode", "GB")
       val contactDetails = aContactDetails.copy(emailAddress = "some.email@example.com", phoneNumber = Some("1234"))
-      val request: RegistrationRequest = IndividualWithoutId("first", "last", LocalDate.of(2000, 1, 2), address, contactDetails)
+      val request: RegistrationRequest = IndividualWithoutId("first", "last", LocalDate.of(2000, 1, 2), anAddress, contactDetails)
       val json = Json.toJson(request)
 
       json mustEqual Json.obj(
@@ -80,9 +79,12 @@ class RegistrationRequestSpec extends AnyFreeSpec with Matchers {
         "lastName" -> "last",
         "dateOfBirth" -> "2000-01-02",
         "address" -> Json.obj(
-          "addressLine1" -> "line 1",
-          "postalCode" -> "postcode",
-          "countryCode" -> "GB"
+          "addressLine1" -> anAddress.addressLine1,
+          "addressLine2" -> anAddress.addressLine2,
+          "addressLine3" -> anAddress.addressLine3,
+          "addressLine4" -> anAddress.addressLine4,
+          "postalCode" -> anAddress.postalCode,
+          "countryCode" -> anAddress.countryCode
         ),
         "contactDetails" -> Json.obj(
           "emailAddress" -> "some.email@example.com",
@@ -93,16 +95,18 @@ class RegistrationRequestSpec extends AnyFreeSpec with Matchers {
 
     "must write an organisation" in {
       val contactDetails = aContactDetails.copy(emailAddress = "some.email@example.com", phoneNumber = None)
-      val address = Address("line 1", None, None, None, "postcode", "GB")
-      val request: RegistrationRequest = OrganisationWithoutId("name", address, contactDetails)
+      val request: RegistrationRequest = OrganisationWithoutId("name", anAddress, contactDetails)
       val json = Json.toJson(request)
 
       json mustEqual Json.obj(
         "name" -> "name",
         "address" -> Json.obj(
-          "addressLine1" -> "line 1",
-          "postalCode" -> "postcode",
-          "countryCode" -> "GB"
+          "addressLine1" -> anAddress.addressLine1,
+          "addressLine2" -> anAddress.addressLine2,
+          "addressLine3" -> anAddress.addressLine3,
+          "addressLine4" -> anAddress.addressLine4,
+          "postalCode" -> anAddress.postalCode,
+          "countryCode" -> anAddress.countryCode
         ),
         "contactDetails" -> Json.obj(
           "emailAddress" -> "some.email@example.com"

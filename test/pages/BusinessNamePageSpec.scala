@@ -16,8 +16,8 @@
 
 package pages
 
+import builders.AddressBuilder.anAddress
 import controllers.routes
-import models.registration.Address
 import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithId, NoMatchResponse}
 import models.{BusinessType, CheckMode, NormalMode, UserAnswers}
 import org.scalatest.freespec.AnyFreeSpec
@@ -28,7 +28,6 @@ class BusinessNamePageSpec extends AnyFreeSpec with Matchers with TryValues with
 
   ".nextPage" - {
     val emptyAnswers = UserAnswers("id", None)
-    val address = Address("line 1", None, None, None, "postcode", "GB")
     val noResponseAnswer = emptyAnswers.copy(registrationResponse = Some(NoMatchResponse()))
 
     "in Normal Mode" - {
@@ -38,7 +37,7 @@ class BusinessNamePageSpec extends AnyFreeSpec with Matchers with TryValues with
       }
 
       "ETMP returns match & account not already registered leads to DetailsMatched" in {
-        val responseAnswer = emptyAnswers.copy(registrationResponse = Some(MatchResponseWithId("Id", address, Some("name"))))
+        val responseAnswer = emptyAnswers.copy(registrationResponse = Some(MatchResponseWithId("Id", anAddress, Some("name"))))
         BusinessNamePage.nextPage(NormalMode, responseAnswer) mustEqual routes.DetailsMatchedController.onPageLoad()
       }
 

@@ -28,8 +28,7 @@ import scala.util.Right
 
 final case class OrganisationWithoutId(name: String,
                                        address: Address,
-                                       contactDetails: ContactDetails
-                                      ) extends RegistrationRequest
+                                       contactDetails: ContactDetails) extends RegistrationRequest
 
 object OrganisationWithoutId {
 

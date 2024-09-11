@@ -16,18 +16,15 @@
 
 package builders
 
-import models.registration.Address
+import builders.AddressBuilder.anAddress
+import builders.ContactDetailsBuilder.aContactDetails
+import models.registration.requests.OrganisationWithoutId
 
-object AddressBuilder {
+object OrganisationWithoutIdBuilder {
 
-  val anAddress: Address = Address(
-    addressLine1 = "default-address-line1",
-    addressLine2 = Some("default-address-line2"),
-    addressLine3 = Some("default-address-line3"),
-    addressLine4 = Some("default-address-line4"),
-    postalCode = Some("default-postcode"),
-    countryCode = "UK"
+  val anOrganisationWithoutId: OrganisationWithoutId = OrganisationWithoutId(
+    name = "default-name",
+    address = anAddress,
+    contactDetails = aContactDetails
   )
-
-  val anyAddress: Address = anAddress
 }
