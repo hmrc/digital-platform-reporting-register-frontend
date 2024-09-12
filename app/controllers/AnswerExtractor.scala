@@ -16,7 +16,7 @@
 
 package controllers
 
-import models.requests.DataRequest
+import models.requests.UserSessionDataRequest
 import play.api.libs.json.Reads
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{AnyContent, Result}
@@ -28,7 +28,7 @@ trait AnswerExtractor {
 
   def getAnswer[A](query: Gettable[A])
                   (block: A => Result)
-                  (implicit request: DataRequest[AnyContent], ev: Reads[A]): Result =
+                  (implicit request: UserSessionDataRequest[AnyContent], ev: Reads[A]): Result =
     request.userAnswers
       .get(query)
       .map(block(_))
@@ -36,10 +36,9 @@ trait AnswerExtractor {
 
   def getAnswerAsync[A](query: Gettable[A])
                        (block: A => Future[Result])
-                       (implicit request: DataRequest[AnyContent], ev: Reads[A]): Future[Result] =
+                       (implicit request: UserSessionDataRequest[AnyContent], ev: Reads[A]): Future[Result] =
     request.userAnswers
       .get(query)
       .map(block(_))
       .getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
-
 }

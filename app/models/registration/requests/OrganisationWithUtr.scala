@@ -28,7 +28,7 @@ final case class OrganisationWithUtr(utr: String, details: Option[OrganisationDe
 object OrganisationWithUtr {
 
   def build(answers: UserAnswers): EitherNec[Query, OrganisationWithUtr] =
-    answers.taxIdentifier.map {
+    answers.user.taxIdentifier.map {
       case Utr(utr) => Right(OrganisationWithUtr(utr, None))
       case _ => buildWithDetails(answers)
     }.getOrElse(buildWithDetails(answers))

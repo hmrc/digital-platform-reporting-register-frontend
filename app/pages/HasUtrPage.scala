@@ -31,7 +31,7 @@ case object HasUtrPage extends QuestionPage[Boolean] {
   override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.get(this).map {
     case true => routes.UtrController.onPageLoad(NormalMode)
     case false => answers.get(BusinessTypePage).map {
-      case Individual | SoleTrader => answers.taxIdentifier.map {
+      case Individual | SoleTrader => answers.user.taxIdentifier.map {
         case _: Nino => routes.IndividualNameController.onPageLoad(NormalMode)
         case _ => routes.HasNinoController.onPageLoad(NormalMode)
       }.getOrElse(routes.HasNinoController.onPageLoad(NormalMode))

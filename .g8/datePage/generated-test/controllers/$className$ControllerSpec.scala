@@ -1,7 +1,7 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.aUserAnswers
+import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import forms.$className$FormProvider
 import models.NormalMode
 import models.pageviews.$className$ViewModel
@@ -42,7 +42,7 @@ class $className$ControllerSpec extends SpecBase with MockitoSugar {
 
   "$className$ Controller" - {
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val result = route(application, request).value
@@ -55,7 +55,7 @@ class $className$ControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = emptyUserAnswers.set($className$Page, validAnswer).success.value
+      val userAnswers = anEmptyAnswer.set($className$Page, validAnswer).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
@@ -73,7 +73,7 @@ class $className$ControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
         .build()
 
@@ -81,12 +81,12 @@ class $className$ControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, postRequest()).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual $className$Page.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual $className$Page.nextPage(NormalMode, anEmptyAnswer).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
       val request = FakeRequest(POST, $className;format="decap"$Route)
           .withFormUrlEncodedBody(("value", "invalid value"))
 

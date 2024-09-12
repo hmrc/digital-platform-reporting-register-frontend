@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package models.requests
+package models
 
-import models.User
-import play.api.mvc.{Request, WrappedRequest}
-
-case class IdentifierRequest[A](user: User, request: Request[A]) extends WrappedRequest[A](request)
+case class User(id: String,
+                taxIdentifier: Option[TaxIdentifier] = None)

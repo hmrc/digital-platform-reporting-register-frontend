@@ -16,38 +16,31 @@
 
 package pages
 
+import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
-import models.{CheckMode, NormalMode, UserAnswers}
-import org.scalatest.{OptionValues, TryValues}
+import models.{CheckMode, NormalMode}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{OptionValues, TryValues}
 
 class RegisteredInUkPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
-
-    val emptyAnswers = UserAnswers("id", None)
-
     "in Normal Mode" - {
-
       "must go to UTR when the answer is yes" in {
-
-        val answers = emptyAnswers.set(RegisteredInUkPage, true).success.value
+        val answers = anEmptyAnswer.set(RegisteredInUkPage, true).success.value
         RegisteredInUkPage.nextPage(NormalMode, answers) mustEqual routes.UtrController.onPageLoad(NormalMode)
       }
 
       "must go to Has UTR when the answer is no" in {
-
-        val answers = emptyAnswers.set(RegisteredInUkPage, false).success.value
+        val answers = anEmptyAnswer.set(RegisteredInUkPage, false).success.value
         RegisteredInUkPage.nextPage(NormalMode, answers) mustEqual routes.HasUtrController.onPageLoad(NormalMode)
       }
     }
 
     "in Check Mode" - {
-
       "must go to Check Answers" in {
-
-        RegisteredInUkPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        RegisteredInUkPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

@@ -42,7 +42,7 @@ object SubscriptionRequest {
       getSecondaryContactDetails(answers)
     ).parMapN(SubscriptionRequest.apply(safeId, _, _, _, _))
 
-  private[requests] def getGbUser(answers: UserAnswers): EitherNec[Query, Boolean] = answers.taxIdentifier match {
+  private[requests] def getGbUser(answers: UserAnswers): EitherNec[Query, Boolean] = answers.user.taxIdentifier match {
     case Some(_) => Right(true)
     case _ => answers.getEither(BusinessTypePage).flatMap {
       case BusinessType.Individual => answers.getEither(HasNinoPage).flatMap {
@@ -56,7 +56,7 @@ object SubscriptionRequest {
   private[requests] def getTradingName(answers: UserAnswers): EitherNec[Query, Option[String]] =
     Right(answers.get(BusinessEnterTradingNamePage))
 
-  private[requests] def getPrimaryContactDetails(answers: UserAnswers): EitherNec[Query, Contact] = answers.taxIdentifier match {
+  private[requests] def getPrimaryContactDetails(answers: UserAnswers): EitherNec[Query, Contact] = answers.user.taxIdentifier match {
     case Some(Utr(_)) => getOrganisationPrimaryContactDetails(answers)
     case _ => answers.getEither(BusinessTypePage).flatMap {
       case BusinessType.Individual | SoleTrader => getIndividualContactDetails(answers)
@@ -96,7 +96,7 @@ object SubscriptionRequest {
     }
 
   private[requests] def getSecondaryContactDetails(answers: UserAnswers): EitherNec[Query, Option[Contact]] =
-    answers.taxIdentifier match {
+    answers.user.taxIdentifier match {
       case Some(Utr(_)) => getOrganisationSecondaryContactDetails(answers)
       case _ => answers.getEither(BusinessTypePage).flatMap {
         case BusinessType.Individual | SoleTrader => Right(None)

@@ -16,7 +16,13 @@
 
 package models.requests
 
-import models.User
+import models.{User, UserAnswers}
 import play.api.mvc.{Request, WrappedRequest}
 
-case class IdentifierRequest[A](user: User, request: Request[A]) extends WrappedRequest[A](request)
+case class OptionalUserSessionDataRequest[A](user: User,
+                                             userAnswers: Option[UserAnswers],
+                                             request: Request[A]) extends WrappedRequest[A](request)
+
+case class UserSessionDataRequest[A](user: User,
+                                     userAnswers: UserAnswers,
+                                     request: Request[A]) extends WrappedRequest[A](request)

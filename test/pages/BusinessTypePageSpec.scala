@@ -16,37 +16,32 @@
 
 package pages
 
+import builders.UserAnswersBuilder.anEmptyAnswer
+import builders.UserBuilder.aUser
 import controllers.routes
-import models.{BusinessType, CheckMode, Nino, NormalMode, UserAnswers, Utr}
-import org.scalatest.{OptionValues, TryValues}
+import models.{BusinessType, CheckMode, Nino, NormalMode, Utr}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{OptionValues, TryValues}
 
 class BusinessTypePageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
-
-    val emptyAnswers = UserAnswers("id", None)
-
     "in Normal Mode" - {
-
       "must go to Individual Name for an Individual business type when we know their NINO" in {
-
-        val answersWithNino = emptyAnswers.copy(taxIdentifier = Some(Nino("nino")))
+        val answersWithNino = anEmptyAnswer.copy(user = aUser.copy(taxIdentifier = Some(Nino("nino"))))
         val answers = answersWithNino.set(BusinessTypePage, BusinessType.Individual).success.value
         BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.IndividualNameController.onPageLoad(NormalMode)
       }
 
       "must go to Has Nino for an Individual business type when we do not know their NINO" in {
-
-        val answers = emptyAnswers.set(BusinessTypePage, BusinessType.Individual).success.value
+        val answers = anEmptyAnswer.set(BusinessTypePage, BusinessType.Individual).success.value
         BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.HasNinoController.onPageLoad(NormalMode)
       }
 
 
       "must go to Has Nino for an Individual business type when we know their UTR instead of their NINO" in {
-
-        val answersWithUtr = emptyAnswers.copy(taxIdentifier = Some(Utr("utr")))
+        val answersWithUtr = anEmptyAnswer.copy(user = aUser.copy(taxIdentifier = Some(Utr("utr"))))
         val answers = answersWithUtr.set(BusinessTypePage, BusinessType.Individual).success.value
         BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.HasNinoController.onPageLoad(NormalMode)
       }
@@ -54,15 +49,15 @@ class BusinessTypePageSpec extends AnyFreeSpec with Matchers with TryValues with
       "must go to Registered in UK for all other business types" in {
 
         for (businessType <- BusinessType.values.filterNot(_ == BusinessType.Individual)) {
-          
-          val answers = emptyAnswers.set(BusinessTypePage, businessType).success.value
+
+          val answers = anEmptyAnswer.set(BusinessTypePage, businessType).success.value
           BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.RegisteredInUkController.onPageLoad(NormalMode)
         }
       }
-      
+
       "must go to Journey Recovery if business type has not been answered" in {
-        
-        BusinessTypePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.JourneyRecoveryController.onPageLoad()
+
+        BusinessTypePage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
     }
 
@@ -70,7 +65,7 @@ class BusinessTypePageSpec extends AnyFreeSpec with Matchers with TryValues with
 
       "must go to Check Answers" in {
 
-        BusinessTypePage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        BusinessTypePage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

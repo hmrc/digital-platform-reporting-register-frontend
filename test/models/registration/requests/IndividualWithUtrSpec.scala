@@ -16,11 +16,12 @@
 
 package models.registration.requests
 
+import builders.UserBuilder.aUser
 import cats.data.*
 import models.{SoleTraderName, UserAnswers}
-import org.scalatest.{EitherValues, OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages.{SoleTraderNamePage, UtrPage}
 import play.api.libs.json.Json
 
@@ -49,19 +50,16 @@ class IndividualWithUtrSpec
     }
 
     "must build from user answers when UTR and sole trader name have been answered" in {
-
-      val answers =
-        UserAnswers("id", None)
-          .set(UtrPage, "1234567890").success.value
-          .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
+      val answers = UserAnswers(aUser)
+        .set(UtrPage, "1234567890").success.value
+        .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
 
       val result = IndividualWithUtr.build(answers)
       result.value mustEqual IndividualWithUtr("1234567890", IndividualDetails("first", "last"))
     }
 
     "must fail to build from user answers and report all errors when mandatory data is missing" in {
-
-      val answers = UserAnswers("id", None)
+      val answers = UserAnswers(aUser)
 
       val result = IndividualWithUtr.build(answers)
       result.left.value.toChain.toList must contain theSameElementsAs Seq(UtrPage, SoleTraderNamePage)

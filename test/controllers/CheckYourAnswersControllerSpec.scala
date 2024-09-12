@@ -24,7 +24,7 @@ import builders.ContactDetailsBuilder.aContactDetails
 import builders.SubscribedResponseBuilder.aSubscribedResponse
 import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
 import builders.UkAddressBuilder.aUkAddress
-import builders.UserAnswersBuilder.aUserAnswers
+import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import connectors.{RegistrationConnector, SubscriptionConnector}
 import models.BusinessType.*
 import models.audit.{AuditEventModel, FailureResponseData}
@@ -115,7 +115,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
       "for an organisation when the registration response is a match with Id containing an organisation name" in {
         val anyName = "name"
-        val answers = emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithId("safe", anyAddress, Some(anyName))))
+        val answers = anEmptyAnswer.copy(registrationResponse = Some(MatchResponseWithId("safe", anyAddress, Some(anyName))))
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
         running(application) {
@@ -130,7 +130,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
       }
 
       "for an organisation when the registration response is a match without Id containing " in {
-        val answers = emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
+        val answers = anEmptyAnswer.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
           .set(BusinessNameNoUtrPage, "business name").get
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
@@ -161,7 +161,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
       "if business type has not been answered" - {
         "and there is no registration response" in {
-          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+          val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
           running(application) {
             val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad().url)
@@ -173,7 +173,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
         }
 
         "and the registration response is a match response with Id with no organisation name" in {
-          val answers = emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithId("safe", anyAddress, None)))
+          val answers = anEmptyAnswer.copy(registrationResponse = Some(MatchResponseWithId("safe", anyAddress, None)))
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
@@ -186,7 +186,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
         }
 
         "and the registration response is not a match response with Id" in {
-          val answers = emptyUserAnswers.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
+          val answers = anEmptyAnswer.copy(registrationResponse = Some(MatchResponseWithoutId("safe")))
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
@@ -204,7 +204,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
       "when we already have a registration match" - {
         "must submit a subscription, audit event, record it in user answers, remove the user's data, and redirect to the next page" in {
           val registrationResponse = MatchResponseWithId("safeId", anyAddress, None)
-          val answers = emptyUserAnswers
+          val answers = anEmptyAnswer
             .copy(registrationResponse = Some(registrationResponse))
             .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
             .set(BusinessTypePage, BusinessType.SoleTrader).success.value
@@ -246,7 +246,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
       "when we already have an already subscribed registration response" - {
         "must redirect to the next page" in {
           val registrationResponse = models.registration.responses.AlreadySubscribedResponse()
-          val answers = emptyUserAnswers.copy(registrationResponse = Some(registrationResponse))
+          val answers = anEmptyAnswer.copy(registrationResponse = Some(registrationResponse))
           val application = applicationBuilder(userAnswers = Some(answers)).overrides(
             bind[RegistrationConnector].toInstance(mockRegistrationConnector),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
@@ -271,7 +271,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
       "when we already have a registration no match response" - {
         "must return a failed future" in {
           val registrationResponse = models.registration.responses.NoMatchResponse()
-          val answers = emptyUserAnswers.copy(registrationResponse = Some(registrationResponse))
+          val answers = anEmptyAnswer.copy(registrationResponse = Some(registrationResponse))
           val application = applicationBuilder(userAnswers = Some(answers)).overrides(
             bind[RegistrationConnector].toInstance(mockRegistrationConnector),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
@@ -298,7 +298,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
           "must register the user" - {
             "and submit a subscription, record it in user answers, remove the user's data, audit event, and redirect to the next page when the registration succeeds" in {
               val registrationResponse = MatchResponseWithId("safeId", anyAddress, None)
-              val answers = emptyUserAnswers
+              val answers = anEmptyAnswer
                 .set(BusinessTypePage, BusinessType.SoleTrader).success.value
                 .set(RegisteredInUkPage, false).success.value
                 .set(IndividualNamePage, IndividualName("first", "last")).success.value
@@ -349,7 +349,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
           "must redirect to the next page when the registration result is Already Subscribed" in {
             val registrationResponse = models.registration.responses.AlreadySubscribedResponse()
-            val answers = emptyUserAnswers
+            val answers = anEmptyAnswer
               .set(BusinessTypePage, BusinessType.SoleTrader).success.value
               .set(RegisteredInUkPage, false).success.value
               .set(IndividualNamePage, IndividualName("first", "last")).success.value
@@ -386,7 +386,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
           "must return a failed future when subscription result is Already Subscribed in" in {
             val registrationResponse = MatchResponseWithId("safeId", anyAddress, None)
-            val answers = emptyUserAnswers
+            val answers = anEmptyAnswer
               .set(BusinessTypePage, BusinessType.SoleTrader).success.value
               .set(RegisteredInUkPage, false).success.value
               .set(IndividualNamePage, IndividualName("first", "last")).success.value
@@ -436,7 +436,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
           "must return a failed future when the result is No Match (scenario should never happen in practice)" in {
             val registrationResponse = models.registration.responses.NoMatchResponse()
-            val answers = emptyUserAnswers
+            val answers = anEmptyAnswer
               .set(BusinessTypePage, BusinessType.SoleTrader).success.value
               .set(RegisteredInUkPage, false).success.value
               .set(IndividualNamePage, IndividualName("first", "last")).success.value
@@ -473,7 +473,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
           "must register the user" - {
             "and submit a subscription, record it in user answers, remove the user's data, audit event, and redirect to the next page when the registration succeeds" in {
               val registrationResponse = MatchResponseWithoutId("safeId")
-              val answers = emptyUserAnswers
+              val answers = anEmptyAnswer
                 .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
                 .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
                 .set(RegisteredInUkPage, false).success.value
@@ -525,7 +525,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
           "must redirect to the next page when the registration result is Already Subscribed" in {
             val registrationResponse = models.registration.responses.AlreadySubscribedResponse()
-            val answers = emptyUserAnswers
+            val answers = anEmptyAnswer
               .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
               .set(RegisteredInUkPage, false).success.value
               .set(BusinessNameNoUtrPage, "name").success.value
@@ -562,7 +562,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
           "must return a failed future when subscription result is Already Subscribed in" in {
             val registrationResponse = MatchResponseWithoutId("safeId")
-            val answers = emptyUserAnswers
+            val answers = anEmptyAnswer
               .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
               .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
               .set(RegisteredInUkPage, false).success.value
@@ -613,7 +613,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with Bef
 
           "must return a failed future when the result is No Match (scenario should never happen in practice)" in {
             val registrationResponse = models.registration.responses.NoMatchResponse()
-            val answers = emptyUserAnswers
+            val answers = anEmptyAnswer
               .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
               .set(RegisteredInUkPage, false).success.value
               .set(BusinessNameNoUtrPage, "name").success.value
