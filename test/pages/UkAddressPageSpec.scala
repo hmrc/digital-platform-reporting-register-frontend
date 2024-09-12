@@ -16,26 +16,25 @@
 
 package pages
 
+import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
-import models.{CheckMode, NormalMode, UserAnswers}
-import org.scalatest.{OptionValues, TryValues}
+import models.{CheckMode, NormalMode}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{OptionValues, TryValues}
 
 class UkAddressPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
-    val emptyAnswers = UserAnswers("id", None)
-
     "in Normal Mode" - {
       "must go to Individual Email Address page" in {
-        UkAddressPage.nextPage(NormalMode, emptyAnswers) mustEqual routes.IndividualEmailAddressController.onPageLoad(NormalMode)
+        UkAddressPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndividualEmailAddressController.onPageLoad(NormalMode)
       }
     }
 
     "in Check Mode" - {
       "must go to Check Answers" in {
-        UkAddressPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        UkAddressPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

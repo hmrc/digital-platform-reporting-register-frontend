@@ -42,11 +42,9 @@ class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
   extends FrontendController(mcc) with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-
-    val answers =
-      request.userAnswers
-        .getOrElse(UserAnswers(request.userId, request.taxIdentifier))
-        .get(RegistrationTypePage)
+    val answers = request.userAnswers
+      .getOrElse(UserAnswers(request.user))
+      .get(RegistrationTypePage)
 
     val preparedForm = answers match {
       case None => formProvider()
@@ -57,29 +55,26 @@ class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    
+
     formProvider().bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
       value => {
-        val baseAnswers = request.userAnswers.getOrElse(UserAnswers(request.userId, request.taxIdentifier))
-        
+        val baseAnswers = request.userAnswers.getOrElse(UserAnswers(request.user))
+
         for {
-          matchResult    <- matchIfNecessary(baseAnswers)
-          answers        = baseAnswers.copy(registrationResponse = matchResult)
+          matchResult <- matchIfNecessary(baseAnswers)
+          answers = baseAnswers.copy(registrationResponse = matchResult)
           updatedAnswers <- Future.fromTry(answers.set(RegistrationTypePage, value))
-          _              <- sessionRepository.set(updatedAnswers)
+          _ <- sessionRepository.set(updatedAnswers)
         } yield Redirect(RegistrationTypePage.nextPage(mode, updatedAnswers))
       }
     )
   }
-  
-  private def matchIfNecessary(answers: UserAnswers)(implicit request: Request[_]): Future[Option[RegistrationResponse]] =
-    answers.taxIdentifier.map {
-      case Utr(utr) =>
-        val request = OrganisationWithUtr(utr, None)
 
-        registrationConnector.register(request).map(Some(_))
-      case _ =>
-        Future.successful(None)
+  private def matchIfNecessary(answers: UserAnswers)
+                              (implicit request: Request[_]): Future[Option[RegistrationResponse]] = answers.user.taxIdentifier
+    .map {
+      case Utr(utr) => registrationConnector.register(OrganisationWithUtr(utr, None)).map(Some(_))
+      case _ => Future.successful(None)
     }.getOrElse(Future.successful(None))
 }

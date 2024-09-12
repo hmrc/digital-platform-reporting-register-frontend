@@ -17,15 +17,16 @@
 package controllers
 
 import base.SpecBase
+import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.IndividualNameFormProvider
-import models.{NormalMode, IndividualName}
+import models.{IndividualName, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.IndividualNamePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.IndividualNameView
 
@@ -39,15 +40,15 @@ class IndividualNameControllerSpec extends SpecBase with MockitoSugar {
   lazy val individualNameRoute = routes.IndividualNameController.onPageLoad(NormalMode).url
 
   val firstName = "lastName"
-  val lastName  = "firstName"
+  val lastName = "firstName"
 
-  val userAnswers = emptyUserAnswers.set(IndividualNamePage, IndividualName(firstName, lastName)).success.value
+  val userAnswers = anEmptyAnswer.set(IndividualNamePage, IndividualName(firstName, lastName)).success.value
 
   "IndividualName Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request = FakeRequest(GET, individualNameRoute)
@@ -84,7 +85,7 @@ class IndividualNameControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(anEmptyAnswer))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -102,7 +103,7 @@ class IndividualNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request =

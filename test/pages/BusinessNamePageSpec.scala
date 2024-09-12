@@ -17,9 +17,10 @@
 package pages
 
 import builders.AddressBuilder.anAddress
+import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithId, NoMatchResponse}
-import models.{BusinessType, CheckMode, NormalMode, UserAnswers}
+import models.{BusinessType, CheckMode, NormalMode}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
@@ -27,17 +28,16 @@ import org.scalatest.{OptionValues, TryValues}
 class BusinessNamePageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
-    val emptyAnswers = UserAnswers("id", None)
-    val noResponseAnswer = emptyAnswers.copy(registrationResponse = Some(NoMatchResponse()))
+    val noResponseAnswer = anEmptyAnswer.copy(registrationResponse = Some(NoMatchResponse()))
 
     "in Normal Mode" - {
       "ETMP returns match & account already registered leads to BusinessAlreadyRegistered" in {
-        val alreadySubscribedAnswer = emptyAnswers.copy(registrationResponse = Some(AlreadySubscribedResponse()))
+        val alreadySubscribedAnswer = anEmptyAnswer.copy(registrationResponse = Some(AlreadySubscribedResponse()))
         BusinessNamePage.nextPage(NormalMode, alreadySubscribedAnswer) mustEqual routes.BusinessAlreadyRegisteredController.onPageLoad()
       }
 
       "ETMP returns match & account not already registered leads to DetailsMatched" in {
-        val responseAnswer = emptyAnswers.copy(registrationResponse = Some(MatchResponseWithId("Id", anAddress, Some("name"))))
+        val responseAnswer = anEmptyAnswer.copy(registrationResponse = Some(MatchResponseWithId("Id", anAddress, Some("name"))))
         BusinessNamePage.nextPage(NormalMode, responseAnswer) mustEqual routes.DetailsMatchedController.onPageLoad()
       }
 
@@ -56,13 +56,13 @@ class BusinessNamePageSpec extends AnyFreeSpec with Matchers with TryValues with
       }
 
       "No response leads to JourneyRecovery" in {
-        BusinessNamePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.JourneyRecoveryController.onPageLoad()
+        BusinessNamePage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
       "must go to Check Answers" in {
-        BusinessNamePage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        BusinessNamePage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.PrimaryContactEmailAddressFormProvider
 import models.NormalMode
 import models.pageviews.PrimaryContactEmailAddressViewModel
@@ -33,10 +34,10 @@ import views.html.PrimaryContactEmailAddressView
 import scala.concurrent.Future
 
 class PrimaryContactEmailAddressControllerSpec extends SpecBase with MockitoSugar {
-  
+
   private lazy val primaryContactEmailAddressRoute = routes.PrimaryContactEmailAddressController.onPageLoad(NormalMode).url
   private val anyName = "name"
-  private val baseAnswers = emptyUserAnswers.set(PrimaryContactNamePage, anyName).success.value
+  private val baseAnswers = anEmptyAnswer.set(PrimaryContactNamePage, anyName).success.value
   private val form = new PrimaryContactEmailAddressFormProvider()(anyName)
 
   "PrimaryContactEmailAddress Controller" - {

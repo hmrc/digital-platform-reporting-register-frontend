@@ -17,9 +17,10 @@
 package pages
 
 import builders.AddressBuilder.anAddress
+import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.registration.responses.{MatchResponseWithId, NoMatchResponse}
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
@@ -27,42 +28,33 @@ import org.scalatest.{OptionValues, TryValues}
 class RegistrationTypePageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
-
-    val emptyAnswers = UserAnswers("id", None)
-
     "in Normal Mode" - {
       "when the user has been matched" - {
         "must go to Is This Your Business" in {
           val registrationResponse = MatchResponseWithId("safeId", anAddress, Some("name"))
-          val answers = emptyAnswers.copy(registrationResponse = Some(registrationResponse))
+          val answers = anEmptyAnswer.copy(registrationResponse = Some(registrationResponse))
 
           RegistrationTypePage.nextPage(NormalMode, answers) mustEqual routes.IsThisYourBusinessController.onPageLoad(NormalMode)
         }
       }
 
       "when the user was not matched" - {
-
         "must go to Business Type" in {
-
-          val answers = emptyAnswers.copy(registrationResponse = Some(NoMatchResponse()))
+          val answers = anEmptyAnswer.copy(registrationResponse = Some(NoMatchResponse()))
           RegistrationTypePage.nextPage(NormalMode, answers) mustEqual routes.BusinessTypeController.onPageLoad(NormalMode)
         }
       }
     }
 
     "when matching was not attempted" - {
-
       "must go to Business Type" in {
-
-        RegistrationTypePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.BusinessTypeController.onPageLoad(NormalMode)
+        RegistrationTypePage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.BusinessTypeController.onPageLoad(NormalMode)
       }
     }
 
     "in Check Mode" - {
-
       "must go to Check Answers" in {
-
-        RegistrationTypePage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        RegistrationTypePage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

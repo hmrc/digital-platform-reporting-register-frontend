@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.HasSecondaryContactFormProvider
 import models.NormalMode
 import models.pageviews.HasSecondaryContactViewModel
@@ -33,14 +34,13 @@ import views.html.HasSecondaryContactView
 import scala.concurrent.Future
 
 class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
-  
+
   private lazy val hasSecondaryContactRoute = routes.HasSecondaryContactController.onPageLoad(NormalMode).url
   private val anyName = "name"
   private val anyBoolean = true
-  private val baseAnswers =
-    emptyUserAnswers
-      .set(PrimaryContactNamePage, anyName).success.value
-      .set(HasSecondaryContactPage, anyBoolean).success.value
+  private val baseAnswers = anEmptyAnswer
+    .set(PrimaryContactNamePage, anyName).success.value
+    .set(HasSecondaryContactPage, anyBoolean).success.value
   private val form = new HasSecondaryContactFormProvider()(anyName)
 
   "HasSecondaryContact Controller" - {

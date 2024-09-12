@@ -17,6 +17,7 @@
 package models.subscription.requests
 
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
+import builders.UserBuilder.aUser
 import models.BusinessType.{LimitedCompany, SoleTrader}
 import models.subscription.*
 import models.{BusinessType, IndividualName, SoleTraderName, Utr}
@@ -94,7 +95,7 @@ class SubscriptionRequestSpec extends AnyFreeSpec
 
   ".getGbUser" - {
     "must return true when tax identifier is present" in {
-      val answers = aUserAnswers.copy(taxIdentifier = Some(Utr("any-utr")))
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = Some(Utr("any-utr"))))
       underTest.getGbUser(answers) mustBe Right(true)
     }
 
@@ -167,7 +168,7 @@ class SubscriptionRequestSpec extends AnyFreeSpec
     }
 
     "must return error when tax identifier not present and has no BusinessTypePage" in {
-      val answers = aUserAnswers.copy(taxIdentifier = None)
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = None))
         .remove(BusinessTypePage).success.value
       val result = underTest.getGbUser(answers)
       result.left.value.toChain.toList must contain theSameElementsAs Seq(BusinessTypePage)
@@ -259,7 +260,7 @@ class SubscriptionRequestSpec extends AnyFreeSpec
 
   ".getPrimaryContactDetails" - {
     "must return organisation primary data when tax identifier is utr and relevant data populated in answers" in {
-      val answers = aUserAnswers.copy(taxIdentifier = Some(Utr("1234567890")))
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = Some(Utr("1234567890"))))
         .set(PrimaryContactNamePage, "any-name").success.value
         .set(PrimaryContactEmailAddressPage, "any.email@example.com").success.value
         .set(CanPhonePrimaryContactPage, true).success.value
@@ -273,7 +274,7 @@ class SubscriptionRequestSpec extends AnyFreeSpec
     }
 
     "must return organisation primary data when business type not Individual or SoleTrader and relevant data populated in answers" in {
-      val answers = aUserAnswers.copy(taxIdentifier = None)
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = None))
         .set(BusinessTypePage, LimitedCompany).success.value
         .set(PrimaryContactNamePage, "any-name").success.value
         .set(PrimaryContactEmailAddressPage, "any.email@example.com").success.value
@@ -288,7 +289,7 @@ class SubscriptionRequestSpec extends AnyFreeSpec
     }
 
     "must return individual contact data when business type is Individual and relevant data populated in answers" in {
-      val answers = aUserAnswers.copy(taxIdentifier = None)
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = None))
         .set(BusinessTypePage, BusinessType.Individual).success.value
         .set(IndividualNamePage, IndividualName("any-first-name", "any-last-name")).success.value
         .set(IndividualEmailAddressPage, "any.email@example.com").success.value
@@ -303,7 +304,7 @@ class SubscriptionRequestSpec extends AnyFreeSpec
     }
 
     "must return individual contact data when business type is Sole trader and relevant data populated in answers" in {
-      val answers = aUserAnswers.copy(taxIdentifier = None)
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = None))
         .set(BusinessTypePage, SoleTrader).success.value
         .set(IndividualNamePage, IndividualName("any-first-name", "any-last-name")).success.value
         .set(IndividualEmailAddressPage, "any.email@example.com").success.value
@@ -429,7 +430,7 @@ class SubscriptionRequestSpec extends AnyFreeSpec
 
   ".getSecondaryContactDetails" - {
     "must return organisation secondary data when tax identifier is utr and relevant data populated in answers" in {
-      val answers = aUserAnswers.copy(taxIdentifier = Some(Utr("1234567890")))
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = Some(Utr("1234567890"))))
         .set(HasSecondaryContactPage, true).success.value
         .set(SecondaryContactNamePage, "any-name").success.value
         .set(SecondaryContactEmailAddressPage, "any.email@example.com").success.value
@@ -444,7 +445,7 @@ class SubscriptionRequestSpec extends AnyFreeSpec
     }
 
     "must return organisation secondary data when business type not Individual or SoleTrader and relevant data populated in answers" in {
-      val answers = aUserAnswers.copy(taxIdentifier = None)
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = None))
         .set(BusinessTypePage, LimitedCompany).success.value
         .set(HasSecondaryContactPage, true).success.value
         .set(SecondaryContactNamePage, "any-name").success.value
@@ -460,13 +461,13 @@ class SubscriptionRequestSpec extends AnyFreeSpec
     }
 
     "must return no contact data when business type is Individual and relevant data populated in answers" in {
-      val answers = aUserAnswers.copy(taxIdentifier = None)
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = None))
         .set(BusinessTypePage, BusinessType.Individual).success.value
       underTest.getSecondaryContactDetails(answers) mustBe Right(None)
     }
 
     "must return no contact data when business type is Sole trader and relevant data populated in answers" in {
-      val answers = aUserAnswers.copy(taxIdentifier = None)
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = None))
         .set(BusinessTypePage, SoleTrader).success.value
       underTest.getSecondaryContactDetails(answers) mustBe Right(None)
     }
@@ -497,7 +498,7 @@ class SubscriptionRequestSpec extends AnyFreeSpec
 
   ".build" - {
     "must return subscription request when relevant data provided" in {
-      val answers = aUserAnswers.copy(taxIdentifier = Some(Utr("any-utr")))
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = Some(Utr("any-utr"))))
         .set(PrimaryContactNamePage, "some-name").success.value
         .set(PrimaryContactEmailAddressPage, "some.email@example.com").success.value
         .set(CanPhonePrimaryContactPage, false).success.value
@@ -519,7 +520,7 @@ class SubscriptionRequestSpec extends AnyFreeSpec
     }
 
     "must return errors when relevant data provided" in {
-      val answers = aUserAnswers.copy(taxIdentifier = Some(Utr("any-utr")))
+      val answers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = Some(Utr("any-utr"))))
         .remove(PrimaryContactNamePage).success.value
 
       val result = underTest.build("any-safe-if", answers)

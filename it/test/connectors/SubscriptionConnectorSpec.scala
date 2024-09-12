@@ -89,7 +89,7 @@ class SubscriptionConnectorSpec
           .willReturn(serverError())
       )
 
-      connector.subscribe(request).failed.futureValue
+      connector.subscribe(request).failed.futureValue.getMessage mustBe "Error with code: 500"
     }
   }
 }

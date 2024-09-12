@@ -16,8 +16,9 @@
 
 package pages
 
+import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
-import models.{BusinessType, CheckMode, NormalMode, UserAnswers}
+import models.{BusinessType, CheckMode, NormalMode}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
@@ -25,22 +26,19 @@ import org.scalatest.{OptionValues, TryValues}
 class DetailsMatchedPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
-
-    val emptyAnswers = UserAnswers("id", None)
-
     "in Normal Mode" - {
       "must go to 'set-up-contact-details' if user is Organisation" in {
-        val answers = emptyAnswers.set(BusinessTypePage, BusinessType.Partnership).success.value
+        val answers = anEmptyAnswer.set(BusinessTypePage, BusinessType.Partnership).success.value
         DetailsMatchedPage.nextPage(NormalMode, answers) mustEqual routes.ContactDetailsGuidanceController.onPageLoad()
       }
 
       "must go to 'individual-email-address' if user is Sole Trader" in {
-        val answers = emptyAnswers.set(BusinessTypePage, BusinessType.SoleTrader).success.value
+        val answers = anEmptyAnswer.set(BusinessTypePage, BusinessType.SoleTrader).success.value
         DetailsMatchedPage.nextPage(NormalMode, answers) mustEqual routes.IndividualEmailAddressController.onPageLoad(NormalMode)
       }
 
       "must go to 'individual-email-address' if user is Individual" in {
-        val answers = emptyAnswers.set(BusinessTypePage, BusinessType.Individual).success.value
+        val answers = anEmptyAnswer.set(BusinessTypePage, BusinessType.Individual).success.value
         DetailsMatchedPage.nextPage(NormalMode, answers) mustEqual routes.IndividualEmailAddressController.onPageLoad(NormalMode)
       }
     }
@@ -49,7 +47,7 @@ class DetailsMatchedPageSpec extends AnyFreeSpec with Matchers with TryValues wi
 
       "must go to Check Answers" in {
 
-        DetailsMatchedPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        DetailsMatchedPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.NinoFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
@@ -25,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.NinoPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.NinoView
 
@@ -33,24 +34,17 @@ import scala.concurrent.Future
 
 class NinoControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new NinoFormProvider()
-  val form = formProvider()
-
-  val nino = "AB123456C"
-
-  lazy val ninoRoute = routes.NinoController.onPageLoad(NormalMode).url
+  private val form = new NinoFormProvider()()
+  private val nino = "AB123456C"
+  private lazy val ninoRoute = routes.NinoController.onPageLoad(NormalMode).url
 
   "Nino Controller" - {
-
     "must return OK and the correct view for a GET" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request = FakeRequest(GET, ninoRoute)
-
         val result = route(application, request).value
-
         val view = application.injector.instanceOf[NinoView]
 
         status(result) mustEqual OK
@@ -59,16 +53,12 @@ class NinoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = emptyUserAnswers.set(NinoPage, nino).success.value
-
+      val userAnswers = anEmptyAnswer.set(NinoPage, nino).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, ninoRoute)
-
         val view = application.injector.instanceOf[NinoView]
-
         val result = route(application, request).value
 
         status(result) mustEqual OK
@@ -77,42 +67,33 @@ class NinoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to the next page when valid data is submitted" in {
-
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        .build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, ninoRoute)
-            .withFormUrlEncodedBody(("value", nino))
-
+        val request = FakeRequest(POST, ninoRoute)
+          .withFormUrlEncodedBody(("value", nino))
         val result = route(application, request).value
+        val updatedAnswers = anEmptyAnswer.set(NinoPage, "123456789").success.value
 
-        val updatedAnswers = emptyUserAnswers.set(NinoPage, "123456789").success.value
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual NinoPage.nextPage(NormalMode, updatedAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, ninoRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
+        val request = FakeRequest(POST, ninoRoute)
+          .withFormUrlEncodedBody(("value", ""))
         val boundForm = form.bind(Map("value" -> ""))
-
         val view = application.injector.instanceOf[NinoView]
-
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
@@ -121,12 +102,10 @@ class NinoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
         val request = FakeRequest(GET, ninoRoute)
-
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -135,14 +114,11 @@ class NinoControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, ninoRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
-
+        val request = FakeRequest(POST, ninoRoute)
+          .withFormUrlEncodedBody(("value", "answer"))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

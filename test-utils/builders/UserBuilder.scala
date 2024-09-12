@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-package models.requests
+package builders
 
 import models.User
-import play.api.mvc.{Request, WrappedRequest}
 
-case class IdentifierRequest[A](user: User, request: Request[A]) extends WrappedRequest[A](request)
+object UserBuilder {
+
+  val aUser: User = User(
+    id = "default-user-id",
+    taxIdentifier = None
+  )
+}

@@ -30,8 +30,7 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import java.time.Instant
 import scala.util.{Failure, Success, Try}
 
-final case class UserAnswers(id: String,
-                             taxIdentifier: Option[TaxIdentifier],
+final case class UserAnswers(user: User,
                              registrationResponse: Option[RegistrationResponse] = None,
                              subscriptionDetails: Option[SubscriptionDetails] = None,
                              data: JsObject = Json.obj(),
@@ -49,7 +48,6 @@ final case class UserAnswers(id: String,
       .getOrElse(false)
 
   def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
-
     val updatedData = data.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) => Success(jsValue)
       case JsError(errors) => Failure(JsResultException(errors))
@@ -62,7 +60,6 @@ final case class UserAnswers(id: String,
   }
 
   def remove[A](page: Settable[A]): Try[UserAnswers] = {
-
     val updatedData = data.removeObject(page.path) match {
       case JsSuccess(jsValue, _) => Success(jsValue)
       case JsError(_) => Success(data)
@@ -78,7 +75,6 @@ final case class UserAnswers(id: String,
 object UserAnswers {
 
   def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[UserAnswers] = {
-
     implicit val sensitiveFormat: Format[SensitiveString] =
       JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)
 
@@ -90,7 +86,7 @@ object UserAnswers {
           (__ \ "data").read[SensitiveString] and
           (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
         )((id, registrationResponse, subscriptionResponse, data, lastUpdated) =>
-        UserAnswers(id, None, registrationResponse, subscriptionResponse, Json.parse(data.decryptedValue).as[JsObject], lastUpdated)
+        UserAnswers(User(id), registrationResponse, subscriptionResponse, Json.parse(data.decryptedValue).as[JsObject], lastUpdated)
       )
 
     val encryptedWrites: OWrites[UserAnswers] =
@@ -100,13 +96,12 @@ object UserAnswers {
           (__ \ "subscriptionDetails").writeNullable[SubscriptionDetails](SubscriptionDetails.encryptedFormat) and
           (__ \ "data").write[SensitiveString] and
           (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-        )(ua => (ua.id, ua.registrationResponse, ua.subscriptionDetails, SensitiveString(Json.stringify(ua.data)), ua.lastUpdated))
+        )(ua => (ua.user.id, ua.registrationResponse, ua.subscriptionDetails, SensitiveString(Json.stringify(ua.data)), ua.lastUpdated))
 
     OFormat(encryptedReads, encryptedWrites)
   }
 
   private val reads: Reads[UserAnswers] = {
-
     import play.api.libs.functional.syntax.*
 
     (
@@ -115,11 +110,12 @@ object UserAnswers {
         (__ \ "subscriptionDetails").readNullable[SubscriptionDetails] and
         (__ \ "data").read[JsObject] and
         (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
-      )(UserAnswers.apply(_, None, _, _, _, _))
+      ) { (id, registrationResponse, subscriptionResponse, data, lastUpdated) =>
+      UserAnswers.apply(User(id), registrationResponse, subscriptionResponse, data, lastUpdated)
+    }
   }
 
   private val writes: OWrites[UserAnswers] = {
-
     import play.api.libs.functional.syntax.*
 
     (
@@ -128,7 +124,7 @@ object UserAnswers {
         (__ \ "subscriptionDetails").writeNullable[SubscriptionDetails] and
         (__ \ "data").write[JsObject] and
         (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-      )(ua => (ua.id, ua.registrationResponse, ua.subscriptionDetails, ua.data, ua.lastUpdated))
+      )(ua => (ua.user.id, ua.registrationResponse, ua.subscriptionDetails, ua.data, ua.lastUpdated))
   }
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
