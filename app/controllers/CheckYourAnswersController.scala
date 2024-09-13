@@ -26,7 +26,7 @@ import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOr
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
 import models.registration.responses as registrationResponses
 import models.registration.responses.RegistrationResponse
-import models.requests.UserSessionDataRequest
+import models.requests.DataRequest
 import models.subscription.requests.SubscriptionRequest
 import models.{NormalMode, SubscriptionDetails, UserAnswers}
 import pages.{BusinessTypePage, CheckYourAnswersPage}
@@ -119,12 +119,12 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
           }
     )
 
-  private def showIndividual(implicit request: UserSessionDataRequest[AnyContent]) = {
+  private def showIndividual(implicit request: DataRequest[AnyContent]) = {
     val viewModel = CheckYourAnswersIndividualViewModel(request.userAnswers)
     Ok(individualView(viewModel))
   }
 
-  private def showOrganisation(implicit request: UserSessionDataRequest[AnyContent]) =
+  private def showOrganisation(implicit request: DataRequest[AnyContent]) =
     CheckYourAnswersOrganisationViewModel(request.userAnswers)
       .map(viewModel => Ok(organisationView(viewModel)))
       .getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))

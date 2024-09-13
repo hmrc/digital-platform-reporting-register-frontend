@@ -16,7 +16,7 @@
 
 package models.requests
 
-import models.User
+import models.TaxIdentifier
 import play.api.mvc.{Request, WrappedRequest}
 
-case class IdentifierRequest[A](user: User, request: Request[A]) extends WrappedRequest[A](request)
+case class IdentifierRequest[A] (request: Request[A], userId: String, taxIdentifier: Option[TaxIdentifier]) extends WrappedRequest[A](request)

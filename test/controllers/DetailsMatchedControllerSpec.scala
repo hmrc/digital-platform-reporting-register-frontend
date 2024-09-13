@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.anEmptyAnswer
 import models.NormalMode
 import org.scalatestplus.mockito.MockitoSugar
 import pages.DetailsMatchedPage
@@ -35,7 +34,7 @@ class DetailsMatchedControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.DetailsMatchedController.onPageLoad().url)
@@ -54,7 +53,7 @@ class DetailsMatchedControllerSpec extends SpecBase with MockitoSugar {
       val mockSessionRepository = mock[SessionRepository]
 
       val application =
-        applicationBuilder(userAnswers = Some(anEmptyAnswer))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -65,7 +64,7 @@ class DetailsMatchedControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DetailsMatchedPage.nextPage(NormalMode, anEmptyAnswer).url
+        redirectLocation(result).value mustEqual DetailsMatchedPage.nextPage(NormalMode, emptyUserAnswers).url
       }
     }
   }

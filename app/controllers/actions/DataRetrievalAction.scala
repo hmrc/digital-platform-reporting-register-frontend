@@ -16,25 +16,27 @@
 
 package controllers.actions
 
-import models.requests.{IdentifierRequest, OptionalUserSessionDataRequest}
+import javax.inject.Inject
+import models.requests.{IdentifierRequest, OptionalDataRequest}
 import play.api.mvc.ActionTransformer
 import repositories.SessionRepository
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DataRetrievalActionImpl @Inject()(val sessionRepository: SessionRepository)
-                                       (implicit val executionContext: ExecutionContext) extends DataRetrievalAction {
+class DataRetrievalActionImpl @Inject()(
+                                         val sessionRepository: SessionRepository
+                                       )(implicit val executionContext: ExecutionContext) extends DataRetrievalAction {
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalUserSessionDataRequest[A]] = {
-    sessionRepository.get(request.user).map { maybeAnswers =>
-      OptionalUserSessionDataRequest(
-        user = request.user,
-        userAnswers = maybeAnswers,
-        request = request.request
-      )
+  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = {
+
+    sessionRepository.get(request.userId).map { maybeAnswers =>
+      OptionalDataRequest(
+        request = request.request,
+        taxIdentifier = request.taxIdentifier,
+        userId = request.userId,
+        userAnswers = maybeAnswers.map(_.copy(taxIdentifier = request.taxIdentifier)))
     }
   }
 }
 
-trait DataRetrievalAction extends ActionTransformer[IdentifierRequest, OptionalUserSessionDataRequest]
+trait DataRetrievalAction extends ActionTransformer[IdentifierRequest, OptionalDataRequest]

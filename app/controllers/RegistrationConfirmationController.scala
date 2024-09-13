@@ -32,13 +32,13 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationConfirmationController @Inject()(sessionRepository: SessionRepository,
-                                                   identify: IdentifierAction,
-                                                   getData: DataRetrievalAction,
-                                                   requireData: DataRequiredAction,
-                                                   formProvider: RegistrationConfirmationFormProvider,
-                                                   appConfig: FrontendAppConfig,
-                                                   view: RegistrationConfirmationView)
-                                                  (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+                                        identify: IdentifierAction,
+                                        getData: DataRetrievalAction,
+                                        requireData: DataRequiredAction,
+                                        formProvider: RegistrationConfirmationFormProvider,
+                                        appConfig: FrontendAppConfig,
+                                        view: RegistrationConfirmationView)
+                                        (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>

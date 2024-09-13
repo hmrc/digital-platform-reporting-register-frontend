@@ -16,9 +16,8 @@
 
 package pages
 
-import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
-import models.{CheckMode, Country, InternationalAddress, NormalMode}
+import models.{CheckMode, Country, InternationalAddress, NormalMode, UserAnswers}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
@@ -29,16 +28,18 @@ class InternationalAddressPageSpec extends AnyFreeSpec with Matchers with TryVal
   private val address = InternationalAddress("line 1", None, "city", None, "Postcode", country)
 
   ".nextPage" - {
+    val emptyAnswers = UserAnswers("id", None)
+
     "in Normal Mode" - {
       "must go to Index" in {
-        val answers = anEmptyAnswer.set(InternationalAddressPage, address).success.value
+        val answers = emptyAnswers.set(InternationalAddressPage, address).success.value
         InternationalAddressPage.nextPage(NormalMode, answers) mustEqual routes.IndividualEmailAddressController.onPageLoad(NormalMode)
       }
     }
 
     "in Check Mode" - {
       "must go to Check Answers" in {
-        InternationalAddressPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        InternationalAddressPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

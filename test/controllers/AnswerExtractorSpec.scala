@@ -17,10 +17,8 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.anEmptyAnswer
-import builders.UserBuilder.aUser
 import models.UserAnswers
-import models.requests.{IdentifierRequest, UserSessionDataRequest}
+import models.requests.{DataRequest, IdentifierRequest}
 import pages.QuestionPage
 import play.api.libs.json.{JsPath, Json}
 import play.api.mvc.Results.{Ok, Redirect}
@@ -38,29 +36,30 @@ class AnswerExtractorSpec extends SpecBase {
     override protected def nextPageNormalMode(answers: UserAnswers): Call = Call("GET", "foo")
   }
 
-  private def buildRequest(answers: UserAnswers): UserSessionDataRequest[AnyContent] =
-    UserSessionDataRequest(answers.user, answers, IdentifierRequest(aUser, FakeRequest()))
+  private def buildRequest(answers: UserAnswers): DataRequest[AnyContent] =
+    DataRequest(IdentifierRequest(FakeRequest(), "id", None), answers.id, answers.taxIdentifier, answers)
 
   private class TestController extends AnswerExtractor {
 
-    def get(query: Gettable[Int])(implicit request: UserSessionDataRequest[AnyContent]): Result =
+    def get(query: Gettable[Int])(implicit request: DataRequest[AnyContent]): Result =
       getAnswer(query) {
-        answer => Ok(Json.toJson(answer))
+        answer =>
+          Ok(Json.toJson(answer))
       }
 
-    def getAsync(query: Gettable[Int])(implicit request: UserSessionDataRequest[AnyContent]): Future[Result] =
+    def getAsync(query: Gettable[Int])(implicit request: DataRequest[AnyContent]): Future[Result] =
       getAnswerAsync(query) {
         answer =>
           Future.successful(Ok(Json.toJson(answer)))
       }
   }
-
+  
   "getAnswer" - {
 
     "must pass the answer into the provided block when the answer exists in user answers" in {
 
-      val answers = anEmptyAnswer.set(TestPage, 1).success.value
-      implicit val request: UserSessionDataRequest[AnyContent] = buildRequest(answers)
+      val answers = emptyUserAnswers.set(TestPage, 1).success.value
+      implicit val request: DataRequest[AnyContent] = buildRequest(answers)
 
       val controller = new TestController()
 
@@ -69,20 +68,20 @@ class AnswerExtractorSpec extends SpecBase {
 
     "must redirect to Journey Recovery when the answer does not exist in user answers" in {
 
-      implicit val request: UserSessionDataRequest[AnyContent] = buildRequest(anEmptyAnswer)
+      implicit val request: DataRequest[AnyContent] = buildRequest(emptyUserAnswers)
 
       val controller = new TestController()
 
       controller.get(TestPage) mustEqual Redirect(routes.JourneyRecoveryController.onPageLoad())
     }
   }
-
+  
   "getAnswerAsync" - {
 
     "must pass the answer into the provided block when the answer exists in user answers" in {
 
-      val answers = anEmptyAnswer.set(TestPage, 1).success.value
-      implicit val request: UserSessionDataRequest[AnyContent] = buildRequest(answers)
+      val answers = emptyUserAnswers.set(TestPage, 1).success.value
+      implicit val request: DataRequest[AnyContent] = buildRequest(answers)
 
       val controller = new TestController()
 
@@ -91,7 +90,7 @@ class AnswerExtractorSpec extends SpecBase {
 
     "must redirect to Journey Recovery when the answer does not exist in user answers" in {
 
-      implicit val request: UserSessionDataRequest[AnyContent] = buildRequest(anEmptyAnswer)
+      implicit val request: DataRequest[AnyContent] = buildRequest(emptyUserAnswers)
 
       val controller = new TestController()
 

@@ -27,12 +27,15 @@ case object BusinessTypePage extends QuestionPage[BusinessType] {
 
   override def toString: String = "businessType"
 
-  override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.get(this).map {
-    case BusinessType.Individual =>
-      answers.user.taxIdentifier.map {
-        case _: Nino => routes.IndividualNameController.onPageLoad(NormalMode)
-        case _ => routes.HasNinoController.onPageLoad(NormalMode)
-      }.getOrElse(routes.HasNinoController.onPageLoad(NormalMode))
-    case _ => routes.RegisteredInUkController.onPageLoad(NormalMode)
-  }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
+    answers.get(this).map {
+      case BusinessType.Individual =>
+        answers.taxIdentifier.map {
+          case _: Nino => routes.IndividualNameController.onPageLoad(NormalMode)
+          case _       => routes.HasNinoController.onPageLoad(NormalMode)
+        }.getOrElse(routes.HasNinoController.onPageLoad(NormalMode))
+        
+      case _ =>
+        routes.RegisteredInUkController.onPageLoad(NormalMode)
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 }

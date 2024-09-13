@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.UkPostCodeFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
@@ -26,7 +25,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.UkPostCodePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 import repositories.SessionRepository
 import views.html.UkPostCodeView
 
@@ -34,16 +33,22 @@ import scala.concurrent.Future
 
 class UkPostCodeControllerSpec extends SpecBase with MockitoSugar {
 
-  private val form = new UkPostCodeFormProvider()()
-  private lazy val ukPostCodeRoute = routes.UkPostCodeController.onPageLoad(NormalMode).url
+  val formProvider = new UkPostCodeFormProvider()
+  val form = formProvider()
+
+  lazy val ukPostCodeRoute = routes.UkPostCodeController.onPageLoad(NormalMode).url
 
   "UkPostCode Controller" - {
+
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, ukPostCodeRoute)
+
         val result = route(application, request).value
+
         val view = application.injector.instanceOf[UkPostCodeView]
 
         status(result) mustEqual OK
@@ -53,7 +58,7 @@ class UkPostCodeControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = anEmptyAnswer.set(UkPostCodePage, "AA1 1AA").success.value
+      val userAnswers = emptyUserAnswers.set(UkPostCodePage, "AA1 1AA").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -76,7 +81,7 @@ class UkPostCodeControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(anEmptyAnswer))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -88,13 +93,13 @@ class UkPostCodeControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual UkPostCodePage.nextPage(NormalMode, anEmptyAnswer).url
+        redirectLocation(result).value mustEqual UkPostCodePage.nextPage(NormalMode, emptyUserAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =

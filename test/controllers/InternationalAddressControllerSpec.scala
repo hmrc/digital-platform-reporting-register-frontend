@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.InternationalAddressFormProvider
 import models.{Country, InternationalAddress, NormalMode}
 import org.mockito.ArgumentMatchers.any
@@ -34,16 +33,20 @@ import scala.concurrent.Future
 
 class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  private val form = new InternationalAddressFormProvider()()
-  private val country = Country.internationalCountries.head
-  private val address = InternationalAddress("Testing Lane", None, "New York", None, "Test PostCode", country)
-  private val userAnswers = anEmptyAnswer.set(InternationalAddressPage, address).success.value
+  val formProvider = new InternationalAddressFormProvider()
+  val form = formProvider()
 
-  private lazy val internationalAddressRoute = routes.InternationalAddressController.onPageLoad(NormalMode).url
+  lazy val internationalAddressRoute = routes.InternationalAddressController.onPageLoad(NormalMode).url
+
+  val country = Country.internationalCountries.head
+  val address = InternationalAddress("Testing Lane", None, "New York", None, "Test PostCode", country)
+  val userAnswers = emptyUserAnswers.set(InternationalAddressPage, address).success.value
 
   "InternationalAddress Controller" - {
+
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, internationalAddressRoute)
@@ -87,18 +90,18 @@ class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, internationalAddressRoute)
-            .withFormUrlEncodedBody(("line1", "Testing Lane"), ("city", "New York"), ("postal", "postCode"), ("country", country.code))
+            .withFormUrlEncodedBody(("line1", "Testing Lane"), ("city", "New York"),("postal", "postCode" ),("country", country.code))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual InternationalAddressPage.nextPage(NormalMode, anEmptyAnswer).url
+        redirectLocation(result).value mustEqual InternationalAddressPage.nextPage(NormalMode, emptyUserAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request =

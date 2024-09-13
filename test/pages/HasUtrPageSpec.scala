@@ -16,11 +16,9 @@
 
 package pages
 
-import builders.UserAnswersBuilder.anEmptyAnswer
-import builders.UserBuilder.aUser
 import controllers.routes
 import models.BusinessType.{Individual, SoleTrader}
-import models.{BusinessType, CheckMode, Nino, NormalMode, Utr}
+import models.{BusinessType, CheckMode, Nino, NormalMode, UserAnswers, Utr}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
@@ -28,9 +26,11 @@ import org.scalatest.{OptionValues, TryValues}
 class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
+    val emptyAnswers = UserAnswers("id", None)
+
     "in Normal Mode" - {
       "must go to UTR when the answer is yes" in {
-        val answers = anEmptyAnswer.set(HasUtrPage, true).success.value
+        val answers = emptyAnswers.set(HasUtrPage, true).success.value
         HasUtrPage.nextPage(NormalMode, answers) mustEqual routes.UtrController.onPageLoad(NormalMode)
       }
 
@@ -39,7 +39,7 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
           val businessTypes = BusinessType.values.filterNot(x => x == Individual | x == SoleTrader)
 
           for (businessType <- businessTypes) {
-            val answers = anEmptyAnswer
+            val answers = emptyAnswers
               .set(HasUtrPage, false).success.value
               .set(BusinessTypePage, businessType).success.value
 
@@ -51,7 +51,7 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
           val businessTypes = Seq(Individual, SoleTrader)
 
           for (businessType <- businessTypes) {
-            val answers = anEmptyAnswer
+            val answers = emptyAnswers
               .set(HasUtrPage, false).success.value
               .set(BusinessTypePage, businessType).success.value
 
@@ -63,7 +63,8 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
           val businessTypes = Seq(Individual, SoleTrader)
 
           for (businessType <- businessTypes) {
-            val answers = anEmptyAnswer.copy(user = aUser.copy(taxIdentifier = Some(Nino("nino"))))
+            val answers = emptyAnswers
+              .copy(taxIdentifier = Some(Nino("nino")))
               .set(HasUtrPage, false).success.value
               .set(BusinessTypePage, businessType).success.value
 
@@ -75,7 +76,8 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
           val businessTypes = Seq(Individual, SoleTrader)
 
           for (businessType <- businessTypes) {
-            val answers = anEmptyAnswer.copy(user = aUser.copy(taxIdentifier = Some(Utr("utr"))))
+            val answers = emptyAnswers
+              .copy(taxIdentifier = Some(Utr("utr")))
               .set(HasUtrPage, false).success.value
               .set(BusinessTypePage, businessType).success.value
 
@@ -87,7 +89,7 @@ class HasUtrPageSpec extends AnyFreeSpec with Matchers with TryValues with Optio
 
     "in Check Mode" - {
       "must go to Check Answers" in {
-        HasUtrPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        HasUtrPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

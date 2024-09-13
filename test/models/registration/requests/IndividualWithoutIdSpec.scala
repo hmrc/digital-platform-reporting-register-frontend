@@ -17,7 +17,6 @@
 package models.registration.requests
 
 import builders.ContactDetailsBuilder.aContactDetails
-import builders.UserBuilder.aUser
 import cats.data.*
 import models.registration.Address
 import models.{Country, IndividualName, InternationalAddress, UkAddress, UserAnswers}
@@ -45,13 +44,15 @@ class IndividualWithoutIdSpec
     val anInternationalAddress = InternationalAddress("line 1", Some("line 2"), "city", Some("region"), "postcode", anInternationalCountry)
 
     "must build from user answers when questions have been answered with a UK address" in {
-      val answers = UserAnswers(aUser)
-        .set(IndividualNamePage, aName).success.value
-        .set(DateOfBirthPage, aDateOfBirth).success.value
-        .set(AddressInUkPage, true).success.value
-        .set(UkAddressPage, aUkAddress).success.value
-        .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
-        .set(CanPhoneIndividualPage, false).success.value
+
+      val answers =
+        UserAnswers("id", None)
+          .set(IndividualNamePage, aName).success.value
+          .set(DateOfBirthPage, aDateOfBirth).success.value
+          .set(AddressInUkPage, true).success.value
+          .set(UkAddressPage, aUkAddress).success.value
+          .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
+          .set(CanPhoneIndividualPage, false).success.value
 
       val result = IndividualWithoutId.build(answers)
       val expectedAddress = Address("line 1", Some("line 2"), Some("town"), Some("county"), Some("postcode"), aUkCountry.code)
@@ -60,13 +61,14 @@ class IndividualWithoutIdSpec
 
     "must build from user answers when questions have been answered with an international address" in {
 
-      val answers = UserAnswers(aUser)
-        .set(IndividualNamePage, aName).success.value
-        .set(DateOfBirthPage, aDateOfBirth).success.value
-        .set(AddressInUkPage, false).success.value
-        .set(InternationalAddressPage, anInternationalAddress).success.value
-        .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
-        .set(CanPhoneIndividualPage, false).success.value
+      val answers =
+        UserAnswers("id", None)
+          .set(IndividualNamePage, aName).success.value
+          .set(DateOfBirthPage, aDateOfBirth).success.value
+          .set(AddressInUkPage, false).success.value
+          .set(InternationalAddressPage, anInternationalAddress).success.value
+          .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
+          .set(CanPhoneIndividualPage, false).success.value
 
       val result = IndividualWithoutId.build(answers)
       val expectedAddress = Address("line 1", Some("line 2"), Some("city"), Some("region"), Some("postcode"), anInternationalCountry.code)
@@ -74,7 +76,7 @@ class IndividualWithoutIdSpec
     }
 
     "must fail to build from user answers and report all errors when mandatory data is missing" in {
-      val answers = UserAnswers(aUser)
+      val answers = UserAnswers("id", None)
       val result = IndividualWithoutId.build(answers)
 
       result.left.value.toChain.toList must contain theSameElementsAs Seq(
@@ -87,10 +89,12 @@ class IndividualWithoutIdSpec
     }
 
     "must fail to build from user answers and report all errors when UK address is missing" in {
-      val answers = UserAnswers(aUser)
-        .set(IndividualNamePage, aName).success.value
-        .set(DateOfBirthPage, aDateOfBirth).success.value
-        .set(AddressInUkPage, true).success.value
+
+      val answers =
+        UserAnswers("id", None)
+          .set(IndividualNamePage, aName).success.value
+          .set(DateOfBirthPage, aDateOfBirth).success.value
+          .set(AddressInUkPage, true).success.value
 
       val result = IndividualWithoutId.build(answers)
       result.left.value.toChain.toList must contain theSameElementsAs Seq(
@@ -101,10 +105,12 @@ class IndividualWithoutIdSpec
     }
 
     "must fail to build from user answers and report all errors when international address is missing" in {
-      val answers = UserAnswers(aUser)
-        .set(IndividualNamePage, aName).success.value
-        .set(DateOfBirthPage, aDateOfBirth).success.value
-        .set(AddressInUkPage, false).success.value
+
+      val answers =
+        UserAnswers("id", None)
+          .set(IndividualNamePage, aName).success.value
+          .set(DateOfBirthPage, aDateOfBirth).success.value
+          .set(AddressInUkPage, false).success.value
 
       val result = IndividualWithoutId.build(answers)
       result.left.value.toChain.toList must contain theSameElementsAs Seq(

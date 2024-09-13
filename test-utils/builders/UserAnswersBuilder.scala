@@ -18,20 +18,21 @@ package builders
 
 import builders.MatchResponseWithIdBuilder.aMatchResponseWithId
 import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
-import builders.UserBuilder.aUser
 import models.UserAnswers
 import play.api.libs.json.Json
 
 object UserAnswersBuilder {
 
   val aUserAnswers: UserAnswers = UserAnswers(
-    user = aUser,
+    id = "default-user-answer-id",
+    taxIdentifier = None,
     registrationResponse = Some(aMatchResponseWithId),
     subscriptionDetails = Some(aSubscriptionDetails),
     data = Json.obj()
   )
 
   val anEmptyAnswer: UserAnswers = aUserAnswers.copy(
+    taxIdentifier = None,
     registrationResponse = None,
     subscriptionDetails = None,
     data = Json.obj())

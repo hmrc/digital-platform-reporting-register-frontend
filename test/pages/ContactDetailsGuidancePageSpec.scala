@@ -16,18 +16,22 @@
 
 package pages
 
-import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
 class ContactDetailsGuidancePageSpec extends AnyFreeSpec with Matchers {
 
   ".nextPage" - {
+
+    val emptyAnswers = UserAnswers("id", None)
+
     "in Normal Mode" - {
+
       "must go to Primary Contact Name" in {
-        ContactDetailsGuidancePage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.PrimaryContactNameController.onPageLoad(NormalMode)
+
+        ContactDetailsGuidancePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.PrimaryContactNameController.onPageLoad(NormalMode)
       }
     }
   }

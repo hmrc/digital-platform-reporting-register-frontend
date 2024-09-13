@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.PrimaryContactNameFormProvider
 import models.NormalMode
 import models.RegistrationType.ThirdParty
@@ -39,7 +38,7 @@ class PrimaryContactNameControllerSpec extends SpecBase with MockitoSugar {
   private val form = new PrimaryContactNameFormProvider()()
 
   private lazy val primaryContactNameRoute = routes.PrimaryContactNameController.onPageLoad(NormalMode).url
-  private val baseAnswers = anEmptyAnswer.set(RegistrationTypePage, ThirdParty).success.value
+  private val baseAnswers = emptyUserAnswers.set(RegistrationTypePage, ThirdParty).success.value
 
   "PrimaryContactName Controller" - {
     "must return OK and the correct view for a GET" in {

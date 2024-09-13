@@ -19,10 +19,10 @@ package controllers.actions
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
-import models.requests.IdentifierRequest
 import models.{Nino, Utr}
-import play.api.mvc.*
+import models.requests.IdentifierRequest
 import play.api.mvc.Results.*
+import play.api.mvc.*
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -34,9 +34,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
 
-class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthConnector,
-                                              config: FrontendAppConfig,
-                                              val parser: BodyParsers.Default)
+class AuthenticatedIdentifierAction @Inject()(
+                                               override val authConnector: AuthConnector,
+                                               config: FrontendAppConfig,
+                                               val parser: BodyParsers.Default
+                                             )
                                              (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
@@ -52,15 +54,15 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
     ) {
       case Some(Agent) ~ _ ~ _ ~ _ ~ _ =>
         Future.successful(Redirect(routes.CannotUseServiceAgentController.onPageLoad()))
-
+        
       case Some(Organisation) ~ Some(Assistant) ~ _ ~ _ ~ _ =>
         Future.successful(Redirect(routes.CannotUseServiceAssistantController.onPageLoad()))
 
       case Some(Individual) ~ _ ~ Some(internalId) ~ maybeNino ~ _ =>
-        block(IdentifierRequest(models.User(internalId, maybeNino.map(Nino.apply)), request))
-
+        block(IdentifierRequest(request, internalId, maybeNino.map(Nino.apply)))
+        
       case Some(Organisation) ~ _ ~ Some(internalId) ~ _ ~ enrolments =>
-        block(IdentifierRequest(models.User(internalId, getCtUtrEnrolment(enrolments)), request))
+        block(IdentifierRequest(request, internalId, getCtUtrEnrolment(enrolments)))
 
       case _ =>
         Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
@@ -71,7 +73,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
         Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
-
+  
   private def getCtUtrEnrolment(enrolments: Enrolments): Option[Utr] =
     enrolments.getEnrolment("IR-CT")
       .flatMap { enrolment =>
