@@ -16,22 +16,20 @@
 
 package controllers.actions
 
-import javax.inject.Inject
 import controllers.routes
-import models.requests.{DataRequest, OptionalDataRequest}
+import models.requests.{OptionalUserSessionDataRequest, UserSessionDataRequest}
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DataRequiredActionImpl @Inject()(implicit val executionContext: ExecutionContext) extends DataRequiredAction {
 
-  override protected def refine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] = {
-
+  override protected def refine[A](request: OptionalUserSessionDataRequest[A]): Future[Either[Result, UserSessionDataRequest[A]]] =
     request.userAnswers
-      .map(data => Future.successful(Right(DataRequest(request.request, request.userId, request.taxIdentifier, data))))
+      .map(data => Future.successful(Right(UserSessionDataRequest(request.user, data, request.request))))
       .getOrElse(Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad()))))
-  }
 }
 
-trait DataRequiredAction extends ActionRefiner[OptionalDataRequest, DataRequest]
+trait DataRequiredAction extends ActionRefiner[OptionalUserSessionDataRequest, UserSessionDataRequest]

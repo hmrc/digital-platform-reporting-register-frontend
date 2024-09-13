@@ -21,7 +21,7 @@ import forms.IsThisYourBusinessFormProvider
 import models.Mode
 import models.registration.Address
 import models.registration.responses.MatchResponseWithId
-import models.requests.DataRequest
+import models.requests.UserSessionDataRequest
 import pages.IsThisYourBusinessPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -70,7 +70,7 @@ class IsThisYourBusinessController @Inject()(override val messagesApi: MessagesA
       )
   }
 
-  private def showPage(page: (String, Address) => Result)(implicit request: DataRequest[AnyContent]): Result = {
+  private def showPage(page: (String, Address) => Result)(implicit request: UserSessionDataRequest[AnyContent]): Result = {
     request.userAnswers.registrationResponse match {
       case Some(r) => r match {
         case r: MatchResponseWithId => r.organisationName match {

@@ -16,30 +16,24 @@
 
 package pages
 
+import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
 class UkPostCodePageSpec extends AnyFreeSpec with Matchers {
 
   ".nextPage" - {
-
-    val emptyAnswers = UserAnswers("id", None)
-
     "in Normal Mode" - {
-
       "must go to Index" in {
-
-        UkPostCodePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.IndexController.onPageLoad()
+        UkPostCodePage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.IndexController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
-
       "must go to Check Answers" in {
-
-        UkPostCodePage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        UkPostCodePage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

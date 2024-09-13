@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.UtrFormProvider
 import models.BusinessType.{AssociationOrTrust, LimitedCompany, Llp, Partnership, SoleTrader}
 import models.NormalMode
@@ -39,17 +40,12 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
   private val utr = "1234567890"
 
   "Utr Controller" - {
-
     "must return OK and the correct view for a GET" - {
-
       val form = formProvider("utrCorporationTax")
 
       for (businessType <- Seq(LimitedCompany, AssociationOrTrust)) {
-
         s"for a ${businessType.toString}" in {
-
-          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
-
+          val answers = anEmptyAnswer.set(BusinessTypePage, businessType).success.value
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
           running(application) {
@@ -71,7 +67,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
         s"for a ${businessType.toString}" in {
 
-          val answers = emptyUserAnswers.set(BusinessTypePage, businessType).success.value
+          val answers = anEmptyAnswer.set(BusinessTypePage, businessType).success.value
 
           val application = applicationBuilder(userAnswers = Some(answers)).build()
 
@@ -92,7 +88,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
         val form = formProvider("utrSelfAssessment")
 
-        val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
+        val answers = anEmptyAnswer.set(BusinessTypePage, SoleTrader).success.value
 
         val application = applicationBuilder(userAnswers = Some(answers)).build()
 
@@ -113,7 +109,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
       val form = formProvider("utrSelfAssessment")
 
-      val answers = emptyUserAnswers
+      val answers = anEmptyAnswer
         .set(BusinessTypePage, SoleTrader).success.value
         .set(UtrPage, utr).success.value
 
@@ -138,7 +134,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(anEmptyAnswer))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -150,7 +146,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual UtrPage.nextPage(NormalMode, emptyUserAnswers).url
+        redirectLocation(result).value mustEqual UtrPage.nextPage(NormalMode, anEmptyAnswer).url
       }
     }
 
@@ -158,7 +154,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
       val form = formProvider("utrSelfAssessment")
 
-      val answers = emptyUserAnswers.set(BusinessTypePage, SoleTrader).success.value
+      val answers = anEmptyAnswer.set(BusinessTypePage, SoleTrader).success.value
 
       val application = applicationBuilder(userAnswers = Some(answers)).build()
 

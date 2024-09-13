@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.SecondaryContactEmailAddressFormProvider
 import models.NormalMode
 import models.pageviews.SecondaryContactEmailAddressViewModel
@@ -36,7 +37,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
 
   private lazy val secondaryContactEmailAddressRoute = routes.SecondaryContactEmailAddressController.onPageLoad(NormalMode).url
   private val anyName = "name"
-  private val baseAnswers = emptyUserAnswers.set(SecondaryContactNamePage, anyName).success.value
+  private val baseAnswers = anEmptyAnswer.set(SecondaryContactNamePage, anyName).success.value
   private val form = new SecondaryContactEmailAddressFormProvider()(anyName)
 
   "SecondaryContactEmailAddress Controller" - {

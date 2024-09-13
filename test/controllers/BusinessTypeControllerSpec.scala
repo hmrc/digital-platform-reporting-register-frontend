@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.BusinessTypeFormProvider
 import models.{BusinessType, NormalMode, RegistrationType}
 import org.mockito.ArgumentMatchers.any
@@ -36,7 +37,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
   private lazy val businessTypeRoute = routes.BusinessTypeController.onPageLoad(NormalMode).url
 
   private val registrationType = RegistrationType.PlatformOperator
-  private val baseAnswers = emptyUserAnswers.set(RegistrationTypePage, registrationType).success.value
+  private val baseAnswers = anEmptyAnswer.set(RegistrationTypePage, registrationType).success.value
   private val formProvider = new BusinessTypeFormProvider()
   private val form = formProvider(registrationType)
 
@@ -136,7 +137,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to Journey Recovery for a GET if registration type has not been answered" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request = FakeRequest(GET, businessTypeRoute)
@@ -167,7 +168,7 @@ class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
 
     "redirect to Journey Recovery for a POST if registration type has not been answered" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request =

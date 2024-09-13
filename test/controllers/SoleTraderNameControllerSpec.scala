@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import builders.UserAnswersBuilder.anEmptyAnswer
 import connectors.RegistrationConnector
 import forms.SoleTraderNameFormProvider
 import models.registration.requests.{IndividualDetails, IndividualWithUtr}
@@ -42,13 +43,13 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
 
   private lazy val soleTraderNameRoute = routes.SoleTraderNameController.onPageLoad(NormalMode).url
 
-  private val userAnswers = emptyUserAnswers.set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
+  private val userAnswers = anEmptyAnswer.set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
 
   "SoleTraderName Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request = FakeRequest(GET, soleTraderNameRoute)
@@ -86,8 +87,8 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockConnector.register(any())(any())) thenReturn Future.successful(NoMatchResponse())
 
-      val baseAnswers = emptyUserAnswers.set(UtrPage, "123").success.value
-      
+      val baseAnswers = anEmptyAnswer.set(UtrPage, "123").success.value
+
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
           .overrides(
@@ -102,14 +103,14 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("firstName", "first"), ("lastName", "last"))
 
         val expectedRegistrationRequest = IndividualWithUtr("123", IndividualDetails("first", "last"))
-        
+
         val expectedAnswers =
           baseAnswers
             .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
             .copy(registrationResponse = Some(NoMatchResponse()))
 
         val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
-        
+
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -124,7 +125,7 @@ class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request =

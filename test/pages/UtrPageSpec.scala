@@ -16,41 +16,33 @@
 
 package pages
 
+import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
-import models.{BusinessType, CheckMode, NormalMode, UserAnswers}
-import org.scalatest.{OptionValues, TryValues}
+import models.{BusinessType, CheckMode, NormalMode}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{OptionValues, TryValues}
 
 class UtrPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
-
-    val emptyAnswers = UserAnswers("id", None)
-
     "in Normal Mode" - {
-
       "must go to Sole Trader Name for a Sole Trader" in {
-
-        val answers = emptyAnswers.set(BusinessTypePage, BusinessType.SoleTrader).success.value
+        val answers = anEmptyAnswer.set(BusinessTypePage, BusinessType.SoleTrader).success.value
         UtrPage.nextPage(NormalMode, answers) mustEqual routes.SoleTraderNameController.onPageLoad(NormalMode)
       }
 
       "must go to Business Name for other business types" in {
-
         for (businessType <- BusinessType.values.filterNot(_ == BusinessType.SoleTrader)) {
-          
-          val answers = emptyAnswers.set(BusinessTypePage, businessType).success.value
+          val answers = anEmptyAnswer.set(BusinessTypePage, businessType).success.value
           UtrPage.nextPage(NormalMode, answers) mustEqual routes.BusinessNameController.onPageLoad(NormalMode)
         }
       }
     }
 
     "in Check Mode" - {
-
       "must go to Check Answers" in {
-
-        UtrPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        UtrPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }
