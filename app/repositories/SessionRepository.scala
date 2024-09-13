@@ -17,7 +17,7 @@
 package repositories
 
 import config.FrontendAppConfig
-import models.UserAnswers
+import models.{User, UserAnswers}
 import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.*
@@ -66,22 +66,17 @@ class SessionRepository @Inject()(mongoComponent: MongoComponent,
       .map(_ => true)
   }
 
-  def get(id: String): Future[Option[UserAnswers]] = Mdc.preservingMdc {
-    keepAlive(id).flatMap {
-      _ =>
-        collection
-          .find(byId(id))
-          .headOption()
-    }
+  def get(user: User): Future[Option[UserAnswers]] = Mdc.preservingMdc {
+    val dbResponse = keepAlive(user.id)
+      .flatMap(_ => collection.find(byId(user.id)).headOption())
+    dbResponse.map(_.map(_.copy(user = user)))
   }
 
   def set(answers: UserAnswers): Future[Boolean] = Mdc.preservingMdc {
-
     val updatedAnswers = answers copy (lastUpdated = Instant.now(clock))
 
-    collection
-      .replaceOne(
-        filter = byId(updatedAnswers.id),
+    collection.replaceOne(
+        filter = byId(updatedAnswers.user.id),
         replacement = updatedAnswers,
         options = ReplaceOptions().upsert(true)
       )

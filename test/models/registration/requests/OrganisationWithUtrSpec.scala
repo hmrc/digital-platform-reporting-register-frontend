@@ -16,11 +16,12 @@
 
 package models.registration.requests
 
+import builders.UserBuilder.aUser
 import cats.data.*
 import models.{BusinessType, Nino, UserAnswers, Utr}
-import org.scalatest.{EitherValues, OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages.{BusinessNamePage, BusinessTypePage, UtrPage}
 import play.api.libs.json.Json
 
@@ -60,55 +61,42 @@ class OrganisationWithUtrSpec
     }
 
     "must build when the user has a UTR in their tax identifier" in {
+      val answers = UserAnswers(aUser.copy(taxIdentifier = Some(Utr("123"))))
 
-      val answers = UserAnswers("id", Some(Utr("123")))
-
-      val result = OrganisationWithUtr.build(answers)
-      result.value mustEqual OrganisationWithUtr("123", None)
+      OrganisationWithUtr.build(answers).value mustEqual OrganisationWithUtr("123", None)
     }
 
     "must build when the user has a NINO in their tax identifier but has entered all necessary details" in {
+      val answers = UserAnswers(aUser.copy(taxIdentifier = Some(Nino("123"))))
+        .set(UtrPage, "123").success.value
+        .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+        .set(BusinessNamePage, "name").success.value
 
-      val answers =
-        UserAnswers("id", Some(Nino("123")))
-          .set(UtrPage, "123").success.value
-          .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
-          .set(BusinessNamePage, "name").success.value
-
-      val result = OrganisationWithUtr.build(answers)
-      result.value mustEqual OrganisationWithUtr("123", Some(OrganisationDetails("name", BusinessType.LimitedCompany)))
+      OrganisationWithUtr.build(answers).value mustEqual OrganisationWithUtr("123", Some(OrganisationDetails("name", BusinessType.LimitedCompany)))
     }
 
     "must build when the user has no tax identifier but has entered all necessary details" in {
-
-      val answers =
-        UserAnswers("id", None)
-          .set(UtrPage, "123").success.value
-          .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
-          .set(BusinessNamePage, "name").success.value
+      val answers = UserAnswers(aUser)
+        .set(UtrPage, "123").success.value
+        .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+        .set(BusinessNamePage, "name").success.value
 
       val result = OrganisationWithUtr.build(answers)
       result.value mustEqual OrganisationWithUtr("123", Some(OrganisationDetails("name", BusinessType.LimitedCompany)))
     }
 
     "must fail to build when the user has a Nino in their tax identifier and has not entered all necessary details" in {
-
-      val answers = UserAnswers("id", Some(Nino("123")))
+      val answers = UserAnswers(aUser.copy(taxIdentifier = Some(Nino("123"))))
 
       val result = OrganisationWithUtr.build(answers)
-      result.left.value.toChain.toList must contain theSameElementsAs Seq(
-        UtrPage, BusinessTypePage, BusinessNamePage
-      )
+      result.left.value.toChain.toList must contain theSameElementsAs Seq(UtrPage, BusinessTypePage, BusinessNamePage)
     }
 
     "must fail to build when the user has no tax identifier and has not entered all necessary details" in {
-
-      val answers = UserAnswers("id", None)
+      val answers = UserAnswers(aUser)
 
       val result = OrganisationWithUtr.build(answers)
-      result.left.value.toChain.toList must contain theSameElementsAs Seq(
-        UtrPage, BusinessTypePage, BusinessNamePage
-      )
+      result.left.value.toChain.toList must contain theSameElementsAs Seq(UtrPage, BusinessTypePage, BusinessNamePage)
     }
   }
 }

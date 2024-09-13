@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import builders.AddressBuilder.anAddress
+import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.IsThisYourBusinessFormProvider
 import helpers.UserAnswerHelper
 import models.NormalMode
@@ -45,7 +46,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
 
     "must return OK and the correct view for a GET" in {
 
-      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
+      val userAnswers = anEmptyAnswer.withBusiness(businessName, businessAddress)
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -63,7 +64,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
+      val userAnswers = anEmptyAnswer.withBusiness(businessName, businessAddress)
         .set(IsThisYourBusinessPage, true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
@@ -82,7 +83,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
+      val userAnswers = anEmptyAnswer.withBusiness(businessName, businessAddress)
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -98,7 +99,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
           FakeRequest(POST, isThisYourBusinessRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
-        val expectedAnswers = emptyUserAnswers.set(IsThisYourBusinessPage, true).success.value
+        val expectedAnswers = anEmptyAnswer.set(IsThisYourBusinessPage, true).success.value
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -108,7 +109,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val userAnswers = emptyUserAnswers.withBusiness(businessName, businessAddress)
+      val userAnswers = anEmptyAnswer.withBusiness(businessName, businessAddress)
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -144,7 +145,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
 
     "must redirect to Journey Recovery for a GET if no business name is found" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request = FakeRequest(GET, isThisYourBusinessRoute)
@@ -174,7 +175,7 @@ class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with U
 
     "must redirect to Journey Recovery for a POST if no business name is found" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request =

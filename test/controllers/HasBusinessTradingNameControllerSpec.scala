@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.aUserAnswers
+import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import forms.HasBusinessTradingNameFormProvider
 import models.NormalMode
 import models.pageviews.HasBusinessTradingNameViewModel
@@ -41,7 +41,7 @@ class HasBusinessTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
   "HasBusinessTradingName Controller" - {
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request = FakeRequest(GET, hasBusinessTradingNameRoute)
@@ -55,7 +55,7 @@ class HasBusinessTradingNameControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = emptyUserAnswers.set(HasBusinessTradingNamePage, true).success.value
+      val userAnswers = anEmptyAnswer.set(HasBusinessTradingNamePage, true).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
@@ -74,7 +74,7 @@ class HasBusinessTradingNameControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
         .build()
 
@@ -82,7 +82,7 @@ class HasBusinessTradingNameControllerSpec extends SpecBase with MockitoSugar {
         val request = FakeRequest(POST, hasBusinessTradingNameRoute)
           .withFormUrlEncodedBody(("value", "true"))
         val result = route(application, request).value
-        val updatedAnswers = emptyUserAnswers.set(HasBusinessTradingNamePage, true).success.value
+        val updatedAnswers = anEmptyAnswer.set(HasBusinessTradingNamePage, true).success.value
 
 
         status(result) mustEqual SEE_OTHER
@@ -91,7 +91,7 @@ class HasBusinessTradingNameControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request = FakeRequest(POST, hasBusinessTradingNameRoute)

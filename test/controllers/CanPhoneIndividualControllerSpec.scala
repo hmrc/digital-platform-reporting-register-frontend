@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.aUserAnswers
+import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import forms.CanPhoneIndividualFormProvider
 import models.NormalMode
 import models.pageviews.CanPhoneIndividualViewModel
@@ -40,7 +40,7 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
 
   "CanPhoneIndividual Controller" - {
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request = FakeRequest(GET, canPhoneIndividualRoute)
@@ -54,7 +54,7 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = emptyUserAnswers.set(CanPhoneIndividualPage, true).success.value
+      val userAnswers = anEmptyAnswer.set(CanPhoneIndividualPage, true).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
@@ -73,7 +73,7 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
         .build()
 
@@ -82,14 +82,14 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
           .withFormUrlEncodedBody(("value", "true"))
         val result = route(application, request).value
 
-        val expectedAnswers = emptyUserAnswers.set(CanPhoneIndividualPage, true).success.value
+        val expectedAnswers = anEmptyAnswer.set(CanPhoneIndividualPage, true).success.value
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual CanPhoneIndividualPage.nextPage(NormalMode, expectedAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request = FakeRequest(POST, canPhoneIndividualRoute)

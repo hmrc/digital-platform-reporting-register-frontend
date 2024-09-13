@@ -16,69 +16,68 @@
 
 package pages
 
+import builders.MatchResponseWithIdBuilder.aMatchResponseWithId
+import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithoutId, NoMatchResponse}
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalatest.TryValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import builders.MatchResponseWithIdBuilder.aMatchResponseWithId
 
 class DateOfBirthPageSpec extends AnyFreeSpec with Matchers with TryValues {
 
   ".nextPage" - {
-    val emptyAnswers = UserAnswers("id", None)
-
     "in Normal Mode" - {
       "must go to REG-KO-7 if NINO supplied and user already registered" in {
-        val answers = emptyAnswers.set(HasNinoPage, true).success.value
+        val answers = anEmptyAnswer.set(HasNinoPage, true).success.value
           .copy(registrationResponse = Some(AlreadySubscribedResponse()))
 
         DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IndividualAlreadyRegisteredController.onPageLoad()
       }
 
       "must go to individual-identity-confirmed page if NINO supplied and user not already registered" in {
-        val answers = emptyAnswers.set(HasNinoPage, true).success.value
+        val answers = anEmptyAnswer.set(HasNinoPage, true).success.value
           .copy(registrationResponse = Some(aMatchResponseWithId))
 
         DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IndividualIdentityConfirmedController.onPageLoad()
       }
 
       "must go to individual-identity-not-confirmed page if NINO supplied but match not found" in {
-        val answers = emptyAnswers.set(HasNinoPage, true).success.value
+        val answers = anEmptyAnswer.set(HasNinoPage, true).success.value
           .copy(registrationResponse = Some(NoMatchResponse()))
 
         DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.IndividualIdentityNotConfirmedController.onPageLoad()
       }
 
       "must go to error page if NINO supplied and invalid response" in {
-        val answers = emptyAnswers.set(HasNinoPage, true).success.value
+        val answers = anEmptyAnswer.set(HasNinoPage, true).success.value
           .copy(registrationResponse = Some(MatchResponseWithoutId("")))
 
         DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
 
       "must go to error page if NINO supplied and no response" in {
-        val answers = emptyAnswers.set(HasNinoPage, true).success.value
+        val answers = anEmptyAnswer.set(HasNinoPage, true).success.value
           .copy(registrationResponse = None)
 
         DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
 
       "must go to live-in-uk page if NINO absent" in {
-        val answers = emptyAnswers.set(HasNinoPage, false).success.value
+        val answers = anEmptyAnswer.set(HasNinoPage, false).success.value
 
         DateOfBirthPage.nextPage(NormalMode, answers) mustEqual routes.AddressInUkController.onPageLoad(NormalMode)
       }
 
       "must go to error page if no data" in {
-        DateOfBirthPage.nextPage(NormalMode, emptyAnswers) mustEqual routes.JourneyRecoveryController.onPageLoad()
+        DateOfBirthPage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
       "must go to Check Answers" in {
-        DateOfBirthPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        DateOfBirthPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }
