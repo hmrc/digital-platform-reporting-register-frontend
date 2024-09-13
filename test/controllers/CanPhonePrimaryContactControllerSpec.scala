@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.CanPhonePrimaryContactFormProvider
 import models.NormalMode
 import models.pageviews.CanPhonePrimaryContactViewModel
@@ -34,13 +33,14 @@ import views.html.CanPhonePrimaryContactView
 import scala.concurrent.Future
 
 class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
-
+  
   private lazy val canPhonePrimaryContactRoute = routes.CanPhonePrimaryContactController.onPageLoad(NormalMode).url
   private val anyName = "name"
   private val anyBoolean = true
-  private val baseAnswers = anEmptyAnswer
-    .set(PrimaryContactNamePage, anyName).success.value
-    .set(CanPhonePrimaryContactPage, anyBoolean).success.value
+  private val baseAnswers =
+    emptyUserAnswers
+      .set(PrimaryContactNamePage, anyName).success.value
+      .set(CanPhonePrimaryContactPage, anyBoolean).success.value
   private val form = new CanPhonePrimaryContactFormProvider()(anyName)
 
   "CanPhonePrimaryContact Controller" - {

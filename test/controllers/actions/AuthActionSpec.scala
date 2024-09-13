@@ -43,7 +43,7 @@ class AuthActionSpec extends SpecBase {
 
   class Harness(authAction: IdentifierAction) {
     def onPageLoad(): Action[AnyContent] = authAction { request =>
-      Results.Ok(s"${request.user.id}${request.user.taxIdentifier.map(_.value).getOrElse("")}")
+      Results.Ok(s"${request.userId}${request.taxIdentifier.map(_.value).getOrElse("")}")
     }
   }
 
@@ -104,7 +104,7 @@ class AuthActionSpec extends SpecBase {
     "when the user is an organisation user" - {
 
       "must succeed" - {
-
+        
         "when the user has a CT UTR enrolment" in {
 
           val enrolments = Enrolments(Set(Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)))
@@ -115,7 +115,7 @@ class AuthActionSpec extends SpecBase {
 
           contentAsString(result) mustEqual "internalId utr"
         }
-
+        
         "when the user has no CT UTR enrolment" in {
 
           val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ emptyEnrolments), appConfig, bodyParsers)
@@ -153,15 +153,15 @@ class AuthActionSpec extends SpecBase {
         }
       }
     }
-
+    
     "when auth gives us back an unexpected set of retrievals" - {
-
+      
       "must go to Unauthorised" in {
 
         val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(None ~ None ~ None ~ None ~ emptyEnrolments), appConfig, bodyParsers)
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(FakeRequest())
-
+        
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
       }

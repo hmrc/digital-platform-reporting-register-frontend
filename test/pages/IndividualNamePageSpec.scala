@@ -16,31 +16,38 @@
 
 package pages
 
-import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
-import models.{CheckMode, IndividualName, NormalMode}
+import models.{CheckMode, IndividualName, NormalMode, UserAnswers}
+import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{OptionValues, TryValues}
 
 class IndividualNamePageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
+
+    val emptyAnswers = UserAnswers("id", None)
+
     "in Normal Mode" - {
+
       "must go to Date Of Birth page if there is an answer" in {
-        val answers = anEmptyAnswer.set(IndividualNamePage, IndividualName("", "")).success.value
+
+        val answers = emptyAnswers.set(IndividualNamePage, IndividualName("", "")).success.value
 
         IndividualNamePage.nextPage(NormalMode, answers) mustEqual routes.DateOfBirthController.onPageLoad(NormalMode)
       }
 
       "must go to error page if there is no data" in {
-        IndividualNamePage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.JourneyRecoveryController.onPageLoad()
+
+        IndividualNamePage.nextPage(NormalMode, emptyAnswers) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
+
       "must go to Check Answers" in {
-        IndividualNamePage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
+
+        IndividualNamePage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

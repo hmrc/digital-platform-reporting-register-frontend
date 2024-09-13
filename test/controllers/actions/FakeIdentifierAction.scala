@@ -16,19 +16,18 @@
 
 package controllers.actions
 
-import builders.UserBuilder.aUser
 import models.TaxIdentifier
+
+import javax.inject.Inject
 import models.requests.IdentifierRequest
 import play.api.mvc.*
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers,
-                                     taxIdentifierProvider: FakeTaxIdentifierProvider) extends IdentifierAction {
+class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers, taxIdentifierProvider: FakeTaxIdentifierProvider) extends IdentifierAction {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(aUser.copy(taxIdentifier = taxIdentifierProvider.taxIdentifier), request))
+    block(IdentifierRequest(request, "id", taxIdentifierProvider.taxIdentifier))
 
   override def parser: BodyParser[AnyContent] =
     bodyParsers.default

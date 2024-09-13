@@ -16,31 +16,38 @@
 
 package pages
 
-import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
-import models.{CheckMode, NormalMode}
+import models.{CheckMode, NormalMode, UserAnswers}
+import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{OptionValues, TryValues}
 
 class HasNinoPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
+
+    val emptyAnswers = UserAnswers("id", None)
+
     "in Normal Mode" - {
+
       "must go to Nino when the answer is yes" in {
-        val answers = anEmptyAnswer.set(HasNinoPage, true).success.value
+
+        val answers = emptyAnswers.set(HasNinoPage, true).success.value
         HasNinoPage.nextPage(NormalMode, answers) mustEqual routes.NinoController.onPageLoad(NormalMode)
       }
 
       "must go to Individual Name when the answer is no" in {
-        val answers = anEmptyAnswer.set(HasNinoPage, false).success.value
+
+        val answers = emptyAnswers.set(HasNinoPage, false).success.value
         HasNinoPage.nextPage(NormalMode, answers) mustEqual routes.IndividualNameController.onPageLoad(NormalMode)
       }
     }
 
     "in Check Mode" - {
+
       "must go to Check Answers" in {
-        HasNinoPage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
+
+        HasNinoPage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

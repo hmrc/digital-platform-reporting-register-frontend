@@ -17,9 +17,8 @@
 package controllers.actions
 
 import base.SpecBase
-import builders.UserBuilder.aUser
-import models.requests.{IdentifierRequest, OptionalUserSessionDataRequest}
 import models.{Nino, UserAnswers}
+import models.requests.{IdentifierRequest, OptionalDataRequest}
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
@@ -31,45 +30,51 @@ import scala.concurrent.Future
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
   class Harness(sessionRepository: SessionRepository) extends DataRetrievalActionImpl(sessionRepository) {
-    def callTransform[A](request: IdentifierRequest[A]): Future[OptionalUserSessionDataRequest[A]] = transform(request)
+    def callTransform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = transform(request)
   }
 
   "Data Retrieval Action" - {
+
     "when there is no data in the cache" - {
+
       "must set userAnswers to 'None' in the request" in {
+
         val sessionRepository = mock[SessionRepository]
+        when(sessionRepository.get("id")) thenReturn Future(None)
         val action = new Harness(sessionRepository)
 
-        when(sessionRepository.get(aUser)) thenReturn Future(None)
+        val result = action.callTransform(IdentifierRequest(FakeRequest(), "id", None)).futureValue
 
-        action.callTransform(IdentifierRequest(aUser, FakeRequest())).futureValue.userAnswers must not be defined
+        result.userAnswers must not be defined
       }
     }
 
     "when there is data in the cache" - {
+
       "must build a userAnswers object and add it to the request" - {
+
         "including the tax identifier when it was present in the request" in {
+
           val sessionRepository = mock[SessionRepository]
+          when(sessionRepository.get("id")) thenReturn Future(Some(UserAnswers("id", None)))
           val action = new Harness(sessionRepository)
-          val user = aUser.copy(taxIdentifier = Some(Nino("some-nino")))
 
-          when(sessionRepository.get(user)) thenReturn Future(Some(UserAnswers(user = user)))
+          val result = action.callTransform(IdentifierRequest(FakeRequest(), "id", Some(Nino("foo")))).futureValue
 
-          val result = action.callTransform(IdentifierRequest(user, FakeRequest())).futureValue
           result.userAnswers mustBe defined
-          result.userAnswers.value.user.taxIdentifier.value mustEqual Nino("some-nino")
+          result.userAnswers.value.taxIdentifier.value mustEqual Nino("foo")
         }
 
         "not including a tax identifier when it wasn't present in the request" in {
+
           val sessionRepository = mock[SessionRepository]
+          when(sessionRepository.get("id")) thenReturn Future(Some(UserAnswers("id", None)))
           val action = new Harness(sessionRepository)
-          val user = aUser.copy(taxIdentifier = None)
 
-          when(sessionRepository.get(user)) thenReturn Future(Some(UserAnswers(user = user)))
+          val result = action.callTransform(IdentifierRequest(FakeRequest(), "id", None)).futureValue
 
-          val result = action.callTransform(IdentifierRequest(user, FakeRequest())).futureValue
           result.userAnswers mustBe defined
-          result.userAnswers.value.user.taxIdentifier must not be defined
+          result.userAnswers.value.taxIdentifier must not be defined
         }
       }
     }

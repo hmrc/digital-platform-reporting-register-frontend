@@ -17,10 +17,9 @@
 package pages
 
 import builders.AddressBuilder.anAddress
-import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithId, NoMatchResponse}
-import models.{BusinessType, CheckMode, NormalMode}
+import models.{BusinessType, CheckMode, NormalMode, UserAnswers}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
@@ -28,16 +27,17 @@ import org.scalatest.{OptionValues, TryValues}
 class SoleTraderNamePageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
 
   ".nextPage" - {
-    val noResponseAnswer = anEmptyAnswer.copy(registrationResponse = Some(NoMatchResponse()))
+    val emptyAnswers = UserAnswers("id", None)
+    val noResponseAnswer = emptyAnswers.copy(registrationResponse = Some(NoMatchResponse()))
 
     "in Normal Mode" - {
       "ETMP returns match & account already registered leads to 'business-already-registered' page" in {
-        val alreadySubscribedAnswer = anEmptyAnswer.copy(registrationResponse = Some(AlreadySubscribedResponse()))
+        val alreadySubscribedAnswer = emptyAnswers.copy(registrationResponse = Some(AlreadySubscribedResponse()))
         SoleTraderNamePage.nextPage(NormalMode, alreadySubscribedAnswer) mustEqual routes.IndividualAlreadyRegisteredController.onPageLoad()
       }
 
       "ETMP returns match & account not already registered leads to 'we have matched your details' page" in {
-        val responseAnswer = anEmptyAnswer.copy(registrationResponse = Some(MatchResponseWithId("Id", anAddress, Some("name"))))
+        val responseAnswer = emptyAnswers.copy(registrationResponse = Some(MatchResponseWithId("Id", anAddress, Some("name"))))
         SoleTraderNamePage.nextPage(NormalMode, responseAnswer) mustEqual routes.DetailsMatchedController.onPageLoad()
       }
 
@@ -54,7 +54,7 @@ class SoleTraderNamePageSpec extends AnyFreeSpec with Matchers with TryValues wi
 
     "in Check Mode" - {
       "must go to Check Answers" in {
-        SoleTraderNamePage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
+        SoleTraderNamePage.nextPage(CheckMode, emptyAnswers) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }

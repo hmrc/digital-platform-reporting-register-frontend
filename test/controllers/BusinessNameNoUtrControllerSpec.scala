@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
+import builders.UserAnswersBuilder.aUserAnswers
 import forms.BusinessNameNoUtrFormProvider
 import models.NormalMode
 import models.pageviews.BusinessNameNoUtrViewModel
@@ -41,7 +41,7 @@ class BusinessNameNoUtrControllerSpec extends SpecBase with MockitoSugar {
 
   "BusinessNameNoUtr Controller" - {
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, businessNameNoUtrRoute)
@@ -55,7 +55,7 @@ class BusinessNameNoUtrControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = anEmptyAnswer.set(BusinessNameNoUtrPage, "name").success.value
+      val userAnswers = emptyUserAnswers.set(BusinessNameNoUtrPage, "name").success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
@@ -74,7 +74,7 @@ class BusinessNameNoUtrControllerSpec extends SpecBase with MockitoSugar {
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer))
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
         .build()
 
@@ -84,12 +84,12 @@ class BusinessNameNoUtrControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual BusinessNameNoUtrPage.nextPage(NormalMode, anEmptyAnswer).url
+        redirectLocation(result).value mustEqual BusinessNameNoUtrPage.nextPage(NormalMode, emptyUserAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, businessNameNoUtrRoute)

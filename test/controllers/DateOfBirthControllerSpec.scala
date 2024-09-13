@@ -16,8 +16,9 @@
 
 package controllers
 
+import java.time.{LocalDate, ZoneOffset}
+
 import base.SpecBase
-import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.DateOfBirthFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
@@ -28,11 +29,10 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 import repositories.SessionRepository
 import views.html.DateOfBirthView
 
-import java.time.{LocalDate, ZoneOffset}
 import scala.concurrent.Future
 
 class DateOfBirthControllerSpec extends SpecBase with MockitoSugar {
@@ -40,7 +40,6 @@ class DateOfBirthControllerSpec extends SpecBase with MockitoSugar {
   private implicit val messages: Messages = stubMessages()
 
   private val formProvider = new DateOfBirthFormProvider()
-
   private def form = formProvider()
 
   val validAnswer = LocalDate.now(ZoneOffset.UTC)
@@ -53,17 +52,20 @@ class DateOfBirthControllerSpec extends SpecBase with MockitoSugar {
   def postRequest(): FakeRequest[AnyContentAsFormUrlEncoded] =
     FakeRequest(POST, dateOfBirthRoute)
       .withFormUrlEncodedBody(
-        "value.day" -> validAnswer.getDayOfMonth.toString,
+        "value.day"   -> validAnswer.getDayOfMonth.toString,
         "value.month" -> validAnswer.getMonthValue.toString,
-        "value.year" -> validAnswer.getYear.toString
+        "value.year"  -> validAnswer.getYear.toString
       )
 
   "DateOfBirth Controller" - {
+
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val result = route(application, getRequest()).value
+
         val view = application.injector.instanceOf[DateOfBirthView]
 
         status(result) mustEqual OK
@@ -73,7 +75,7 @@ class DateOfBirthControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = anEmptyAnswer.set(DateOfBirthPage, validAnswer).success.value
+      val userAnswers = emptyUserAnswers.set(DateOfBirthPage, validAnswer).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -94,7 +96,7 @@ class DateOfBirthControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(anEmptyAnswer))
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
@@ -102,18 +104,23 @@ class DateOfBirthControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, postRequest()).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual DateOfBirthPage.nextPage(NormalMode, anEmptyAnswer).url
+        redirectLocation(result).value mustEqual DateOfBirthPage.nextPage(NormalMode, emptyUserAnswers).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
-      val request = FakeRequest(POST, dateOfBirthRoute)
-        .withFormUrlEncodedBody(("value", "invalid value"))
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      val request =
+        FakeRequest(POST, dateOfBirthRoute)
+          .withFormUrlEncodedBody(("value", "invalid value"))
 
       running(application) {
         val boundForm = form.bind(Map("value" -> "invalid value"))
+
         val view = application.injector.instanceOf[DateOfBirthView]
+
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
