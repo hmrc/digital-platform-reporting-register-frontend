@@ -20,7 +20,10 @@ import models.{IndividualName, SoleTraderName}
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 
-sealed trait Contact
+sealed trait Contact {
+  val email: String
+  val phone: Option[String]
+}
 
 object Contact {
 

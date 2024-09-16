@@ -50,20 +50,18 @@ object SubscriptionDetails {
     )
   }
 
-  private def getBusinessName(userAnswers: UserAnswers): Option[String] =
-    userAnswers.get(BusinessTypePage).flatMap {
-      case Individual | SoleTrader => None
-      case _ => userAnswers.registrationResponse.flatMap {
-        case x: MatchResponseWithId => x.organisationName
-        case x: MatchResponseWithoutId => userAnswers.get(BusinessNameNoUtrPage)
-        case _ => None
-      }
-    }.orElse {
-      userAnswers.registrationResponse.flatMap {
-        case x: MatchResponseWithId => x.organisationName
-        case _ => None
-      }
+  private def getBusinessName(userAnswers: UserAnswers): Option[String] = userAnswers.get(BusinessTypePage) match {
+    case Some(Individual) | Some(SoleTrader) => None
+    case Some(_) => userAnswers.registrationResponse.flatMap {
+      case x: MatchResponseWithId => x.organisationName
+      case x: MatchResponseWithoutId => userAnswers.get(BusinessNameNoUtrPage)
+      case _ => None
     }
+    case None => userAnswers.registrationResponse.flatMap {
+      case x: MatchResponseWithId => x.organisationName
+      case _ => None
+    }
+  }
 
   def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[SubscriptionDetails] = {
 

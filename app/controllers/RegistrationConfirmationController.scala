@@ -21,8 +21,10 @@ import controllers.actions.*
 import forms.RegistrationConfirmationFormProvider
 import models.Mode
 import models.pageviews.RegistrationConfirmationViewModel
+import models.subscription.responses.SubscribedResponse
 import pages.RegistrationConfirmationPage
 import play.api.i18n.I18nSupport
+import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -42,29 +44,28 @@ class RegistrationConfirmationController @Inject()(sessionRepository: SessionRep
   extends FrontendController(mcc) with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify(false) andThen getData andThen requireData) { implicit request =>
-    showPage(
-      RegistrationConfirmationViewModel(mode, request.userAnswers, formProvider(), appConfig.isPrivateBeta),
-      model => Ok(view(model))
-    )
+    request.userAnswers.subscriptionDetails
+      .map(_.subscriptionResponse)
+      .filter(_.isInstanceOf[SubscribedResponse])
+      .flatMap(_ => RegistrationConfirmationViewModel(mode, request.userAnswers, formProvider()))
+      .map(viewModel => Ok(view(viewModel)(appConfig)))
+      .getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify(false) andThen getData andThen requireData).async { implicit request =>
     formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(showPage(
-        RegistrationConfirmationViewModel(mode, request.userAnswers, formWithErrors, appConfig.isPrivateBeta),
-        model => BadRequest(view(model))
-      )),
+      formWithErrors => RegistrationConfirmationViewModel(mode, request.userAnswers, formWithErrors) match {
+        case Some(viewModel) => Future.successful(BadRequest(view(viewModel)(appConfig)))
+        case None => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      },
       value =>
         for {
           updatedAnswers <- Future.fromTry(request.userAnswers.set(RegistrationConfirmationPage, value))
           _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(RegistrationConfirmationPage.nextPage(mode, updatedAnswers))
+        } yield {
+          val redirectUrl = if (value) appConfig.addPlatformOperatorUrl else appConfig.manageFrontendUrl
+          Redirect(redirectUrl)
+        }
     )
   }
-
-  private def showPage(model: Option[RegistrationConfirmationViewModel], page: RegistrationConfirmationViewModel => Result) =
-    model match {
-      case Some(value) => page(value)
-      case None => Redirect(routes.JourneyRecoveryController.onPageLoad())
-    }
 }
