@@ -17,7 +17,7 @@
 package controllers
 
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.AddressBuilder.anAddress
 import builders.UserAnswersBuilder.aUserAnswers
 import helpers.UserAnswerHelper
@@ -26,7 +26,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.BusinessDetailsMatchOtherView
 
-class BusinessDetailsMatchOtherControllerSpec extends SpecBase with UserAnswerHelper {
+class BusinessDetailsMatchOtherControllerSpec extends ControllerSpecBase with UserAnswerHelper {
 
   "BusinessDetailsMatchOther Controller" - {
     "must return OK and the correct view for a GET" in {

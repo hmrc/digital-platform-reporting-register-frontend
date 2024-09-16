@@ -31,20 +31,19 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IndividualEmailAddressController @Inject()(sessionRepository: SessionRepository,
-                                      identify: IdentifierAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
-                                      formProvider: IndividualEmailAddressFormProvider,
-                                      view: IndividualEmailAddressView)
-                                     (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+                                                 identify: IdentifierActionProvider,
+                                                 getData: DataRetrievalAction,
+                                                 requireData: DataRequiredAction,
+                                                 formProvider: IndividualEmailAddressFormProvider,
+                                                 view: IndividualEmailAddressView)
+                                                (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val userAnswers = request.userAnswers
-    Ok(view(IndividualEmailAddressViewModel(mode, userAnswers, formProvider())))
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
+    Ok(view(IndividualEmailAddressViewModel(mode, request.userAnswers, formProvider())))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
     formProvider().bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest(view(IndividualEmailAddressViewModel(mode, request.userAnswers, formWithErrors)))),
       value =>

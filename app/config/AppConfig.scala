@@ -17,12 +17,13 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
+import config.ConfigKeys.{DigitalPlatformReportingUrlKey, ManageFrontendBaseUrlKey}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 
 @Singleton
-class FrontendAppConfig @Inject()(configuration: Configuration) {
+class AppConfig @Inject()(configuration: Configuration) {
 
   val host: String = configuration.get[String]("host")
   val appName: String = configuration.get[String]("appName")
@@ -49,6 +50,11 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
   )
 
   lazy val auditSource: String = configuration.get[String]("auditing.auditSource")
+
+  lazy val digitalPlatformReportingUrl: String = configuration.get[Service](DigitalPlatformReportingUrlKey).baseUrl
+
+  private lazy val manageFrontendBaseUrl: String = configuration.get[Service](ManageFrontendBaseUrlKey).baseUrl
+  lazy val manageFrontendUrl: String = s"$manageFrontendBaseUrl/manage-digital-platform-reporting"
 
   val timeout: Int = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")

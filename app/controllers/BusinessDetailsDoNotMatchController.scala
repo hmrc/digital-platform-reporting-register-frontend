@@ -24,14 +24,14 @@ import views.html.BusinessDetailsDoNotMatchView
 
 import javax.inject.Inject
 
-class BusinessDetailsDoNotMatchController @Inject()(identify: IdentifierAction,
+class BusinessDetailsDoNotMatchController @Inject()(identify: IdentifierActionProvider,
                                                     getData: DataRetrievalAction,
                                                     requireData: DataRequiredAction,
                                                     view: BusinessDetailsDoNotMatchView)
                                                    (implicit mcc: MessagesControllerComponents)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad: Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     Ok(view())
   }
 }

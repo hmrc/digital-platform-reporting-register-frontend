@@ -18,65 +18,47 @@ package controllers
 
 import controllers.actions.*
 import forms.BusinessTypeFormProvider
-
-import javax.inject.Inject
 import models.Mode
 import pages.{BusinessTypePage, RegistrationTypePage}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.BusinessTypeView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class BusinessTypeController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       sessionRepository: SessionRepository,
-                                       identify: IdentifierAction,
+class BusinessTypeController @Inject()(sessionRepository: SessionRepository,
+                                       identify: IdentifierActionProvider,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        formProvider: BusinessTypeFormProvider,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: BusinessTypeView
-                                     )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
-    with I18nSupport
-    with AnswerExtractor {
+                                       view: BusinessTypeView)
+                                      (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      getAnswer(RegistrationTypePage) {
-        registrationType =>
-
-          val form = formProvider(registrationType)
-          
-          val preparedForm = request.userAnswers.get(BusinessTypePage) match {
-            case None => form
-            case Some(value) => form.fill(value)
-          }
-
-          Ok(view(preparedForm, mode, registrationType))
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
+    getAnswer(RegistrationTypePage) { registrationType =>
+      val preparedForm = request.userAnswers.get(BusinessTypePage) match {
+        case None => formProvider(registrationType)
+        case Some(value) => formProvider(registrationType).fill(value)
       }
+
+      Ok(view(preparedForm, mode, registrationType))
+    }
   }
-  
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      getAnswerAsync(RegistrationTypePage) {
-        registrationType =>
 
-          val form = formProvider(registrationType)
-          
-          form.bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, registrationType))),
-  
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessTypePage, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(BusinessTypePage.nextPage(mode, updatedAnswers))
-          )
-      }
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
+    getAnswerAsync(RegistrationTypePage) { registrationType =>
+      formProvider(registrationType).bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, registrationType))),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessTypePage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(BusinessTypePage.nextPage(mode, updatedAnswers))
+      )
+    }
   }
 }

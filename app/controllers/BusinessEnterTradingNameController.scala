@@ -31,7 +31,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessEnterTradingNameController @Inject()(sessionRepository: SessionRepository,
-                                                   identify: IdentifierAction,
+                                                   identify: IdentifierActionProvider,
                                                    getData: DataRetrievalAction,
                                                    requireData: DataRequiredAction,
                                                    formProvider: BusinessEnterTradingNameFormProvider,
@@ -39,12 +39,12 @@ class BusinessEnterTradingNameController @Inject()(sessionRepository: SessionRep
                                                   (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     val userAnswers = request.userAnswers
     Ok(view(BusinessEnterTradingNameViewModel(mode, userAnswers, formProvider())))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
     formProvider().bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest(view(BusinessEnterTradingNameViewModel(mode, request.userAnswers, formWithErrors)))),
       value =>

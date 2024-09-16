@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
@@ -28,7 +28,7 @@ import repositories.SessionRepository
 
 import scala.concurrent.Future
 
-class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
+class KeepAliveControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   "keepAlive" - {
 

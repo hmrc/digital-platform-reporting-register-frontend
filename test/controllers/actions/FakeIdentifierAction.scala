@@ -17,18 +17,28 @@
 package controllers.actions
 
 import builders.UserBuilder.aUser
+import config.AppConfig
 import models.TaxIdentifier
 import models.requests.IdentifierRequest
 import play.api.mvc.*
+import play.api.mvc.Results.Redirect
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers,
-                                     taxIdentifierProvider: FakeTaxIdentifierProvider) extends IdentifierAction {
+class FakeIdentifierAction @Inject()(appConfig: AppConfig,
+                                     bodyParsers: PlayBodyParsers,
+                                     taxIdentifierProvider: FakeTaxIdentifierProvider,
+                                     hasDprsEnrollment: Boolean,
+                                     withDprsEnrollmentCheck: Boolean) extends IdentifierAction {
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(aUser.copy(taxIdentifier = taxIdentifierProvider.taxIdentifier), request))
+  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
+    if (withDprsEnrollmentCheck && hasDprsEnrollment) {
+      Future.successful(Redirect(appConfig.manageFrontendUrl))
+    } else {
+      block(IdentifierRequest(aUser.copy(taxIdentifier = taxIdentifierProvider.taxIdentifier), request))
+    }
+  }
 
   override def parser: BodyParser[AnyContent] =
     bodyParsers.default
@@ -40,4 +50,34 @@ class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers,
 class FakeTaxIdentifierProvider @Inject() {
 
   def taxIdentifier: Option[TaxIdentifier] = None
+}
+
+class FakeIdentifierActionProvider @Inject()(appConfig: AppConfig,
+                                             bodyParser: PlayBodyParsers,
+                                             taxIdentifierProvider: FakeTaxIdentifierProvider)
+                                            (implicit val executionContext: ExecutionContext)
+  extends IdentifierActionProvider {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true) = new FakeIdentifierAction(
+    appConfig = appConfig,
+    bodyParsers = bodyParser,
+    taxIdentifierProvider = taxIdentifierProvider,
+    hasDprsEnrollment = false,
+    withDprsEnrollmentCheck = withDprsEnrollmentCheck
+  )
+}
+
+class FakeIdentifierActionProviderWithDprsEnrollment @Inject()(appConfig: AppConfig,
+                                                               bodyParser: PlayBodyParsers,
+                                                               taxIdentifierProvider: FakeTaxIdentifierProvider)
+                                                              (implicit val executionContext: ExecutionContext)
+  extends IdentifierActionProvider {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true) = new FakeIdentifierAction(
+    appConfig = appConfig,
+    bodyParsers = bodyParser,
+    taxIdentifierProvider = taxIdentifierProvider,
+    hasDprsEnrollment = true,
+    withDprsEnrollmentCheck = withDprsEnrollmentCheck
+  )
 }

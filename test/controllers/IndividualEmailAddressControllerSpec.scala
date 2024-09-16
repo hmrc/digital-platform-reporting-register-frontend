@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import forms.IndividualEmailAddressFormProvider
 import models.NormalMode
@@ -33,7 +33,7 @@ import views.html.IndividualEmailAddressView
 
 import scala.concurrent.Future
 
-class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
+class IndividualEmailAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val form = new IndividualEmailAddressFormProvider()()
 

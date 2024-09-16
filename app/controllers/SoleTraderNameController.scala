@@ -21,8 +21,6 @@ import controllers.actions.*
 import forms.SoleTraderNameFormProvider
 import models.registration.requests.IndividualWithUtr
 import models.registration.responses.RegistrationResponse
-
-import javax.inject.Inject
 import models.{Mode, UserAnswers}
 import pages.SoleTraderNamePage
 import play.api.i18n.I18nSupport
@@ -31,10 +29,11 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.SoleTraderNameView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SoleTraderNameController @Inject()(sessionRepository: SessionRepository,
-                                         identify: IdentifierAction,
+                                         identify: IdentifierActionProvider,
                                          getData: DataRetrievalAction,
                                          requireData: DataRequiredAction,
                                          formProvider: SoleTraderNameFormProvider,
@@ -43,7 +42,7 @@ class SoleTraderNameController @Inject()(sessionRepository: SessionRepository,
                                         (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
 
     val preparedForm = request.userAnswers.get(SoleTraderNamePage) match {
       case None => formProvider()
@@ -53,16 +52,15 @@ class SoleTraderNameController @Inject()(sessionRepository: SessionRepository,
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
     formProvider().bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
       value =>
         for {
-          updatedAnswers   <- Future.fromTry(request.userAnswers.set(SoleTraderNamePage, value))
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(SoleTraderNamePage, value))
           registerResponse <- register(updatedAnswers)
-          fullAnswers      = updatedAnswers.copy(registrationResponse = Some(registerResponse))
-          _                <- sessionRepository.set(fullAnswers)
+          fullAnswers = updatedAnswers.copy(registrationResponse = Some(registerResponse))
+          _ <- sessionRepository.set(fullAnswers)
         } yield Redirect(SoleTraderNamePage.nextPage(mode, fullAnswers))
     )
   }

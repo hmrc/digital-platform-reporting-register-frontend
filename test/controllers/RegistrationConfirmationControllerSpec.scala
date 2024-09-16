@@ -16,9 +16,9 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
-import config.FrontendAppConfig
+import config.AppConfig
 import forms.RegistrationConfirmationFormProvider
 import generators.{Generators, ModelGenerators}
 import models.pageviews.RegistrationConfirmationViewModel
@@ -37,7 +37,7 @@ import views.html.RegistrationConfirmationView
 
 import scala.concurrent.Future
 
-class RegistrationConfirmationControllerSpec extends SpecBase with MockitoSugar with Generators with ModelGenerators {
+class RegistrationConfirmationControllerSpec extends ControllerSpecBase with MockitoSugar with Generators with ModelGenerators {
 
   private val form = new RegistrationConfirmationFormProvider()()
   private lazy val registrationConfirmationRoute = routes.RegistrationConfirmationController.onPageLoad(NormalMode).url
@@ -55,13 +55,13 @@ class RegistrationConfirmationControllerSpec extends SpecBase with MockitoSugar 
         secondaryEmail: Option[String],
         registrationType: RegistrationType
       ) =>
-        val application = applicationBuilder(userAnswers = Some(aUserAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(aUserAnswers), hasDprsEnrollment = true).build()
 
         running(application) {
           val request = FakeRequest(GET, registrationConfirmationRoute)
           val result = route(application, request).value
           val view = application.injector.instanceOf[RegistrationConfirmationView]
-          val appConfig = application.injector.instanceOf[FrontendAppConfig]
+          val appConfig = application.injector.instanceOf[AppConfig]
           val viewModel = RegistrationConfirmationViewModel(NormalMode, aUserAnswers, form, appConfig.isPrivateBeta)
 
           status(result) mustEqual OK
@@ -88,12 +88,28 @@ class RegistrationConfirmationControllerSpec extends SpecBase with MockitoSugar 
           val request = FakeRequest(GET, registrationConfirmationRoute)
           val view = application.injector.instanceOf[RegistrationConfirmationView]
           val result = route(application, request).value
-          val appConfig = application.injector.instanceOf[FrontendAppConfig]
+          val appConfig = application.injector.instanceOf[AppConfig]
           val viewModel = RegistrationConfirmationViewModel(NormalMode, userAnswers, form.fill(true), appConfig.isPrivateBeta)
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(viewModel.get)(request, messages(application)).toString
         }
+    }
+
+    "must not redirect to Manage Frontend on a GET when DPRS enrollment exists" in {
+      val userAnswers = aUserAnswers.set(RegistrationConfirmationPage, true).success.value
+      val application = applicationBuilder(userAnswers = Some(userAnswers), hasDprsEnrollment = true).build()
+
+      running(application) {
+        val request = FakeRequest(GET, registrationConfirmationRoute)
+        val view = application.injector.instanceOf[RegistrationConfirmationView]
+        val result = route(application, request).value
+        val appConfig = application.injector.instanceOf[AppConfig]
+        val viewModel = RegistrationConfirmationViewModel(NormalMode, userAnswers, form.fill(true), appConfig.isPrivateBeta)
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(viewModel.get)(request, messages(application)).toString
+      }
     }
 
     "must go to error page if invalid data" in {
@@ -128,6 +144,26 @@ class RegistrationConfirmationControllerSpec extends SpecBase with MockitoSugar 
       }
     }
 
+    "must not redirect to Manage Frontend on POST when when DPRS enrollment exists" in {
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(userAnswers = Some(aUserAnswers), hasDprsEnrollment = true)
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(POST, registrationConfirmationRoute)
+          .withFormUrlEncodedBody(("value", "true"))
+        val updatedAnswers = aUserAnswers.set(RegistrationConfirmationPage, true).success.value
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual RegistrationConfirmationPage.nextPage(NormalMode, updatedAnswers).url
+      }
+    }
+
     "must return a Bad Request and errors when invalid data is submitted" in {
       val application = applicationBuilder(userAnswers = Some(aUserAnswers)).build()
 
@@ -137,7 +173,7 @@ class RegistrationConfirmationControllerSpec extends SpecBase with MockitoSugar 
         val boundForm = form.bind(Map("value" -> ""))
         val view = application.injector.instanceOf[RegistrationConfirmationView]
         val result = route(application, request).value
-        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        val appConfig = application.injector.instanceOf[AppConfig]
         val viewModel = RegistrationConfirmationViewModel(NormalMode, aUserAnswers, boundForm, appConfig.isPrivateBeta)
 
         status(result) mustEqual BAD_REQUEST

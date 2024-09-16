@@ -15,7 +15,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class $className$Controller @Inject()(sessionRepository: SessionRepository,
-                                      identify: IdentifierAction,
+                                      identify: IdentifierActionProvider,
                                       getData: DataRetrievalAction,
                                       requireData: DataRequiredAction,
                                       formProvider: $className$FormProvider,

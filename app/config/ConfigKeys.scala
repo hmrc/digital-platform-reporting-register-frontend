@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package config
 
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import views.html.CannotUseServiceAgentView
+object ConfigKeys {
 
-import javax.inject.Inject
-
-class CannotUseServiceAgentController @Inject()(view: CannotUseServiceAgentView)
-                                               (implicit mcc: MessagesControllerComponents) extends FrontendController(mcc) with I18nSupport {
-
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    Ok(view())
-  }
+  val DigitalPlatformReportingUrlKey: String = "microservice.services.digital-platform-reporting"
+  val ManageFrontendBaseUrlKey: String = "microservice.services.digital-platform-reporting-manage-frontend"
 }

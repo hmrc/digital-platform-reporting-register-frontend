@@ -31,22 +31,22 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class HasSecondaryContactController @Inject()(sessionRepository: SessionRepository,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: HasSecondaryContactFormProvider,
-                                        view: HasSecondaryContactView)
-                                        (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+                                              identify: IdentifierActionProvider,
+                                              getData: DataRetrievalAction,
+                                              requireData: DataRequiredAction,
+                                              formProvider: HasSecondaryContactFormProvider,
+                                              view: HasSecondaryContactView)
+                                             (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     getAnswer(PrimaryContactNamePage) { contactName =>
       val userAnswers = request.userAnswers
       Ok(view(HasSecondaryContactViewModel(mode, userAnswers, formProvider(contactName), contactName)))
     }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
     getAnswerAsync(PrimaryContactNamePage) { contactName =>
       formProvider(contactName).bindFromRequest().fold(
         formWithErrors => Future.successful(BadRequest(view(HasSecondaryContactViewModel(mode, request.userAnswers, formWithErrors, contactName)))),

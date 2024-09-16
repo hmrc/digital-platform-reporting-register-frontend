@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.HasSecondaryContactFormProvider
 import models.NormalMode
@@ -33,7 +33,7 @@ import views.html.HasSecondaryContactView
 
 import scala.concurrent.Future
 
-class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
+class HasSecondaryContactControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private lazy val hasSecondaryContactRoute = routes.HasSecondaryContactController.onPageLoad(NormalMode).url
   private val anyName = "name"

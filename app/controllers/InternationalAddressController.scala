@@ -16,55 +16,45 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.InternationalAddressFormProvider
-import javax.inject.Inject
 import models.Mode
 import pages.InternationalAddressPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.InternationalAddressView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class InternationalAddressController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      sessionRepository: SessionRepository,
-                                      identify: IdentifierAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
-                                      formProvider: InternationalAddressFormProvider,
-                                      val controllerComponents: MessagesControllerComponents,
-                                      view: InternationalAddressView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class InternationalAddressController @Inject()(sessionRepository: SessionRepository,
+                                               identify: IdentifierActionProvider,
+                                               getData: DataRetrievalAction,
+                                               requireData: DataRequiredAction,
+                                               formProvider: InternationalAddressFormProvider,
+                                               view: InternationalAddressView)
+                                              (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  extends FrontendController(mcc) with I18nSupport {
 
-  val form = formProvider()
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
+    val preparedForm = request.userAnswers.get(InternationalAddressPage) match {
+      case None => formProvider()
+      case Some(value) => formProvider().fill(value)
+    }
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-
-      val preparedForm = request.userAnswers.get(InternationalAddressPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(InternationalAddressPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(InternationalAddressPage.nextPage(mode, updatedAnswers))
-      )
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
+    formProvider().bindFromRequest().fold(
+      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+      value =>
+        for {
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(InternationalAddressPage, value))
+          _ <- sessionRepository.set(updatedAnswers)
+        } yield Redirect(InternationalAddressPage.nextPage(mode, updatedAnswers))
+    )
   }
 }

@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.Inject
 import connectors.SubscriptionConnector.SubscribeFailure
 import connectors.{RegistrationConnector, SubscriptionConnector}
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{IdentifierActionProvider, DataRequiredAction, DataRetrievalAction}
 import models.BusinessType.*
 import models.audit.AuditEventModel
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
@@ -40,7 +40,7 @@ import views.html.{CheckYourAnswersIndividualView, CheckYourAnswersOrganisationV
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckYourAnswersController @Inject()(identify: IdentifierAction,
+class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
                                            getData: DataRetrievalAction,
                                            requireData: DataRequiredAction,
                                            individualView: CheckYourAnswersIndividualView,
@@ -52,14 +52,14 @@ class CheckYourAnswersController @Inject()(identify: IdentifierAction,
                                           (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     request.userAnswers.get(BusinessTypePage).map {
       case SoleTrader | Individual => showIndividual(implicitly)
       case _ => showOrganisation(implicitly)
     }.getOrElse(showOrganisation(implicitly))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
     getRegistrationResponse(request.userAnswers).flatMap {
       case response: registrationResponses.AlreadySubscribedResponse =>
         val answersWithRegistration = request.userAnswers.copy(registrationResponse = Some(response))

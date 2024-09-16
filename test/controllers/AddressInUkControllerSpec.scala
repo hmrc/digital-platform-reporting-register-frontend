@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.AddressInUkFormProvider
 import models.NormalMode
@@ -32,7 +32,7 @@ import views.html.AddressInUkView
 
 import scala.concurrent.Future
 
-class AddressInUkControllerSpec extends SpecBase with MockitoSugar {
+class AddressInUkControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val form = new AddressInUkFormProvider()()
 

@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.DateOfBirthFormProvider
 import models.NormalMode
@@ -35,7 +35,7 @@ import views.html.DateOfBirthView
 import java.time.{LocalDate, ZoneOffset}
 import scala.concurrent.Future
 
-class DateOfBirthControllerSpec extends SpecBase with MockitoSugar {
+class DateOfBirthControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private implicit val messages: Messages = stubMessages()
 

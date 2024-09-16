@@ -16,12 +16,12 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import models.NormalMode
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
-class IndexControllerSpec extends SpecBase {
+class IndexControllerSpec extends ControllerSpecBase {
 
   "Index Controller" - {
 

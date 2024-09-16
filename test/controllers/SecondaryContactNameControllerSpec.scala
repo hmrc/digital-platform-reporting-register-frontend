@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.SecondaryContactNameFormProvider
 import models.NormalMode
@@ -34,7 +34,7 @@ import views.html.SecondaryContactNameView
 
 import scala.concurrent.Future
 
-class SecondaryContactNameControllerSpec extends SpecBase with MockitoSugar {
+class SecondaryContactNameControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val form = new SecondaryContactNameFormProvider()()
 

@@ -17,12 +17,11 @@
 package controllers
 
 import connectors.RegistrationConnector
-import controllers.actions._
+import controllers.actions.*
 import forms.BusinessNameFormProvider
-import javax.inject.Inject
-import models.{Mode, UserAnswers}
 import models.registration.requests.OrganisationWithUtr
 import models.registration.responses.RegistrationResponse
+import models.{Mode, UserAnswers}
 import pages.BusinessNamePage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -30,10 +29,11 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.BusinessNameView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessNameController @Inject()(sessionRepository: SessionRepository,
-                                       identify: IdentifierAction,
+                                       identify: IdentifierActionProvider,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        formProvider: BusinessNameFormProvider,
@@ -42,30 +42,26 @@ class BusinessNameController @Inject()(sessionRepository: SessionRepository,
                                       (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
+    val preparedForm = request.userAnswers.get(BusinessNamePage) match {
+      case None => formProvider()
+      case Some(value) => formProvider().fill(value)
+    }
 
-      val preparedForm = request.userAnswers.get(BusinessNamePage) match {
-        case None => formProvider()
-        case Some(value) => formProvider().fill(value)
-      }
-
-      Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-
-      formProvider().bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        value =>
-          for {
-            updatedAnswers   <- Future.fromTry(request.userAnswers.set(BusinessNamePage, value))
-            registerResponse <- register(updatedAnswers)
-            fullAnswers      = updatedAnswers.copy(registrationResponse = Some(registerResponse))
-            _                <- sessionRepository.set(fullAnswers)
-          } yield Redirect(BusinessNamePage.nextPage(mode, fullAnswers))
-      )
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
+    formProvider().bindFromRequest().fold(
+      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+      value =>
+        for {
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessNamePage, value))
+          registerResponse <- register(updatedAnswers)
+          fullAnswers = updatedAnswers.copy(registrationResponse = Some(registerResponse))
+          _ <- sessionRepository.set(fullAnswers)
+        } yield Redirect(BusinessNamePage.nextPage(mode, fullAnswers))
+    )
   }
 
   private def register(answers: UserAnswers)(implicit request: Request[_]): Future[RegistrationResponse] =

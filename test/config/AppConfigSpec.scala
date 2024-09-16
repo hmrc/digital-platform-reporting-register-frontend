@@ -16,23 +16,32 @@
 
 package config
 
-import base.SpecBase
 import org.mockito.Mockito.when
 import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
 
-class FrontendAppConfigSpec extends SpecBase with MockitoSugar {
+class AppConfigSpec extends AnyFreeSpec with Matchers with MockitoSugar {
 
   private val mockConfiguration = mock[Configuration]
 
-  private val underTest = FrontendAppConfig(mockConfiguration)
+  private val underTest = AppConfig(mockConfiguration)
 
   ".auditSource" - {
     "must return the auditing source from the application.conf file" in {
       when(mockConfiguration.get[String]("auditing.auditSource")).thenReturn("some-audit-source")
 
       underTest.auditSource mustBe "some-audit-source"
+    }
+  }
+
+  ".manageFrontendUrl" - {
+    "must return Manage Frontend service URL from the application.conf file" in {
+      when(mockConfiguration.get[Service]("microservice.services.digital-platform-reporting-manage-frontend"))
+        .thenReturn(Service("manage-frontend-url", "20006", "http"))
+
+      underTest.manageFrontendUrl mustBe "http://manage-frontend-url:20006/manage-digital-platform-reporting"
     }
   }
 }

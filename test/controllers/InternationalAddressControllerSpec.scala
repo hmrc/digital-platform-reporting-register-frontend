@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.InternationalAddressFormProvider
 import models.{Country, InternationalAddress, NormalMode}
@@ -32,7 +32,7 @@ import views.html.InternationalAddressView
 
 import scala.concurrent.Future
 
-class InternationalAddressControllerSpec extends SpecBase with MockitoSugar {
+class InternationalAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val form = new InternationalAddressFormProvider()()
   private val country = Country.internationalCountries.head

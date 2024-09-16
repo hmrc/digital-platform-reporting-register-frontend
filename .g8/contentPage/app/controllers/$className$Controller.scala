@@ -8,7 +8,7 @@ import views.html.$className$View
 
 import javax.inject.Inject
 
-class $className$Controller @Inject()(identify: IdentifierAction,
+class $className$Controller @Inject()(identify: IdentifierActionProvider,
                                       getData: DataRetrievalAction,
                                       requireData: DataRequiredAction,
                                       view: $className$View)

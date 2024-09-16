@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import models.NormalMode
 import pages.ContactDetailsGuidancePage
@@ -24,7 +24,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.ContactDetailsGuidanceView
 
-class ContactDetailsGuidanceControllerSpec extends SpecBase {
+class ContactDetailsGuidanceControllerSpec extends ControllerSpecBase {
 
   "ContactDetailsGuidance Controller" - {
     "must return OK and the correct view for a GET" in {

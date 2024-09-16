@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import forms.BusinessAddressFormProvider
 import generators.Generators
@@ -34,7 +34,7 @@ import views.html.BusinessAddressView
 
 import scala.concurrent.Future
 
-class BusinessAddressControllerSpec extends SpecBase with MockitoSugar with Generators {
+class BusinessAddressControllerSpec extends ControllerSpecBase with MockitoSugar with Generators {
 
   private lazy val businessAddressRoute = routes.BusinessAddressController.onPageLoad(NormalMode).url
 

@@ -24,14 +24,14 @@ import views.html.IndividualIdentityConfirmedView
 
 import javax.inject.Inject
 
-class IndividualIdentityConfirmedController @Inject()(identify: IdentifierAction,
+class IndividualIdentityConfirmedController @Inject()(identify: IdentifierActionProvider,
                                                       getData: DataRetrievalAction,
                                                       requireData: DataRequiredAction,
                                                       view: IndividualIdentityConfirmedView)
                                                      (implicit mcc: MessagesControllerComponents)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad: Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     Ok(view())
   }
 }

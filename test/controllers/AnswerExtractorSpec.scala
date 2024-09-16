@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import builders.UserBuilder.aUser
 import models.UserAnswers
@@ -30,7 +30,7 @@ import queries.Gettable
 
 import scala.concurrent.Future
 
-class AnswerExtractorSpec extends SpecBase {
+class AnswerExtractorSpec extends ControllerSpecBase {
 
   private object TestPage extends QuestionPage[Int] {
     override def path: JsPath = JsPath \ "test"

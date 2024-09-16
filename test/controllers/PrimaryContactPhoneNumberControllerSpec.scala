@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.PrimaryContactPhoneNumberFormProvider
 import models.NormalMode
@@ -33,7 +33,7 @@ import views.html.PrimaryContactPhoneNumberView
 
 import scala.concurrent.Future
 
-class PrimaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
+class PrimaryContactPhoneNumberControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private lazy val primaryContactPhoneNumberRoute = routes.PrimaryContactPhoneNumberController.onPageLoad(NormalMode).url
   private val anyName = "name"

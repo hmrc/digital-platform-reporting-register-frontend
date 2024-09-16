@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.FrontendAppConfig
+import config.AppConfig
 import controllers.actions.*
 import forms.RegistrationConfirmationFormProvider
 import models.Mode
@@ -32,23 +32,23 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationConfirmationController @Inject()(sessionRepository: SessionRepository,
-                                                   identify: IdentifierAction,
+                                                   identify: IdentifierActionProvider,
                                                    getData: DataRetrievalAction,
                                                    requireData: DataRequiredAction,
                                                    formProvider: RegistrationConfirmationFormProvider,
-                                                   appConfig: FrontendAppConfig,
+                                                   appConfig: AppConfig,
                                                    view: RegistrationConfirmationView)
                                                   (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify(false) andThen getData andThen requireData) { implicit request =>
     showPage(
       RegistrationConfirmationViewModel(mode, request.userAnswers, formProvider(), appConfig.isPrivateBeta),
       model => Ok(view(model))
     )
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify(false) andThen getData andThen requireData).async { implicit request =>
     formProvider().bindFromRequest().fold(
       formWithErrors => Future.successful(showPage(
         RegistrationConfirmationViewModel(mode, request.userAnswers, formWithErrors, appConfig.isPrivateBeta),

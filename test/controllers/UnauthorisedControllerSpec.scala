@@ -16,13 +16,13 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.UnauthorisedView
 
-class UnauthorisedControllerSpec extends SpecBase {
+class UnauthorisedControllerSpec extends ControllerSpecBase {
 
   "Unauthorised Controller" - {
 

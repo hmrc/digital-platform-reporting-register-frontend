@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import forms.CanPhoneIndividualFormProvider
 import models.NormalMode
@@ -33,7 +33,7 @@ import views.html.CanPhoneIndividualView
 
 import scala.concurrent.Future
 
-class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
+class CanPhoneIndividualControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val form = new CanPhoneIndividualFormProvider()()
   private lazy val canPhoneIndividualRoute = routes.CanPhoneIndividualController.onPageLoad(NormalMode).url

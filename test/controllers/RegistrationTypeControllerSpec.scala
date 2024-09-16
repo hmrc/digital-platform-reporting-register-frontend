@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import connectors.RegistrationConnector
 import controllers.actions.FakeTaxIdentifierProvider
@@ -37,7 +37,7 @@ import views.html.RegistrationTypeView
 
 import scala.concurrent.Future
 
-class RegistrationTypeControllerSpec extends SpecBase with MockitoSugar {
+class RegistrationTypeControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private lazy val registrationTypeRoute = routes.RegistrationTypeController.onPageLoad(NormalMode).url
 

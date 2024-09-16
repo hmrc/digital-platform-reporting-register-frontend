@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import connectors.RegistrationConnector
 import forms.SoleTraderNameFormProvider
@@ -36,7 +36,7 @@ import views.html.SoleTraderNameView
 
 import scala.concurrent.Future
 
-class SoleTraderNameControllerSpec extends SpecBase with MockitoSugar {
+class SoleTraderNameControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val formProvider = new SoleTraderNameFormProvider()
   private val form = formProvider()

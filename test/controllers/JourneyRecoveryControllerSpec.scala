@@ -16,13 +16,13 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.{JourneyRecoveryContinueView, JourneyRecoveryStartAgainView}
 
-class JourneyRecoveryControllerSpec extends SpecBase {
+class JourneyRecoveryControllerSpec extends ControllerSpecBase {
 
   "JourneyRecovery Controller" - {
 
