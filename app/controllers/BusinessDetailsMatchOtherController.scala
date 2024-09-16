@@ -25,14 +25,14 @@ import views.html.BusinessDetailsMatchOtherView
 
 import javax.inject.Inject
 
-class BusinessDetailsMatchOtherController @Inject()(identify: IdentifierAction,
+class BusinessDetailsMatchOtherController @Inject()(identify: IdentifierActionProvider,
                                                     getData: DataRetrievalAction,
                                                     requireData: DataRequiredAction,
                                                     view: BusinessDetailsMatchOtherView)
                                                    (implicit mcc: MessagesControllerComponents)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad: Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     BusinessDetailsMatchOtherViewModel(request.userAnswers) match {
       case Some(userAnswer) => Ok(view(userAnswer))
       case None => Redirect(routes.JourneyRecoveryController.onPageLoad())

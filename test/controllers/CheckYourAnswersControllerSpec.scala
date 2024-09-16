@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.AddressBuilder
 import builders.AddressBuilder.anyAddress
 import builders.BusinessAddressBuilder.aBusinessAddress
@@ -47,7 +47,7 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{redirectLocation, *}
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.AuditService
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
@@ -56,7 +56,7 @@ import views.html.{CheckYourAnswersIndividualView, CheckYourAnswersOrganisationV
 import java.time.{Instant, LocalDate}
 import scala.concurrent.Future
 
-class CheckYourAnswersControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
+class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSugar with BeforeAndAfterEach {
 
   private implicit val messages: Messages = stubMessages()
 

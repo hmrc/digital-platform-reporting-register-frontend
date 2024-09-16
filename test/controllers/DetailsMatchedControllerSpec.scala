@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import models.NormalMode
 import org.scalatestplus.mockito.MockitoSugar
@@ -27,7 +27,7 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.DetailsMatchedView
 
-class DetailsMatchedControllerSpec extends SpecBase with MockitoSugar {
+class DetailsMatchedControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private lazy val detailsMatchedRoute = routes.DetailsMatchedController.onPageLoad().url
 

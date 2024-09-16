@@ -33,7 +33,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class HasUtrController @Inject()(sessionRepository: SessionRepository,
-                                 identify: IdentifierAction,
+                                 identify: IdentifierActionProvider,
                                  getData: DataRetrievalAction,
                                  requireData: DataRequiredAction,
                                  formProvider: HasUtrFormProvider,
@@ -43,7 +43,7 @@ class HasUtrController @Inject()(sessionRepository: SessionRepository,
                                 (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     getAnswer(BusinessTypePage) { businessType =>
       val preparedForm = request.userAnswers.get(HasUtrPage) match {
         case None => formProvider(businessType)
@@ -56,7 +56,7 @@ class HasUtrController @Inject()(sessionRepository: SessionRepository,
     }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
     getAnswerAsync(BusinessTypePage) { businessType =>
       formProvider(businessType).bindFromRequest().fold(
         formWithErrors => renderView(businessType, formWithErrors, mode)

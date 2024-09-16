@@ -16,9 +16,9 @@
 
 package controllers.auth
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserBuilder.aUser
-import config.FrontendAppConfig
+import config.AppConfig
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -30,7 +30,7 @@ import repositories.SessionRepository
 import java.net.URLEncoder
 import scala.concurrent.Future
 
-class AuthControllerSpec extends SpecBase with MockitoSugar {
+class AuthControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   "signOut" - {
     "must clear user answers and redirect to sign out, specifying the exit survey as the continue URL" in {
@@ -43,7 +43,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        val appConfig = application.injector.instanceOf[AppConfig]
         val request = FakeRequest(GET, routes.AuthController.signOut().url)
         val result = route(application, request).value
         val encodedContinueUrl = URLEncoder.encode(appConfig.exitSurveyUrl, "UTF-8")
@@ -68,7 +68,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
         .build()
 
       running(application) {
-        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        val appConfig = application.injector.instanceOf[AppConfig]
         val request = FakeRequest(GET, routes.AuthController.signOutNoSurvey().url)
         val result = route(application, request).value
         val encodedContinueUrl = URLEncoder.encode(routes.SignedOutController.onPageLoad().url, "UTF-8")

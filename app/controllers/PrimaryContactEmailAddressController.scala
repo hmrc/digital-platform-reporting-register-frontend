@@ -31,7 +31,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class PrimaryContactEmailAddressController @Inject()(sessionRepository: SessionRepository,
-                                                     identify: IdentifierAction,
+                                                     identify: IdentifierActionProvider,
                                                      getData: DataRetrievalAction,
                                                      requireData: DataRequiredAction,
                                                      formProvider: PrimaryContactEmailAddressFormProvider,
@@ -39,14 +39,14 @@ class PrimaryContactEmailAddressController @Inject()(sessionRepository: SessionR
                                                     (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     getAnswer(PrimaryContactNamePage) { name =>
       val userAnswers = request.userAnswers
       Ok(view(PrimaryContactEmailAddressViewModel(mode, userAnswers, formProvider(name), name)))
     }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
     getAnswerAsync(PrimaryContactNamePage) { name =>
       formProvider(name).bindFromRequest().fold(
         formWithErrors => Future.successful(BadRequest(view(PrimaryContactEmailAddressViewModel(mode, request.userAnswers, formWithErrors, name)))),

@@ -16,13 +16,13 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.SoleTraderDetailsNotMatchView
 
-class SoleTraderDetailsNotMatchControllerSpec extends SpecBase {
+class SoleTraderDetailsNotMatchControllerSpec extends ControllerSpecBase {
 
   "SoleTraderDetailsNotMatch Controller" - {
     "must return OK and the correct view for a GET" in {

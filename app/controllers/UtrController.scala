@@ -32,7 +32,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class UtrController @Inject()(sessionRepository: SessionRepository,
-                              identify: IdentifierAction,
+                              identify: IdentifierActionProvider,
                               getData: DataRetrievalAction,
                               requireData: DataRequiredAction,
                               formProvider: UtrFormProvider,
@@ -42,45 +42,39 @@ class UtrController @Inject()(sessionRepository: SessionRepository,
                              (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      getAnswer(BusinessTypePage) {
-        businessType =>
-          val form = getForm(businessType)
-
-          val preparedForm = request.userAnswers.get(UtrPage) match {
-            case None => form
-            case Some(value) => form.fill(value)
-          }
-
-          renderView(businessType, preparedForm, mode) match {
-            case Some(view) => Ok(view)
-            case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
-          }
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
+    getAnswer(BusinessTypePage) { businessType =>
+      val form = getForm(businessType)
+      val preparedForm = request.userAnswers.get(UtrPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
       }
+
+      renderView(businessType, preparedForm, mode) match {
+        case Some(view) => Ok(view)
+        case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+      }
+    }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      getAnswerAsync(BusinessTypePage) {
-        businessType =>
-          val form = getForm(businessType)
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
+    getAnswerAsync(BusinessTypePage) { businessType =>
+      val form = getForm(businessType)
 
-          form.bindFromRequest().fold(
-            formWithErrors => Future.successful(
-              renderView(businessType, formWithErrors, mode) match {
-                case Some(view) => BadRequest(view)
-                case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
-              }
-            ),
-
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(UtrPage, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(UtrPage.nextPage(mode, updatedAnswers))
-          )
-      }
+      form.bindFromRequest().fold(
+        formWithErrors => Future.successful(
+          renderView(businessType, formWithErrors, mode) match {
+            case Some(view) => BadRequest(view)
+            case _ => Redirect(routes.JourneyRecoveryController.onPageLoad())
+          }
+        ),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(UtrPage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(UtrPage.nextPage(mode, updatedAnswers))
+      )
+    }
   }
 
   private def renderView(businessType: BusinessType, form: Form[_], mode: Mode)(implicit request: Request[_]) =

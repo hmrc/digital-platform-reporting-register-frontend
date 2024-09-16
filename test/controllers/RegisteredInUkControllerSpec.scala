@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.RegisteredInUkFormProvider
 import models.NormalMode
@@ -32,7 +32,7 @@ import views.html.RegisteredInUkView
 
 import scala.concurrent.Future
 
-class RegisteredInUkControllerSpec extends SpecBase with MockitoSugar {
+class RegisteredInUkControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val form = new RegisteredInUkFormProvider()()
   private lazy val registeredInUkRoute = routes.RegisteredInUkController.onPageLoad(NormalMode).url

@@ -26,18 +26,18 @@ import views.html.ContactDetailsGuidanceView
 
 import javax.inject.Inject
 
-class ContactDetailsGuidanceController @Inject()(identify: IdentifierAction,
+class ContactDetailsGuidanceController @Inject()(identify: IdentifierActionProvider,
                                                  getData: DataRetrievalAction,
                                                  requireData: DataRequiredAction,
                                                  view: ContactDetailsGuidanceView)
                                                 (implicit mcc: MessagesControllerComponents)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad: Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     Ok(view())
   }
 
-  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onSubmit: Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     Redirect(ContactDetailsGuidancePage.nextPage(NormalMode, request.userAnswers))
   }
 }

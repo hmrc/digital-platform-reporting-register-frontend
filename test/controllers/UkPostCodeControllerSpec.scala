@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.UkPostCodeFormProvider
 import models.NormalMode
@@ -32,7 +32,7 @@ import views.html.UkPostCodeView
 
 import scala.concurrent.Future
 
-class UkPostCodeControllerSpec extends SpecBase with MockitoSugar {
+class UkPostCodeControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val form = new UkPostCodeFormProvider()()
   private lazy val ukPostCodeRoute = routes.UkPostCodeController.onPageLoad(NormalMode).url

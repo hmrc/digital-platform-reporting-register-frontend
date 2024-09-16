@@ -1,6 +1,6 @@
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import forms.$className$FormProvider
 import models.NormalMode

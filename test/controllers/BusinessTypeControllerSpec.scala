@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.BusinessTypeFormProvider
 import models.{BusinessType, NormalMode, RegistrationType}
@@ -32,7 +32,7 @@ import views.html.BusinessTypeView
 
 import scala.concurrent.Future
 
-class BusinessTypeControllerSpec extends SpecBase with MockitoSugar {
+class BusinessTypeControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private lazy val businessTypeRoute = routes.BusinessTypeController.onPageLoad(NormalMode).url
 

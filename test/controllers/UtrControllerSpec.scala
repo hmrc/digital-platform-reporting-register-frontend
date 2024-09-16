@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.UtrFormProvider
 import models.BusinessType.{AssociationOrTrust, LimitedCompany, Llp, Partnership, SoleTrader}
@@ -33,7 +33,7 @@ import views.html.{UtrCorporationTaxView, UtrPartnershipView, UtrSelfAssessmentV
 
 import scala.concurrent.Future
 
-class UtrControllerSpec extends SpecBase with MockitoSugar {
+class UtrControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val formProvider = new UtrFormProvider()
   private lazy val utrRoute = routes.UtrController.onPageLoad(NormalMode).url
@@ -50,9 +50,7 @@ class UtrControllerSpec extends SpecBase with MockitoSugar {
 
           running(application) {
             val request = FakeRequest(GET, utrRoute)
-
             val result = route(application, request).value
-
             val view = application.injector.instanceOf[UtrCorporationTaxView]
 
             status(result) mustEqual OK

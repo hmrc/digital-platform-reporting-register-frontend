@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.AddressBuilder.anAddress
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.IsThisYourBusinessFormProvider
@@ -34,7 +34,7 @@ import views.html.IsThisYourBusinessView
 
 import scala.concurrent.Future
 
-class IsThisYourBusinessControllerSpec extends SpecBase with MockitoSugar with UserAnswerHelper {
+class IsThisYourBusinessControllerSpec extends ControllerSpecBase with MockitoSugar with UserAnswerHelper {
 
   private val formProvider = new IsThisYourBusinessFormProvider()
   private val form = formProvider()

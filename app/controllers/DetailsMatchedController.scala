@@ -19,29 +19,24 @@ package controllers
 import controllers.actions.*
 import models.NormalMode
 import pages.DetailsMatchedPage
-
-import javax.inject.Inject
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.DetailsMatchedView
 
-class DetailsMatchedController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: DetailsMatchedView
-                                     ) extends FrontendBaseController with I18nSupport {
+import javax.inject.Inject
 
-  def onPageLoad: Action[AnyContent] = identify {
-    implicit request =>
-      Ok(view())
+class DetailsMatchedController @Inject()(identify: IdentifierActionProvider,
+                                         getData: DataRetrievalAction,
+                                         requireData: DataRequiredAction,
+                                         view: DetailsMatchedView)
+                                        (implicit mcc: MessagesControllerComponents) extends FrontendController(mcc) with I18nSupport {
+
+  def onPageLoad: Action[AnyContent] = identify() { implicit request =>
+    Ok(view())
   }
 
-  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-       Redirect(DetailsMatchedPage.nextPage(NormalMode, request.userAnswers))
+  def onSubmit: Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
+    Redirect(DetailsMatchedPage.nextPage(NormalMode, request.userAnswers))
   }
 }

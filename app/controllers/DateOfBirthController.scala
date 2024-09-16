@@ -33,7 +33,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DateOfBirthController @Inject()(sessionRepository: SessionRepository,
-                                      identify: IdentifierAction,
+                                      identify: IdentifierActionProvider,
                                       getData: DataRetrievalAction,
                                       requireData: DataRequiredAction,
                                       formProvider: DateOfBirthFormProvider,
@@ -42,7 +42,7 @@ class DateOfBirthController @Inject()(sessionRepository: SessionRepository,
                                      (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     val preparedForm = request.userAnswers.get(DateOfBirthPage) match {
       case None => formProvider()
       case Some(value) => formProvider().fill(value)
@@ -51,7 +51,7 @@ class DateOfBirthController @Inject()(sessionRepository: SessionRepository,
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
     formProvider().bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
       value =>

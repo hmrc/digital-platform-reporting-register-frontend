@@ -16,8 +16,7 @@
 
 package controllers.actions
 
-import com.google.inject.Inject
-import config.FrontendAppConfig
+import config.AppConfig
 import controllers.routes
 import models.requests.IdentifierRequest
 import models.{Nino, Utr}
@@ -30,14 +29,16 @@ import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
 
-class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthConnector,
-                                              config: FrontendAppConfig,
-                                              val parser: BodyParsers.Default)
-                                             (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions {
+class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
+                                    appConfig: AppConfig,
+                                    val parser: BodyParsers.Default,
+                                    withDprsEnrollmentCheck: Boolean = false)
+                                   (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
@@ -50,6 +51,9 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
         Retrievals.nino and
         Retrievals.allEnrolments
     ) {
+      case _ ~ _ ~ _ ~ _ ~ enrollments if withDprsEnrollmentCheck && hasDprsEnrolment(enrollments) =>
+        Future.successful(Redirect(appConfig.manageFrontendUrl))
+
       case Some(Agent) ~ _ ~ _ ~ _ ~ _ =>
         Future.successful(Redirect(routes.CannotUseServiceAgentController.onPageLoad()))
 
@@ -66,7 +70,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
         Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     } recover {
       case _: NoActiveSession =>
-        Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
+        Redirect(appConfig.loginUrl, Map("continue" -> Seq(appConfig.loginContinueUrl)))
       case _: AuthorisationException =>
         Redirect(routes.UnauthorisedController.onPageLoad())
     }
@@ -79,4 +83,28 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
           .find(_.key == "UTR")
           .map(identifier => Utr(identifier.value))
       }
+
+  private def hasDprsEnrolment(enrolments: Enrolments): Boolean =
+    enrolments.getEnrolment("HMRC-DPRS")
+      .flatMap(_.identifiers.find(_.key == "DPRSID"))
+      .isDefined
+}
+
+trait IdentifierActionProvider {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true): IdentifierAction
+}
+
+class AuthenticatedIdentifierActionProvider @Inject()(authConnector: AuthConnector,
+                                                      appConfig: AppConfig,
+                                                      parser: BodyParsers.Default)
+                                                     (implicit val executionContext: ExecutionContext)
+  extends IdentifierActionProvider {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true) = new AuthenticatedIdentifierAction(
+    withDprsEnrollmentCheck = withDprsEnrollmentCheck,
+    authConnector = authConnector,
+    appConfig = appConfig,
+    parser = parser
+  )
 }

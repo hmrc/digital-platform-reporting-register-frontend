@@ -32,7 +32,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class PrimaryContactNameController @Inject()(sessionRepository: SessionRepository,
-                                             identify: IdentifierAction,
+                                             identify: IdentifierActionProvider,
                                              getData: DataRetrievalAction,
                                              requireData: DataRequiredAction,
                                              formProvider: PrimaryContactNameFormProvider,
@@ -40,17 +40,18 @@ class PrimaryContactNameController @Inject()(sessionRepository: SessionRepositor
                                             (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     getAnswer(RegistrationTypePage) { registrationType =>
       val userAnswers = request.userAnswers
       Ok(view(PrimaryContactNameViewModel(mode, userAnswers, formProvider(), registrationType == ThirdParty)))
     }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
     getAnswerAsync(RegistrationTypePage) { registrationType =>
       formProvider().bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(view(PrimaryContactNameViewModel(mode, request.userAnswers, formWithErrors, registrationType == ThirdParty)))),
+        formWithErrors =>
+          Future.successful(BadRequest(view(PrimaryContactNameViewModel(mode, request.userAnswers, formWithErrors, registrationType == ThirdParty)))),
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactNamePage, value))

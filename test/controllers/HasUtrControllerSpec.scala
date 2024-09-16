@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.HasUtrFormProvider
 import models.BusinessType.*
@@ -33,7 +33,7 @@ import views.html.{HasUtrCorporationTaxView, HasUtrPartnershipView, HasUtrSelfAs
 
 import scala.concurrent.Future
 
-class HasUtrControllerSpec extends SpecBase with MockitoSugar {
+class HasUtrControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val formProvider = new HasUtrFormProvider()
 

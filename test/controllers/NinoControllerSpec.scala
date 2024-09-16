@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.NinoFormProvider
 import models.NormalMode
@@ -32,7 +32,7 @@ import views.html.NinoView
 
 import scala.concurrent.Future
 
-class NinoControllerSpec extends SpecBase with MockitoSugar {
+class NinoControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val form = new NinoFormProvider()()
   private val nino = "AB123456C"

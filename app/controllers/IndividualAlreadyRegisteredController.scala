@@ -24,15 +24,14 @@ import views.html.IndividualAlreadyRegisteredView
 
 import javax.inject.Inject
 
-class IndividualAlreadyRegisteredController @Inject()(identify: IdentifierAction,
+class IndividualAlreadyRegisteredController @Inject()(identify: IdentifierActionProvider,
                                                       getData: DataRetrievalAction,
                                                       requireData: DataRequiredAction,
                                                       view: IndividualAlreadyRegisteredView)
                                                      (implicit mcc: MessagesControllerComponents)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      Ok(view())
+  def onPageLoad: Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
+    Ok(view())
   }
 }

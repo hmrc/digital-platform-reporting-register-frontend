@@ -23,51 +23,42 @@ import models.registration.Address
 import models.registration.responses.MatchResponseWithId
 import models.requests.UserSessionDataRequest
 import pages.IsThisYourBusinessPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.IsThisYourBusinessView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IsThisYourBusinessController @Inject()(override val messagesApi: MessagesApi,
-                                             sessionRepository: SessionRepository,
-                                             identify: IdentifierAction,
+class IsThisYourBusinessController @Inject()(sessionRepository: SessionRepository,
+                                             identify: IdentifierActionProvider,
                                              getData: DataRetrievalAction,
                                              requireData: DataRequiredAction,
                                              formProvider: IsThisYourBusinessFormProvider,
-                                             val controllerComponents: MessagesControllerComponents,
                                              view: IsThisYourBusinessView)
-                                            (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                            (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+  extends FrontendController(mcc) with I18nSupport {
 
-  private val form = formProvider()
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
+    val preparedForm = request.userAnswers.get(IsThisYourBusinessPage) match {
+      case None => formProvider()
+      case Some(value) => formProvider().fill(value)
+    }
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-
-      val preparedForm = request.userAnswers.get(IsThisYourBusinessPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
-
-      showPage((businessName, address) => Ok(view(preparedForm, businessName, address, mode)))
+    showPage((businessName, address) => Ok(view(preparedForm, businessName, address, mode)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(showPage((businessName, address) => BadRequest(view(formWithErrors, businessName, address, mode)))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourBusinessPage, value))
-            _ <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(IsThisYourBusinessPage.nextPage(mode, updatedAnswers))
-      )
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
+    formProvider().bindFromRequest().fold(
+      formWithErrors => Future.successful(showPage((businessName, address) => BadRequest(view(formWithErrors, businessName, address, mode)))),
+      value =>
+        for {
+          updatedAnswers <- Future.fromTry(request.userAnswers.set(IsThisYourBusinessPage, value))
+          _ <- sessionRepository.set(updatedAnswers)
+        } yield Redirect(IsThisYourBusinessPage.nextPage(mode, updatedAnswers))
+    )
   }
 
   private def showPage(page: (String, Address) => Result)(implicit request: UserSessionDataRequest[AnyContent]): Result = {

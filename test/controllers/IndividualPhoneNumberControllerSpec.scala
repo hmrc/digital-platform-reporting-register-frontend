@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import forms.IndividualPhoneNumberFormProvider
 import models.NormalMode
@@ -34,7 +34,7 @@ import views.html.IndividualPhoneNumberView
 
 import scala.concurrent.Future
 
-class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
+class IndividualPhoneNumberControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private implicit val msgs: Messages = stubMessages()
   private val form = new IndividualPhoneNumberFormProvider()()

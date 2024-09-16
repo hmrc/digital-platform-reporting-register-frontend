@@ -16,24 +16,22 @@
 
 package controllers
 
-import controllers.actions._
-import javax.inject.Inject
-import play.api.i18n.{I18nSupport, MessagesApi}
+import controllers.actions.*
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.SoleTraderDetailsNotMatchView
 
-class SoleTraderDetailsNotMatchController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: SoleTraderDetailsNotMatchView
-                                     ) extends FrontendBaseController with I18nSupport {
+import javax.inject.Inject
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      Ok(view())
+class SoleTraderDetailsNotMatchController @Inject()(identify: IdentifierActionProvider,
+                                                    getData: DataRetrievalAction,
+                                                    requireData: DataRequiredAction,
+                                                    view: SoleTraderDetailsNotMatchView)
+                                                   (implicit mcc: MessagesControllerComponents)
+  extends FrontendController(mcc) with I18nSupport {
+
+  def onPageLoad: Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
+    Ok(view())
   }
 }

@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.SecondaryContactEmailAddressFormProvider
 import models.NormalMode
@@ -33,7 +33,7 @@ import views.html.SecondaryContactEmailAddressView
 
 import scala.concurrent.Future
 
-class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSugar {
+class SecondaryContactEmailAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private lazy val secondaryContactEmailAddressRoute = routes.SecondaryContactEmailAddressController.onPageLoad(NormalMode).url
   private val anyName = "name"

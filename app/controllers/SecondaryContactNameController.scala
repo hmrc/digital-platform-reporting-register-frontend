@@ -32,25 +32,26 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SecondaryContactNameController @Inject()(sessionRepository: SessionRepository,
-                                      identify: IdentifierAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
-                                      formProvider: SecondaryContactNameFormProvider,
-                                      view: SecondaryContactNameView)
-                                     (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+                                               identify: IdentifierActionProvider,
+                                               getData: DataRetrievalAction,
+                                               requireData: DataRequiredAction,
+                                               formProvider: SecondaryContactNameFormProvider,
+                                               view: SecondaryContactNameView)
+                                              (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     getAnswer(RegistrationTypePage) { registrationType =>
       val userAnswers = request.userAnswers
       Ok(view(SecondaryContactNameViewModel(mode, userAnswers, formProvider(), registrationType == ThirdParty)))
     }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
     getAnswerAsync(RegistrationTypePage) { registrationType =>
       formProvider().bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(view(SecondaryContactNameViewModel(mode, request.userAnswers, formWithErrors, registrationType == ThirdParty)))),
+        formWithErrors =>
+          Future.successful(BadRequest(view(SecondaryContactNameViewModel(mode, request.userAnswers, formWithErrors, registrationType == ThirdParty)))),
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactNamePage, value))

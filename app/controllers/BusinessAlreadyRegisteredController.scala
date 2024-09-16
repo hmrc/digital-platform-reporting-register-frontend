@@ -19,20 +19,19 @@ package controllers
 import controllers.actions.*
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.BusinessAlreadyRegisteredView
 
 import javax.inject.Inject
 
-class BusinessAlreadyRegisteredController @Inject()(identify: IdentifierAction,
+class BusinessAlreadyRegisteredController @Inject()(identify: IdentifierActionProvider,
                                                     getData: DataRetrievalAction,
                                                     requireData: DataRequiredAction,
-                                                    val controllerComponents: MessagesControllerComponents,
                                                     view: BusinessAlreadyRegisteredView)
-  extends FrontendBaseController with I18nSupport {
+                                                   (implicit mcc: MessagesControllerComponents)
+  extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      Ok(view())
+  def onPageLoad: Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
+    Ok(view())
   }
 }

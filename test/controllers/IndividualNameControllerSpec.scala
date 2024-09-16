@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.IndividualNameFormProvider
 import models.{IndividualName, NormalMode}
@@ -32,7 +32,7 @@ import views.html.IndividualNameView
 
 import scala.concurrent.Future
 
-class IndividualNameControllerSpec extends SpecBase with MockitoSugar {
+class IndividualNameControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   val formProvider = new IndividualNameFormProvider()
   val form = formProvider()

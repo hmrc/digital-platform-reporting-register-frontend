@@ -16,13 +16,13 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.IndividualIdentityConfirmedView
 
-class IndividualIdentityConfirmedControllerSpec extends SpecBase {
+class IndividualIdentityConfirmedControllerSpec extends ControllerSpecBase {
 
   "IndividualIdentityConfirmed Controller" - {
     "must return OK and the correct view for a GET" in {

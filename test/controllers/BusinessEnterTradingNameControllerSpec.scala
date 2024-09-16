@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import forms.BusinessEnterTradingNameFormProvider
 import models.NormalMode
@@ -33,7 +33,7 @@ import views.html.BusinessEnterTradingNameView
 
 import scala.concurrent.Future
 
-class BusinessEnterTradingNameControllerSpec extends SpecBase with MockitoSugar {
+class BusinessEnterTradingNameControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val form = new BusinessEnterTradingNameFormProvider()()
 

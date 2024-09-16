@@ -33,7 +33,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
-                                           identify: IdentifierAction,
+                                           identify: IdentifierActionProvider,
                                            getData: DataRetrievalAction,
                                            formProvider: RegistrationTypeFormProvider,
                                            view: RegistrationTypeView,
@@ -41,7 +41,7 @@ class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
                                           (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData) { implicit request =>
     val answers = request.userAnswers
       .getOrElse(UserAnswers(request.user))
       .get(RegistrationTypePage)
@@ -54,8 +54,7 @@ class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData).async { implicit request =>
     formProvider().bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
       value => {

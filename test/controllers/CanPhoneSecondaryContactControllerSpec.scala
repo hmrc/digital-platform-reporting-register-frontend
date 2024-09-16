@@ -16,7 +16,7 @@
 
 package controllers
 
-import base.SpecBase
+import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.CanPhoneSecondaryContactFormProvider
 import models.NormalMode
@@ -33,7 +33,7 @@ import views.html.CanPhoneSecondaryContactView
 
 import scala.concurrent.Future
 
-class CanPhoneSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
+class CanPhoneSecondaryContactControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private lazy val canPhoneSecondaryContactRoute = routes.CanPhoneSecondaryContactController.onPageLoad(NormalMode).url
   private val anyName = "name"

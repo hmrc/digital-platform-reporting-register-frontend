@@ -16,7 +16,7 @@
 
 package services
 
-import config.FrontendAppConfig
+import config.AppConfig
 import models.audit.AuditEventModel
 import play.api.Logging
 import play.api.libs.json.Json
@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuditService @Inject()(auditConnector: AuditConnector,
-                             appConfig: FrontendAppConfig)
+                             appConfig: AppConfig)
                             (implicit ec: ExecutionContext) extends Logging {
 
   def sendAudit[T](event: AuditEventModel)
