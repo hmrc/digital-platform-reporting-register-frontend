@@ -44,4 +44,22 @@ class AppConfigSpec extends AnyFreeSpec with Matchers with MockitoSugar {
       underTest.manageFrontendUrl mustBe "http://manage-frontend-url:20006/manage-digital-platform-reporting"
     }
   }
+
+  ".platformOperatorFrontendUrl" - {
+    "must return Platform Operator Frontend service URL from the application.conf file" in {
+      when(mockConfiguration.get[Service]("microservice.services.digital-platform-reporting-operator-frontend"))
+        .thenReturn(Service("platform-operator-frontend-url", "20005", "http"))
+
+      underTest.platformOperatorFrontendUrl mustBe "http://platform-operator-frontend-url:20005/digital-platform-reporting"
+    }
+  }
+
+  ".addPlatformOperatorUrl" - {
+    "must return a URL to start the process of adding a Platform Operator" in {
+      when(mockConfiguration.get[Service]("microservice.services.digital-platform-reporting-operator-frontend"))
+        .thenReturn(Service("platform-operator-frontend-url", "20005", "http"))
+
+      underTest.addPlatformOperatorUrl mustBe "http://platform-operator-frontend-url:20005/digital-platform-reporting/add-platform-operator/start"
+    }
+  }
 }

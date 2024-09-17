@@ -17,7 +17,7 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import config.ConfigKeys.{DigitalPlatformReportingUrlKey, ManageFrontendBaseUrlKey}
+import config.ConfigKeys.{DigitalPlatformReportingUrlKey, ManageFrontendBaseUrlKey, PlatformOperatorFrontendBaseUrlKey}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
@@ -53,6 +53,10 @@ class AppConfig @Inject()(configuration: Configuration) {
 
   lazy val digitalPlatformReportingUrl: String = configuration.get[Service](DigitalPlatformReportingUrlKey).baseUrl
 
+  private lazy val platformOperatorFrontendBaseUrl: String = configuration.get[Service](PlatformOperatorFrontendBaseUrlKey).baseUrl
+  lazy val platformOperatorFrontendUrl: String = s"$platformOperatorFrontendBaseUrl/digital-platform-reporting"
+  lazy val addPlatformOperatorUrl: String = s"$platformOperatorFrontendUrl/add-platform-operator/start"
+  
   private lazy val manageFrontendBaseUrl: String = configuration.get[Service](ManageFrontendBaseUrlKey).baseUrl
   lazy val manageFrontendUrl: String = s"$manageFrontendBaseUrl/manage-digital-platform-reporting"
 
