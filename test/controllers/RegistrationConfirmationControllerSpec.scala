@@ -62,10 +62,10 @@ class RegistrationConfirmationControllerSpec extends ControllerSpecBase with Moc
           val result = route(application, request).value
           val view = application.injector.instanceOf[RegistrationConfirmationView]
           val appConfig = application.injector.instanceOf[AppConfig]
-          val viewModel = RegistrationConfirmationViewModel(NormalMode, aUserAnswers, form, appConfig.isPrivateBeta)
+          val viewModel = RegistrationConfirmationViewModel(NormalMode, aUserAnswers, form)
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(viewModel.get)(request, messages(application)).toString
+          contentAsString(result) mustEqual view(viewModel.get)(appConfig)(request, messages(application)).toString
         }
     }
 
@@ -89,10 +89,10 @@ class RegistrationConfirmationControllerSpec extends ControllerSpecBase with Moc
           val view = application.injector.instanceOf[RegistrationConfirmationView]
           val result = route(application, request).value
           val appConfig = application.injector.instanceOf[AppConfig]
-          val viewModel = RegistrationConfirmationViewModel(NormalMode, userAnswers, form.fill(true), appConfig.isPrivateBeta)
+          val viewModel = RegistrationConfirmationViewModel(NormalMode, userAnswers, form.fill(true))
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(viewModel.get)(request, messages(application)).toString
+          contentAsString(result) mustEqual view(viewModel.get)(appConfig)(request, messages(application)).toString
         }
     }
 
@@ -105,10 +105,10 @@ class RegistrationConfirmationControllerSpec extends ControllerSpecBase with Moc
         val view = application.injector.instanceOf[RegistrationConfirmationView]
         val result = route(application, request).value
         val appConfig = application.injector.instanceOf[AppConfig]
-        val viewModel = RegistrationConfirmationViewModel(NormalMode, userAnswers, form.fill(true), appConfig.isPrivateBeta)
+        val viewModel = RegistrationConfirmationViewModel(NormalMode, userAnswers, form.fill(true))
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(viewModel.get)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(viewModel.get)(appConfig)(request, messages(application)).toString
       }
     }
 
@@ -124,7 +124,7 @@ class RegistrationConfirmationControllerSpec extends ControllerSpecBase with Moc
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to operating-frontend when true option submitted" in {
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
@@ -136,11 +136,31 @@ class RegistrationConfirmationControllerSpec extends ControllerSpecBase with Moc
       running(application) {
         val request = FakeRequest(POST, registrationConfirmationRoute)
           .withFormUrlEncodedBody(("value", "true"))
-        val updatedAnswers = aUserAnswers.set(RegistrationConfirmationPage, true).success.value
         val result = route(application, request).value
+        val appConfig = application.injector.instanceOf[AppConfig]
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual RegistrationConfirmationPage.nextPage(NormalMode, updatedAnswers).url
+        redirectLocation(result).value mustEqual appConfig.addPlatformOperatorUrl
+      }
+    }
+
+    "must redirect to manage-frontend when false option submitted" in {
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(userAnswers = Some(aUserAnswers))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(POST, registrationConfirmationRoute)
+          .withFormUrlEncodedBody(("value", "false"))
+        val result = route(application, request).value
+        val appConfig = application.injector.instanceOf[AppConfig]
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual appConfig.manageFrontendUrl
       }
     }
 
@@ -156,11 +176,11 @@ class RegistrationConfirmationControllerSpec extends ControllerSpecBase with Moc
       running(application) {
         val request = FakeRequest(POST, registrationConfirmationRoute)
           .withFormUrlEncodedBody(("value", "true"))
-        val updatedAnswers = aUserAnswers.set(RegistrationConfirmationPage, true).success.value
         val result = route(application, request).value
+        val appConfig = application.injector.instanceOf[AppConfig]
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual RegistrationConfirmationPage.nextPage(NormalMode, updatedAnswers).url
+        redirectLocation(result).value mustEqual appConfig.addPlatformOperatorUrl
       }
     }
 
@@ -174,10 +194,10 @@ class RegistrationConfirmationControllerSpec extends ControllerSpecBase with Moc
         val view = application.injector.instanceOf[RegistrationConfirmationView]
         val result = route(application, request).value
         val appConfig = application.injector.instanceOf[AppConfig]
-        val viewModel = RegistrationConfirmationViewModel(NormalMode, aUserAnswers, boundForm, appConfig.isPrivateBeta)
+        val viewModel = RegistrationConfirmationViewModel(NormalMode, aUserAnswers, boundForm)
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(viewModel.get)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(viewModel.get)(appConfig)(request, messages(application)).toString
       }
     }
 

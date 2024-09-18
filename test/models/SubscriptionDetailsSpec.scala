@@ -61,7 +61,7 @@ class SubscriptionDetailsSpec extends AnyFreeSpec with Matchers {
       json.as[SubscriptionDetails](SubscriptionDetails.encryptedFormat(implicitly)) mustEqual subscriptionDetails
     }
 
-    "must correctly create SubscriptionDetails when MatchResponseWithID" in {
+    "must correctly create SubscriptionDetails when Org, MatchResponseWithID" in {
       val registrationResponse = MatchResponseWithId("safeId", anAddress, Some("Testing 1 Ltd"))
       val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
       val request = aSubscriptionRequest
@@ -74,7 +74,7 @@ class SubscriptionDetailsSpec extends AnyFreeSpec with Matchers {
       SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
     }
 
-    "must correctly create SubscriptionDetails when MatchResponseWithoutID" in {
+    "must correctly create SubscriptionDetails when Org, MatchResponseWithoutID" in {
       val registrationResponse = MatchResponseWithoutId("safeId")
       val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
       val request = aSubscriptionRequest
@@ -88,7 +88,7 @@ class SubscriptionDetailsSpec extends AnyFreeSpec with Matchers {
       SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
     }
 
-    "must correctly create SubscriptionDetails when RegistrationType is ThirdParty Individual" in {
+    "must correctly create SubscriptionDetails ThirdParty Individual, MatchResponseWithoutId" in {
       val registrationResponse = MatchResponseWithoutId("safeId")
       val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
       val request = aSubscriptionRequest
@@ -101,7 +101,7 @@ class SubscriptionDetailsSpec extends AnyFreeSpec with Matchers {
       SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
     }
 
-    "must correctly create SubscriptionDetails when RegistrationType is ThirdParty Sole Trader" in {
+    "must correctly create SubscriptionDetails when ThirdParty Sole Trader, MatchResponseWithoutId" in {
       val registrationResponse = MatchResponseWithoutId("safeId")
       val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
       val request = aSubscriptionRequest
@@ -114,7 +114,33 @@ class SubscriptionDetailsSpec extends AnyFreeSpec with Matchers {
       SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
     }
 
-    "must correctly create SubscriptionDetails when RegistrationType is ThirdParty but not Individual MatchResponseWithoutId" in {
+    "must correctly create SubscriptionDetails when ThirdParty Sole Trader, MatchResponseWithId" in {
+      val registrationResponse = MatchResponseWithId("safeId", anAddress, Some("Testing 1 Ltd"))
+      val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
+      val request = aSubscriptionRequest
+      val userAnswers = aUserAnswers
+        .copy(registrationResponse = Some(registrationResponse))
+        .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
+        .set(BusinessTypePage, BusinessType.SoleTrader).success.value
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.SoleTrader), None)
+
+      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+    }
+
+    "must correctly create SubscriptionDetails when ThirdParty Individual, MatchResponseWithId" in {
+      val registrationResponse = MatchResponseWithId("safeId", anAddress, Some("Testing 1 Ltd"))
+      val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
+      val request = aSubscriptionRequest
+      val userAnswers = aUserAnswers
+        .copy(registrationResponse = Some(registrationResponse))
+        .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
+        .set(BusinessTypePage, BusinessType.Individual).success.value
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Individual), None)
+
+      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+    }
+
+    "must correctly create SubscriptionDetails when ThirdParty Org, MatchResponseWithoutId" in {
       val registrationResponse = MatchResponseWithoutId("safeId")
       val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
       val request = aSubscriptionRequest
@@ -128,7 +154,7 @@ class SubscriptionDetailsSpec extends AnyFreeSpec with Matchers {
       SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
     }
 
-    "must correctly create SubscriptionDetails when RegistrationType is ThirdParty but not Individual MatchResponseWithId" in {
+    "must correctly create SubscriptionDetails when ThirdParty Individual MatchResponseWithId" in {
       val registrationResponse = MatchResponseWithId("safeId", anAddress, Some("Testing 4 Ltd"))
       val response = SubscribedResponse("dprsId", Instant.parse("2024-03-17T09:30:47Z"))
       val request = aSubscriptionRequest

@@ -17,63 +17,45 @@
 package models.pageviews
 
 import models.RegistrationType.ThirdParty
-import models.subscription.responses.{SubscribedResponse, SubscriptionResponse}
-import models.subscription.{Contact, IndividualContact, OrganisationContact}
+import models.subscription.responses.SubscribedResponse
 import models.{Mode, UserAnswers}
 import pages.*
 import play.api.data.Form
 
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, ZoneId}
 
 case class RegistrationConfirmationViewModel(mode: Mode,
                                              form: Form[Boolean],
-                                             dprsUserId: String,
+                                             dprsId: String,
                                              subscribedDateTime: String,
                                              primaryEmail: String,
                                              secondaryEmail: Option[String],
                                              isThirdParty: Boolean,
-                                             isPrivateBeta: Boolean,
                                              businessName: Option[String])
 
 object RegistrationConfirmationViewModel {
 
   private val Formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma (z)").withZone(ZoneId.of("GMT"))
 
-  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[Boolean], isPrivateBeta: Boolean): Option[RegistrationConfirmationViewModel] = {
-    val details = userAnswers.subscriptionDetails
-    val subscriptionRequest = details.map(_.subscriptionRequest)
-    val subscriptionResponse = details.map(_.subscriptionResponse)
+  def apply(mode: Mode, userAnswers: UserAnswers, form: Form[Boolean]): Option[RegistrationConfirmationViewModel] = {
+    val optAnswerValue = userAnswers.get(RegistrationConfirmationPage)
+    val subscriptionResponse = userAnswers.subscriptionDetails.map(_.subscriptionResponse).get.asInstanceOf[SubscribedResponse]
+    val subscribedDateTime = Formatter.format(subscriptionResponse.subscribedDateTime).replace("AM", "am").replace("PM", "pm")
 
-    val optionalDprsUserId: Option[(String, Instant)] = subscriptionResponse match {
-      case Some(SubscribedResponse(dprsUserId, subscribedDateTime)) => Some(dprsUserId, subscribedDateTime)
-      case _ => None
-    }
-
-    optionalDprsUserId.map { dprsUserId =>
-      val optAnswerValue = userAnswers.get(RegistrationConfirmationPage)
-      val primaryEmail = subscriptionRequest.flatMap(r => getEmail(Some(r.primaryContact))).getOrElse("")
-      val secondaryEmail = subscriptionRequest.flatMap(r => getEmail(r.secondaryContact))
-      val isThirdParty = details.map(_.registrationType).contains(ThirdParty)
-      val businessName = details.flatMap(_.businessName)
-      val subscribedDateTime = Formatter.format(dprsUserId._2).replace("AM", "am").replace("PM", "pm")
-
-      RegistrationConfirmationViewModel(
-        mode = mode,
-        form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue)),
-        dprsUserId = dprsUserId._1,
-        subscribedDateTime = subscribedDateTime,
-        primaryEmail = primaryEmail,
-        secondaryEmail = secondaryEmail,
-        isThirdParty = isThirdParty,
-        isPrivateBeta = isPrivateBeta,
-        businessName = businessName
-      )
-    }
-  }
-
-  private def getEmail(contact: Option[Contact]): Option[String] = contact.map {
-    case IndividualContact(_, email, _) => email
-    case OrganisationContact(_, email, _) => email
+    userAnswers.subscriptionDetails
+      .map(_.subscriptionRequest)
+      .map { subscriptionRequest =>
+        RegistrationConfirmationViewModel(
+          mode = mode,
+          form = optAnswerValue.fold(form)(answerValue => if (form.hasErrors) form else form.fill(answerValue)),
+          dprsId = subscriptionResponse.dprsId,
+          subscribedDateTime = subscribedDateTime,
+          primaryEmail = subscriptionRequest.primaryContact.email,
+          secondaryEmail = subscriptionRequest.secondaryContact.map(_.email),
+          isThirdParty = userAnswers.subscriptionDetails.map(_.registrationType).contains(ThirdParty),
+          businessName = userAnswers.subscriptionDetails.flatMap(_.businessName)
+        )
+      }
   }
 }

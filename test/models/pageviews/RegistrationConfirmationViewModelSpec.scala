@@ -20,7 +20,7 @@ import builders.OrganisationContactBuilder.anOrganisationContact
 import builders.SubscribedResponseBuilder.aSubscribedResponse
 import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
 import builders.SubscriptionRequestBuilder.aSubscriptionRequest
-import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
+import builders.UserAnswersBuilder.aUserAnswers
 import forms.RegistrationConfirmationFormProvider
 import models.RegistrationType.ThirdParty
 import models.{BusinessType, NormalMode, RegistrationType, SubscriptionDetails}
@@ -34,7 +34,6 @@ class RegistrationConfirmationViewModelSpec extends AnyFreeSpec with Matchers {
 
   private val anyMode = NormalMode
   private val formProvider = new RegistrationConfirmationFormProvider()
-  private val isPrivateBeta = false
   private val subscribedResponse = aSubscribedResponse.copy(dprsId = "some-dprs-id", Instant.parse("2024-03-17T09:30:47Z"))
   private val subscriptionRequest = aSubscriptionRequest.copy(primaryContact = anOrganisationContact.copy(email = "primary.email@example.com"))
   private val subscriptionDetails = aSubscriptionDetails.copy(
@@ -54,16 +53,15 @@ class RegistrationConfirmationViewModelSpec extends AnyFreeSpec with Matchers {
       val userAnswers = aUserAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
         .set(RegistrationConfirmationPage, anyBoolean).get
 
-      underTest.apply(anyMode, userAnswers, form, isPrivateBeta) mustBe
+      underTest.apply(anyMode, userAnswers, form) mustBe
         Some(RegistrationConfirmationViewModel(
           mode = anyMode,
           form = form.fill(anyBoolean),
-          dprsUserId = "some-dprs-id",
+          dprsId = "some-dprs-id",
           subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
           primaryEmail = "primary.email@example.com",
           secondaryEmail = None,
           isThirdParty = true,
-          isPrivateBeta = isPrivateBeta,
           businessName = Some("some-business-name")
         ))
     }
@@ -73,16 +71,15 @@ class RegistrationConfirmationViewModelSpec extends AnyFreeSpec with Matchers {
       val userAnswers = aUserAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
         .remove(RegistrationConfirmationPage).get
 
-      underTest.apply(anyMode, userAnswers, form, isPrivateBeta) mustBe
+      underTest.apply(anyMode, userAnswers, form) mustBe
         Some(RegistrationConfirmationViewModel(
           mode = anyMode,
           form = form,
-          dprsUserId = "some-dprs-id",
+          dprsId = "some-dprs-id",
           subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
           primaryEmail = "primary.email@example.com",
           secondaryEmail = None,
           isThirdParty = true,
-          isPrivateBeta = isPrivateBeta,
           businessName = Some("some-business-name")
         ))
     }
@@ -92,22 +89,17 @@ class RegistrationConfirmationViewModelSpec extends AnyFreeSpec with Matchers {
       val userAnswers = aUserAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
         .remove(RegistrationConfirmationPage).get
 
-      underTest.apply(anyMode, userAnswers, formWithErrors, isPrivateBeta) mustBe
+      underTest.apply(anyMode, userAnswers, formWithErrors) mustBe
         Some(RegistrationConfirmationViewModel(
           mode = anyMode,
           form = formWithErrors,
-          dprsUserId = "some-dprs-id",
+          dprsId = "some-dprs-id",
           subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
           primaryEmail = "primary.email@example.com",
           secondaryEmail = None,
           isThirdParty = true,
-          isPrivateBeta = isPrivateBeta,
           businessName = Some("some-business-name")
         ))
-    }
-
-    "must return data is invalid" in {
-      underTest.apply(anyMode, anEmptyAnswer, formProvider(), isPrivateBeta) mustBe None
     }
   }
 }
