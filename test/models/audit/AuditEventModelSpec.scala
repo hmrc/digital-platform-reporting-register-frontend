@@ -16,6 +16,7 @@
 
 package models.audit
 
+import base.SpecBase
 import builders.AuditEventModelBuilder.anAuditEventModel
 import builders.FailureResponseDataBuilder.aFailureResponseData
 import builders.SubscribedResponseBuilder.aSubscribedResponse
@@ -23,13 +24,11 @@ import builders.SuccessResponseDataBuilder.aSuccessResponseData
 import builders.UserAnswersBuilder.aUserAnswers
 import connectors.SubscriptionConnector.SubscribeFailure
 import models.subscription.responses.AlreadySubscribedResponse
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.Json
 
 import java.time.{LocalDateTime, ZoneId}
 
-class AuditEventModelSpec extends AnyFreeSpec with Matchers {
+class AuditEventModelSpec extends SpecBase {
 
   private val underTest = AuditEventModel
 

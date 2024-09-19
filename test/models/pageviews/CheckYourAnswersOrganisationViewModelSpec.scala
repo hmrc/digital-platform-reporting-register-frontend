@@ -16,18 +16,17 @@
 
 package models.pageviews
 
+import base.SpecBase
 import builders.AddressBuilder.anyAddress
 import builders.BusinessAddressBuilder.anyBusinessAddress
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId, NoMatchResponse}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 import pages.*
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 
-class CheckYourAnswersOrganisationViewModelSpec extends AnyFreeSpec with Matchers with OptionValues with TryValues {
+class CheckYourAnswersOrganisationViewModelSpec extends SpecBase with OptionValues with TryValues {
 
   private implicit val messages: Messages = stubMessages()
 

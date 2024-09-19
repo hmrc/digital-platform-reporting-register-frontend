@@ -16,13 +16,12 @@
 
 package pages
 
+import base.SpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.{CheckMode, NormalMode}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 
-class PrimaryContactEmailAddressPageSpec extends AnyFreeSpec with Matchers {
+class PrimaryContactEmailAddressPageSpec extends SpecBase {
 
   ".nextPage" - {
     "in Normal Mode" - {

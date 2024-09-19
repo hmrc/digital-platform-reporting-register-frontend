@@ -16,11 +16,10 @@
 
 package models.pageviews
 
+import base.SpecBase
 import builders.InternationalAddressBuilder.anInternationalAddress
 import builders.UserAnswersBuilder.*
 import models.IndividualName
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 import pages.*
 import play.api.i18n.Messages
@@ -28,7 +27,7 @@ import play.api.test.Helpers.stubMessages
 
 import java.time.LocalDate
 
-class CheckYourAnswersIndividualViewModelSpec extends AnyFreeSpec with Matchers with OptionValues with TryValues {
+class CheckYourAnswersIndividualViewModelSpec extends SpecBase with OptionValues with TryValues {
 
   private implicit val messages: Messages = stubMessages()
 

@@ -16,13 +16,12 @@
 
 package models.registration
 
+import base.SpecBase
 import builders.BusinessAddressBuilder.aBusinessAddress
 import builders.InternationalAddressBuilder.anInternationalAddress
 import builders.UkAddressBuilder.aUkAddress
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 
-class AddressSpec extends AnyFreeSpec with Matchers {
+class AddressSpec extends SpecBase {
 
   private val underTest = Address
 

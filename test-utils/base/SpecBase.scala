@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package models.subscription
+package base
 
-import base.SpecBase
-import models.{IndividualName, SoleTraderName}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 
-class IndividualSpec extends SpecBase {
-
-  private val underTest = Individual
-
-  "must map IndividualName to Individual" in {
-    underTest.apply(IndividualName("any-first-name", "any-last-name")) mustBe
-      Individual("any-first-name", "any-last-name")
-  }
-
-  "must map SoleTraderName to Individual" in {
-    underTest.apply(SoleTraderName("any-first-name", "any-last-name")) mustBe
-      Individual("any-first-name", "any-last-name")
-  }
-}
+trait SpecBase extends AnyFreeSpec with Matchers

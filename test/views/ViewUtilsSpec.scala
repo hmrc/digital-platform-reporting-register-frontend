@@ -16,12 +16,11 @@
 
 package views
 
+import base.SpecBase
 import models.registration.Address
 import models.{Country, InternationalAddress, UkAddress}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers.mustEqual
 
-class ViewUtilsSpec extends AnyFreeSpec {
+class ViewUtilsSpec extends SpecBase {
 
   "must format an address properly" - {
 

@@ -16,14 +16,13 @@
 
 package models.pageviews
 
+import base.SpecBase
 import builders.UserAnswersBuilder.aUserAnswers
 import forms.CanPhoneIndividualFormProvider
 import models.NormalMode
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import pages.CanPhoneIndividualPage
 
-class CanPhoneIndividualViewModelSpec extends AnyFreeSpec with Matchers {
+class CanPhoneIndividualViewModelSpec extends SpecBase {
 
   private val anyMode = NormalMode
   private val formProvider = new CanPhoneIndividualFormProvider()

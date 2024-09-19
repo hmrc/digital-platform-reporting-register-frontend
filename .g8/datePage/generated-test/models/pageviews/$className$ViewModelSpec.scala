@@ -1,17 +1,16 @@
 package models.pageviews
 
+import base.SpecBase
 import builders.UserAnswersBuilder.aUserAnswers
 import forms.$className$FormProvider
 import models.NormalMode
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import pages.$className$Page
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 
 import java.time.LocalDate
 
-class $className$ViewModelSpec extends AnyFreeSpec with Matchers {
+class $className$ViewModelSpec extends SpecBase {
 
   private implicit val messages: Messages = stubMessages()
 

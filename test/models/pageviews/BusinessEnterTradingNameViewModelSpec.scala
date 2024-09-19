@@ -16,14 +16,13 @@
 
 package models.pageviews
 
+import base.SpecBase
 import builders.UserAnswersBuilder.aUserAnswers
 import forms.BusinessEnterTradingNameFormProvider
 import models.NormalMode
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import pages.BusinessEnterTradingNamePage
 
-class BusinessEnterTradingNameViewModelSpec extends AnyFreeSpec with Matchers {
+class BusinessEnterTradingNameViewModelSpec extends SpecBase {
 
   private val anyMode = NormalMode
   private val formProvider = new BusinessEnterTradingNameFormProvider()

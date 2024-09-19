@@ -16,16 +16,15 @@
 
 package pages
 
+import base.SpecBase
 import builders.InternationalAddressBuilder.anInternationalAddress
 import builders.UkAddressBuilder.aUkAddress
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.{CheckMode, NormalMode}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 
-class AddressInUkPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
+class AddressInUkPageSpec extends SpecBase with TryValues with OptionValues {
 
   ".nextPage" - {
     "in Normal Mode" - {

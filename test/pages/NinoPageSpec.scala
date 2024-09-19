@@ -16,14 +16,13 @@
 
 package pages
 
+import base.SpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.{CheckMode, NormalMode}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 
-class NinoPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
+class NinoPageSpec extends SpecBase with TryValues with OptionValues {
 
   ".nextPage" - {
     "in Normal Mode" - {

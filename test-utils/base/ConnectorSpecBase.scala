@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package models.subscription
+package base
 
-import base.SpecBase
-import models.{IndividualName, SoleTraderName}
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.test.WireMockSupport
 
-class IndividualSpec extends SpecBase {
+trait ConnectorSpecBase extends SpecBase
+  with ScalaFutures
+  with IntegrationPatience
+  with WireMockSupport {
 
-  private val underTest = Individual
-
-  "must map IndividualName to Individual" in {
-    underTest.apply(IndividualName("any-first-name", "any-last-name")) mustBe
-      Individual("any-first-name", "any-last-name")
-  }
-
-  "must map SoleTraderName to Individual" in {
-    underTest.apply(SoleTraderName("any-first-name", "any-last-name")) mustBe
-      Individual("any-first-name", "any-last-name")
-  }
+  implicit protected lazy val hc: HeaderCarrier = HeaderCarrier()
 }

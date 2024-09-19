@@ -16,36 +16,24 @@
 
 package connectors
 
+import base.ConnectorSpecBase
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import models.subscription.*
 import models.subscription.requests.*
 import models.subscription.responses.*
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.test.WireMockSupport
 
 import java.time.Instant
 
-class SubscriptionConnectorSpec
-  extends AnyFreeSpec
-    with Matchers
-    with ScalaFutures
-    with IntegrationPatience
-    with WireMockSupport {
+class SubscriptionConnectorSpec extends ConnectorSpecBase {
 
-  private lazy val app: Application =
-    new GuiceApplicationBuilder()
-      .configure("microservice.services.digital-platform-reporting.port" -> wireMockPort)
-      .build()
+  private lazy val app: Application = new GuiceApplicationBuilder()
+    .configure("microservice.services.digital-platform-reporting.port" -> wireMockPort)
+    .build()
 
-  private lazy val connector = app.injector.instanceOf[SubscriptionConnector]
-
-  implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
+  private lazy val underTest = app.injector.instanceOf[SubscriptionConnector]
 
   ".subscribe" - {
     "must return a subscription response when the server returns OK" in {
@@ -59,7 +47,7 @@ class SubscriptionConnectorSpec
           .willReturn(ok(Json.toJson(response).toString))
       )
 
-      val result = connector.subscribe(request).futureValue
+      val result = underTest.subscribe(request).futureValue
 
       result mustEqual response
     }
@@ -74,7 +62,7 @@ class SubscriptionConnectorSpec
           .willReturn(aResponse().withStatus(409))
       )
 
-      val result = connector.subscribe(request).futureValue
+      val result = underTest.subscribe(request).futureValue
 
       result mustEqual AlreadySubscribedResponse()
     }
@@ -89,7 +77,7 @@ class SubscriptionConnectorSpec
           .willReturn(serverError())
       )
 
-      connector.subscribe(request).failed.futureValue.getMessage mustBe "Error with code: 500"
+      underTest.subscribe(request).failed.futureValue.getMessage mustBe "Error with code: 500"
     }
   }
 }

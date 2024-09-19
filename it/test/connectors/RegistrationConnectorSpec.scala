@@ -16,34 +16,22 @@
 
 package connectors
 
+import base.ConnectorSpecBase
 import builders.OrganisationWithoutIdBuilder.anOrganisationWithoutId
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import models.registration.requests.*
 import models.registration.responses.*
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.test.WireMockSupport
 
-class RegistrationConnectorSpec
-  extends AnyFreeSpec
-    with Matchers
-    with ScalaFutures
-    with IntegrationPatience
-    with WireMockSupport {
+class RegistrationConnectorSpec extends ConnectorSpecBase {
 
-  private lazy val app: Application =
-    new GuiceApplicationBuilder()
-      .configure("microservice.services.digital-platform-reporting.port" -> wireMockPort)
-      .build()
+  private lazy val app: Application = new GuiceApplicationBuilder()
+    .configure("microservice.services.digital-platform-reporting.port" -> wireMockPort)
+    .build()
 
-  private lazy val connector = app.injector.instanceOf[RegistrationConnector]
-
-  implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
+  private lazy val underTest = app.injector.instanceOf[RegistrationConnector]
 
   ".register" - {
     "must return a registration response when the server returns OK" in {
@@ -54,7 +42,7 @@ class RegistrationConnectorSpec
           .willReturn(ok(Json.toJson(response).toString))
       )
 
-      val result = connector.register(anOrganisationWithoutId).futureValue
+      val result = underTest.register(anOrganisationWithoutId).futureValue
 
       result mustEqual response
     }
@@ -68,7 +56,7 @@ class RegistrationConnectorSpec
           .willReturn(notFound())
       )
 
-      val result = connector.register(request).futureValue
+      val result = underTest.register(request).futureValue
 
       result mustEqual response
     }
@@ -82,7 +70,7 @@ class RegistrationConnectorSpec
           .willReturn(aResponse().withStatus(409))
       )
 
-      val result = connector.register(request).futureValue
+      val result = underTest.register(request).futureValue
 
       result mustEqual response
     }
@@ -92,7 +80,7 @@ class RegistrationConnectorSpec
         .stubFor(post(urlMatching("/digital-platform-reporting/register"))
           .willReturn(serverError()))
 
-      connector.register(anOrganisationWithoutId).failed.futureValue
+      underTest.register(anOrganisationWithoutId).failed.futureValue
     }
   }
 }

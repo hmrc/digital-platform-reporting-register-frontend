@@ -16,21 +16,20 @@
 
 package models
 
+import base.SpecBase
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.OptionValues
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
 
-class RegistrationTypeSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
+class RegistrationTypeSpec extends SpecBase with ScalaCheckPropertyChecks with OptionValues {
 
   "RegistrationType" - {
 
     "must deserialise valid values" in {
 
-      val gen = Gen.oneOf(RegistrationType.values.toSeq)
+      val gen = Gen.oneOf(RegistrationType.values)
 
       forAll(gen) {
         registrationType =>

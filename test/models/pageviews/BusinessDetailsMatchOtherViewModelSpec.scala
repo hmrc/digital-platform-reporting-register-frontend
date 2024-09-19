@@ -16,13 +16,12 @@
 
 package models.pageviews
 
+import base.SpecBase
 import builders.MatchResponseWithIdBuilder.aMatchResponseWithId
 import builders.MatchResponseWithoutIdBuilder.aMatchResponseWithoutId
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 
-class BusinessDetailsMatchOtherViewModelSpec extends AnyFreeSpec with Matchers {
+class BusinessDetailsMatchOtherViewModelSpec extends SpecBase {
 
   private val underTest = BusinessDetailsMatchOtherViewModel
 

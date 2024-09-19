@@ -16,13 +16,12 @@
 
 package services
 
+import base.SpecBase
 import builders.SuccessResponseDataBuilder.aSuccessResponseData
 import config.AppConfig
 import models.audit.AuditEventModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
@@ -32,7 +31,7 @@ import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuditServiceSpec extends AnyFreeSpec with Matchers
+class AuditServiceSpec extends SpecBase
   with MockitoSugar
   with FutureAwaits
   with DefaultAwaitTimeout {

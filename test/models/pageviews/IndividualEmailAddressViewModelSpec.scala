@@ -16,14 +16,13 @@
 
 package models.pageviews
 
+import base.SpecBase
 import builders.UserAnswersBuilder.aUserAnswers
 import forms.IndividualEmailAddressFormProvider
 import models.NormalMode
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import pages.IndividualEmailAddressPage
 
-class IndividualEmailAddressViewModelSpec extends AnyFreeSpec with Matchers {
+class IndividualEmailAddressViewModelSpec extends SpecBase {
 
   private val anyMode = NormalMode
   private val formProvider = new IndividualEmailAddressFormProvider()

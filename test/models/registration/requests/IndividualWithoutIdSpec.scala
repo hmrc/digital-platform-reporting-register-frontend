@@ -16,24 +16,21 @@
 
 package models.registration.requests
 
+import base.SpecBase
 import builders.ContactDetailsBuilder.aContactDetails
 import builders.UserBuilder.aUser
 import cats.data.*
 import models.registration.Address
 import models.{Country, IndividualName, InternationalAddress, UkAddress, UserAnswers}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages.*
 
 import java.time.LocalDate
 
-class IndividualWithoutIdSpec
-  extends AnyFreeSpec
-    with Matchers
-    with TryValues
-    with OptionValues
-    with EitherValues {
+class IndividualWithoutIdSpec extends SpecBase
+  with TryValues
+  with OptionValues
+  with EitherValues {
 
   "individual without Id" - {
 

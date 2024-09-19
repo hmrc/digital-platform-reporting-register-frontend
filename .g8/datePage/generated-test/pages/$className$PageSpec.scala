@@ -1,12 +1,11 @@
 package pages
 
+import base.SpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.{CheckMode, NormalMode}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 
-class $className$PageSpec extends AnyFreeSpec with Matchers {
+class $className$PageSpec extends SpecBase {
 
   ".nextPage" - {
     "in Normal Mode" - {

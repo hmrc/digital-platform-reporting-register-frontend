@@ -1,14 +1,13 @@
 package models
 
+import base.SpecBase
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalatest.OptionValues
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
 
-class $className$Spec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
+class $className$Spec extends SpecBase with ScalaCheckPropertyChecks with OptionValues {
 
   "$className$" - {
     "must deserialise valid values" in {

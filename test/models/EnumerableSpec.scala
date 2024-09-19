@@ -16,15 +16,16 @@
 
 package models
 
+import base.SpecBase
 import org.scalatest.{EitherValues, OptionValues}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import play.api.libs.json._
+import play.api.libs.json.*
 
 object EnumerableSpec {
 
   sealed trait Foo
+
   case object Bar extends Foo
+
   case object Baz extends Foo
 
   object Foo {
@@ -36,9 +37,9 @@ object EnumerableSpec {
   }
 }
 
-class EnumerableSpec extends AnyFreeSpec with Matchers with EitherValues with OptionValues with Enumerable.Implicits {
+class EnumerableSpec extends SpecBase with EitherValues with OptionValues with Enumerable.Implicits {
 
-  import EnumerableSpec._
+  import EnumerableSpec.*
 
   ".reads" - {
 

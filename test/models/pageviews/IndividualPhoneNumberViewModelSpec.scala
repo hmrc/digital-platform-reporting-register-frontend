@@ -16,16 +16,15 @@
 
 package models.pageviews
 
+import base.SpecBase
 import builders.UserAnswersBuilder.aUserAnswers
 import forms.IndividualPhoneNumberFormProvider
 import models.NormalMode
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import pages.IndividualPhoneNumberPage
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 
-class IndividualPhoneNumberViewModelSpec extends AnyFreeSpec with Matchers {
+class IndividualPhoneNumberViewModelSpec extends SpecBase {
 
   private implicit val msgs: Messages = stubMessages()
   private val anyMode = NormalMode

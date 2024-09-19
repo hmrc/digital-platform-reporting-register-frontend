@@ -16,14 +16,13 @@
 
 package pages
 
+import base.SpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.{CheckMode, Country, InternationalAddress, NormalMode}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 
-class InternationalAddressPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
+class InternationalAddressPageSpec extends SpecBase with TryValues with OptionValues {
 
   private val country = Country.internationalCountries.head
   private val address = InternationalAddress("line 1", None, "city", None, "Postcode", country)

@@ -16,13 +16,12 @@
 
 package models.subscription.responses
 
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import base.SpecBase
 import play.api.libs.json.Json
 
 import java.time.Instant
 
-class SubscriptionResponseSpec extends AnyFreeSpec with Matchers {
+class SubscriptionResponseSpec extends SpecBase {
 
   "subscription response" - {
     "must serialise / deserialise a subscribed response" in {

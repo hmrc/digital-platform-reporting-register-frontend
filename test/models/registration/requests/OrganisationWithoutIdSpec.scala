@@ -16,17 +16,15 @@
 
 package models.registration.requests
 
+import base.SpecBase
 import builders.BusinessAddressBuilder.aBusinessAddress
 import builders.ContactDetailsBuilder.aContactDetails
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import models.registration.Address
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{EitherValues, OptionValues, TryValues}
-import pages.{BusinessAddressPage, BusinessNameNoUtrPage, CanPhonePrimaryContactPage, PrimaryContactEmailAddressPage, PrimaryContactNamePage}
+import pages.*
 
-class OrganisationWithoutIdSpec extends AnyFreeSpec
-  with Matchers
+class OrganisationWithoutIdSpec extends SpecBase
   with TryValues
   with OptionValues
   with EitherValues {

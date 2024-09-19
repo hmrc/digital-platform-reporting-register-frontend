@@ -16,14 +16,13 @@
 
 package models.pageviews
 
+import base.SpecBase
 import builders.UserAnswersBuilder.aUserAnswers
 import forms.CanPhoneSecondaryContactFormProvider
 import models.NormalMode
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import pages.CanPhoneSecondaryContactPage
 
-class CanPhoneSecondaryContactViewModelSpec extends AnyFreeSpec with Matchers {
+class CanPhoneSecondaryContactViewModelSpec extends SpecBase {
 
   private val anyName = "name"
   private val anyMode = NormalMode
