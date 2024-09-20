@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package models
+package models.eacd
 
-import models.eacd.requests.GroupEnrolment
+import play.api.libs.json.{Json, OFormat}
 
-case class User(id: String,
-                groupEnrolment: Option[GroupEnrolment] = None, // TODO: Refactor to make it non optional
-                taxIdentifier: Option[TaxIdentifier] = None)
+case class Identifier(key: String, value: String)
+
+object Identifier {
+  private val identifierName: String = "DPRSID"
+
+  implicit val format: OFormat[Identifier] = Json.format[Identifier]
+
+  def apply(value: String): Identifier = Identifier(key = identifierName, value = value)
+}

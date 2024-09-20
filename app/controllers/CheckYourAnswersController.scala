@@ -18,16 +18,18 @@ package controllers
 
 import com.google.inject.Inject
 import connectors.SubscriptionConnector.SubscribeFailure
-import connectors.{RegistrationConnector, SubscriptionConnector}
-import controllers.actions.{IdentifierActionProvider, DataRequiredAction, DataRetrievalAction}
+import connectors.{EnrolmentStoreConnector, RegistrationConnector, SubscriptionConnector}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierActionProvider}
 import models.BusinessType.*
 import models.audit.AuditEventModel
+import models.eacd.Identifier
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
 import models.registration.responses as registrationResponses
 import models.registration.responses.RegistrationResponse
 import models.requests.UserSessionDataRequest
 import models.subscription.requests.SubscriptionRequest
+import models.subscription.responses.SubscribedResponse
 import models.{NormalMode, SubscriptionDetails, UserAnswers}
 import pages.{BusinessTypePage, CheckYourAnswersPage}
 import play.api.i18n.I18nSupport
@@ -47,6 +49,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
                                            organisationView: CheckYourAnswersOrganisationView,
                                            registrationConnector: RegistrationConnector,
                                            subscriptionConnector: SubscriptionConnector,
+                                           enrolmentStoreConnector: EnrolmentStoreConnector,
                                            auditService: AuditService,
                                            sessionRepository: SessionRepository)
                                           (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
@@ -76,6 +79,12 @@ class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
             subscriptionDetails = Some(subscriptionDetails),
             data = Json.obj()
           )
+          subscriptionDetails.subscriptionResponse match {
+            case subscribedResponse: SubscribedResponse =>
+              val enrolmentWithDprsId = request.user.groupEnrolment.get.copy(identifier = Some(Identifier(subscribedResponse.dprsId)))
+              enrolmentStoreConnector.allocateEnrolmentToGroup(enrolmentWithDprsId)
+            case _ =>
+          }
 
           sessionRepository.set(answersWithSubscription).map { _ =>
             Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithSubscription))

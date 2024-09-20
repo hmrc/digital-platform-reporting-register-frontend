@@ -16,13 +16,12 @@
 
 package config
 
+import base.SpecBase
 import org.mockito.Mockito.when
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
 
-class AppConfigSpec extends AnyFreeSpec with Matchers with MockitoSugar {
+class AppConfigSpec extends SpecBase with MockitoSugar {
 
   private val mockConfiguration = mock[Configuration]
 
@@ -60,6 +59,15 @@ class AppConfigSpec extends AnyFreeSpec with Matchers with MockitoSugar {
         .thenReturn(Service("platform-operator-frontend-url", "20005", "http"))
 
       underTest.addPlatformOperatorUrl mustBe "http://platform-operator-frontend-url:20005/digital-platform-reporting/platform-operator/add-platform-operator/start"
+    }
+  }
+
+  ".enrollmentStoreBaseUrl" - {
+    "must return Enrollment Store service URL from the application.conf file" in {
+      when(mockConfiguration.get[Service]("microservice.services.tax-enrolments"))
+        .thenReturn(Service("tax-enrolments-url", "9995", "http"))
+
+      underTest.taxEnrolmentsBaseUrl mustBe "http://tax-enrolments-url:9995"
     }
   }
 }

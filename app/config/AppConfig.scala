@@ -17,7 +17,7 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import config.ConfigKeys.{DigitalPlatformReportingUrlKey, ManageFrontendBaseUrlKey, PlatformOperatorFrontendBaseUrlKey}
+import config.ConfigKeys.{DigitalPlatformReportingUrlKey, ManageFrontendBaseUrlKey, PlatformOperatorFrontendBaseUrlKey, TaxEnrolmentsUrlKey}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
@@ -38,16 +38,10 @@ class AppConfig @Inject()(configuration: Configuration) {
   val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
   val signOutUrl: String = configuration.get[String]("urls.signOut")
 
+  lazy val taxEnrolmentsBaseUrl: String = configuration.get[Service](TaxEnrolmentsUrlKey).baseUrl
+
   private lazy val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   lazy val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/digital-platform-reporting-register-frontend"
-
-  val languageTranslationEnabled: Boolean =
-    configuration.get[Boolean]("features.welsh-translation")
-
-  def languageMap: Map[String, Lang] = Map(
-    "en" -> Lang("en"),
-    "cy" -> Lang("cy")
-  )
 
   lazy val auditSource: String = configuration.get[String]("auditing.auditSource")
 
@@ -56,7 +50,7 @@ class AppConfig @Inject()(configuration: Configuration) {
   private lazy val platformOperatorFrontendBaseUrl: String = configuration.get[Service](PlatformOperatorFrontendBaseUrlKey).baseUrl
   lazy val platformOperatorFrontendUrl: String = s"$platformOperatorFrontendBaseUrl/digital-platform-reporting"
   lazy val addPlatformOperatorUrl: String = s"$platformOperatorFrontendUrl/platform-operator/add-platform-operator/start"
-  
+
   private lazy val manageFrontendBaseUrl: String = configuration.get[Service](ManageFrontendBaseUrlKey).baseUrl
   lazy val manageFrontendUrl: String = s"$manageFrontendBaseUrl/digital-platform-reporting/manage-reporting"
 
@@ -68,4 +62,11 @@ class AppConfig @Inject()(configuration: Configuration) {
   val dataEncryptionEnabled: Boolean = configuration.get[Boolean]("features.use-encryption")
 
   lazy val isPrivateBeta: Boolean = configuration.getOptional("features.private-beta").getOrElse(false)
+
+  val languageTranslationEnabled: Boolean = configuration.get[Boolean]("features.welsh-translation")
+
+  def languageMap: Map[String, Lang] = Map(
+    "en" -> Lang("en"),
+    "cy" -> Lang("cy")
+  )
 }

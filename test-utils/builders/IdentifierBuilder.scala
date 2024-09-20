@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package models
+package builders
 
-import models.eacd.requests.GroupEnrolment
+import models.eacd.Identifier
 
-case class User(id: String,
-                groupEnrolment: Option[GroupEnrolment] = None, // TODO: Refactor to make it non optional
-                taxIdentifier: Option[TaxIdentifier] = None)
+object IdentifierBuilder {
+
+  val anIdentifier: Identifier = Identifier(value = "default-identifier-id")
+}
