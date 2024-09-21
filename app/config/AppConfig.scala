@@ -55,10 +55,10 @@ class AppConfig @Inject()(configuration: Configuration) {
 
   private lazy val platformOperatorFrontendBaseUrl: String = configuration.get[Service](PlatformOperatorFrontendBaseUrlKey).baseUrl
   lazy val platformOperatorFrontendUrl: String = s"$platformOperatorFrontendBaseUrl/digital-platform-reporting"
-  lazy val addPlatformOperatorUrl: String = s"$platformOperatorFrontendUrl/add-platform-operator/start"
+  lazy val addPlatformOperatorUrl: String = s"$platformOperatorFrontendUrl/platform-operator/add-platform-operator/start"
   
   private lazy val manageFrontendBaseUrl: String = configuration.get[Service](ManageFrontendBaseUrlKey).baseUrl
-  lazy val manageFrontendUrl: String = s"$manageFrontendBaseUrl/manage-digital-platform-reporting"
+  lazy val manageFrontendUrl: String = s"$manageFrontendBaseUrl/digital-platform-reporting/manage-reporting"
 
   val timeout: Int = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
