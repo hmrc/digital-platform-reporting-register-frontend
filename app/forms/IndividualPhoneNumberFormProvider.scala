@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.common.Validation
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.i18n.Messages
@@ -28,6 +29,7 @@ class IndividualPhoneNumberFormProvider @Inject() extends Mappings {
     "value" -> text("individualPhoneNumber.error.required")
       .verifying(firstError(
         maxLength(24, "individualPhoneNumber.error.length"),
+        regexp(Validation.phoneNumberPattern.toString, "individualPhoneNumber.error.format"),
         validPhoneNumber("individualPhoneNumber.error.format")
       ))
   )
