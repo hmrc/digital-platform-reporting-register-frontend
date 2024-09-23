@@ -51,7 +51,7 @@ class IndividualPhoneNumberFormProviderSpec extends StringFieldBehaviours {
     }
 
     "must fail to bind phone numbers longer than 24 characters" in {
-      val result = underTest.bind(Map(fieldName -> "+44 7777 777777 ext. 1234"))
+      val result = underTest.bind(Map(fieldName -> "+44 7777 777777 EXT 12345"))
       result.error("value").value.message mustEqual lengthKey
     }
   }
