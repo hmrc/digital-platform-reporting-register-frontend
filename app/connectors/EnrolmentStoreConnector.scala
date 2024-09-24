@@ -45,7 +45,7 @@ class EnrolmentStoreConnector @Inject()(appConfig: AppConfig, httpClient: HttpCl
    * Can return 409 Conflict (if enrolment already exists)
    */
   def allocateEnrolmentToGroup(groupEnrolment: GroupEnrolment)(implicit hc: HeaderCarrier): Future[Done] = {
-    httpClient.post(url"${appConfig.taxEnrolmentsBaseUrl}/enrolment-store/groups/${groupEnrolment.groupId}/enrolments/${groupEnrolment.enrolmentKey}")
+    httpClient.post(url"${appConfig.taxEnrolmentsBaseUrl}/tax-enrolments/groups/${groupEnrolment.groupId}/enrolments/${groupEnrolment.enrolmentKey}")
       .withBody(Json.toJson(groupEnrolment))
       .execute[HttpResponse]
       .flatMap { response =>

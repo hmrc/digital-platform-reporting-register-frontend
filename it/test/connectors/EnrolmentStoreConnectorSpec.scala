@@ -33,7 +33,7 @@ class EnrolmentStoreConnectorSpec extends ConnectorSpecBase {
   ".allocateEnrolmentToGroup" - {
     "must succeed when the server returns CREATED" in {
       wireMockServer
-        .stubFor(post(urlMatching(s"/enrolment-store/groups/${aGroupEnrolment.groupId}/enrolments/${aGroupEnrolment.enrolmentKey}"))
+        .stubFor(post(urlMatching(s"/tax-enrolments/groups/${aGroupEnrolment.groupId}/enrolments/${aGroupEnrolment.enrolmentKey}"))
           .willReturn(created()))
 
       underTest.allocateEnrolmentToGroup(aGroupEnrolment).futureValue
@@ -41,7 +41,7 @@ class EnrolmentStoreConnectorSpec extends ConnectorSpecBase {
 
     "must succeed when the server returns CONFLICT(409)" in {
       wireMockServer
-        .stubFor(post(urlMatching(s"/enrolment-store/groups/${aGroupEnrolment.groupId}/enrolments/${aGroupEnrolment.enrolmentKey}"))
+        .stubFor(post(urlMatching(s"/tax-enrolments/groups/${aGroupEnrolment.groupId}/enrolments/${aGroupEnrolment.enrolmentKey}"))
           .willReturn(aResponse.withStatus(409)))
 
       underTest.allocateEnrolmentToGroup(aGroupEnrolment).futureValue
@@ -49,7 +49,7 @@ class EnrolmentStoreConnectorSpec extends ConnectorSpecBase {
 
     "must return a failed future when the server returns an error" in {
       wireMockServer
-        .stubFor(post(urlMatching(s"/enrolment-store/groups/${aGroupEnrolment.groupId}/enrolments/${aGroupEnrolment.enrolmentKey}"))
+        .stubFor(post(urlMatching(s"/tax-enrolments/groups/${aGroupEnrolment.groupId}/enrolments/${aGroupEnrolment.enrolmentKey}"))
           .willReturn(serverError()))
 
       underTest.allocateEnrolmentToGroup(aGroupEnrolment).failed.futureValue
