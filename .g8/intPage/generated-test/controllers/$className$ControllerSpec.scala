@@ -17,7 +17,7 @@ import views.html.$className$View
 
 import scala.concurrent.Future
 
-class $className$ControllerSpec extends SpecBase with MockitoSugar {
+class $className$ControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val form = new $className$FormProvider()()
   private val validAnswer = $minimum$

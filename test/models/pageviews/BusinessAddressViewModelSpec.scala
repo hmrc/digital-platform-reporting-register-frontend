@@ -16,15 +16,14 @@
 
 package models.pageviews
 
+import base.SpecBase
 import builders.UserAnswersBuilder.aUserAnswers
 import forms.BusinessAddressFormProvider
 import generators.Generators
 import models.NormalMode
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import pages.BusinessAddressPage
 
-class BusinessAddressViewModelSpec extends AnyFreeSpec with Matchers with Generators {
+class BusinessAddressViewModelSpec extends SpecBase with Generators {
 
   private val anyMode = NormalMode
   private val formProvider = new BusinessAddressFormProvider()

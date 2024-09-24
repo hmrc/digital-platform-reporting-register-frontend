@@ -18,6 +18,7 @@ package controllers.actions
 
 import config.AppConfig
 import controllers.routes
+import models.eacd.requests.GroupEnrolment
 import models.requests.IdentifierRequest
 import models.{Nino, Utr}
 import play.api.mvc.*
@@ -25,7 +26,7 @@ import play.api.mvc.Results.*
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -49,30 +50,31 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
         Retrievals.credentialRole and
         Retrievals.internalId and
         Retrievals.nino and
-        Retrievals.allEnrolments
+        Retrievals.allEnrolments and
+        Retrievals.groupIdentifier and
+        Retrievals.credentials
     ) {
-      case _ ~ _ ~ _ ~ _ ~ enrollments if withDprsEnrollmentCheck && hasDprsEnrolment(enrollments) =>
+      case _ ~ _ ~ _ ~ _ ~ enrollments ~ _ ~ _ if withDprsEnrollmentCheck && hasDprsEnrolment(enrollments) =>
         Future.successful(Redirect(appConfig.manageFrontendUrl))
 
-      case Some(Agent) ~ _ ~ _ ~ _ ~ _ =>
+      case Some(Agent) ~ _ ~ _ ~ _ ~ _ ~ _ ~ _ =>
         Future.successful(Redirect(routes.CannotUseServiceAgentController.onPageLoad()))
 
-      case Some(Organisation) ~ Some(Assistant) ~ _ ~ _ ~ _ =>
+      case Some(Organisation) ~ Some(Assistant) ~ _ ~ _ ~ _ ~ _ ~ _ =>
         Future.successful(Redirect(routes.CannotUseServiceAssistantController.onPageLoad()))
 
-      case Some(Individual) ~ _ ~ Some(internalId) ~ maybeNino ~ _ =>
-        block(IdentifierRequest(models.User(internalId, maybeNino.map(Nino.apply)), request))
+      case Some(Individual) ~ _ ~ Some(internalId) ~ maybeNino ~ _ ~ Some(groupIdentifier) ~ Some(credentials) =>
+        val groupEnrolment = GroupEnrolment(credentials.providerId, groupIdentifier)
+        block(IdentifierRequest(models.User(internalId, Some(groupEnrolment), maybeNino.map(Nino.apply)), request))
 
-      case Some(Organisation) ~ _ ~ Some(internalId) ~ _ ~ enrolments =>
-        block(IdentifierRequest(models.User(internalId, getCtUtrEnrolment(enrolments)), request))
+      case Some(Organisation) ~ _ ~ Some(internalId) ~ _ ~ enrolments ~ Some(groupIdentifier) ~ Some(credentials) =>
+        val groupEnrolment = GroupEnrolment(credentials.providerId, groupIdentifier)
+        block(IdentifierRequest(models.User(internalId, Some(groupEnrolment), getCtUtrEnrolment(enrolments)), request))
 
-      case _ =>
-        Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
+      case _ => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     } recover {
-      case _: NoActiveSession =>
-        Redirect(appConfig.loginUrl, Map("continue" -> Seq(appConfig.loginContinueUrl)))
-      case _: AuthorisationException =>
-        Redirect(routes.UnauthorisedController.onPageLoad())
+      case _: NoActiveSession => Redirect(appConfig.loginUrl, Map("continue" -> Seq(appConfig.loginContinueUrl)))
+      case _: AuthorisationException => Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
 

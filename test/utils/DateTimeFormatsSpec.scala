@@ -16,17 +16,15 @@
 
 package utils
 
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import base.SpecBase
 import play.api.i18n.Lang
 import utils.DateTimeFormats.dateFormat
 
 import java.time.LocalDate
 
-class DateTimeFormatsSpec extends AnyFreeSpec with Matchers {
+class DateTimeFormatsSpec extends SpecBase {
 
   ".dateTimeFormat" - {
-
     "must format dates in English" in {
       val formatter = dateFormat()(Lang("en"))
       val result = LocalDate.of(2023, 1, 1).format(formatter)

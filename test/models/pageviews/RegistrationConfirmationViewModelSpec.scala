@@ -16,6 +16,7 @@
 
 package models.pageviews
 
+import base.SpecBase
 import builders.OrganisationContactBuilder.anOrganisationContact
 import builders.SubscribedResponseBuilder.aSubscribedResponse
 import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
@@ -24,13 +25,11 @@ import builders.UserAnswersBuilder.aUserAnswers
 import forms.RegistrationConfirmationFormProvider
 import models.RegistrationType.ThirdParty
 import models.{BusinessType, NormalMode, RegistrationType, SubscriptionDetails}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import pages.RegistrationConfirmationPage
 
 import java.time.Instant
 
-class RegistrationConfirmationViewModelSpec extends AnyFreeSpec with Matchers {
+class RegistrationConfirmationViewModelSpec extends SpecBase {
 
   private val anyMode = NormalMode
   private val formProvider = new RegistrationConfirmationFormProvider()

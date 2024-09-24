@@ -16,16 +16,15 @@
 
 package models.registration.requests
 
+import base.SpecBase
 import builders.AddressBuilder.anAddress
 import builders.ContactDetailsBuilder.aContactDetails
 import models.BusinessType
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.Json
 
 import java.time.LocalDate
 
-class RegistrationRequestSpec extends AnyFreeSpec with Matchers {
+class RegistrationRequestSpec extends SpecBase {
 
   "a registration request" - {
     "must write an individual with NINO request" in {

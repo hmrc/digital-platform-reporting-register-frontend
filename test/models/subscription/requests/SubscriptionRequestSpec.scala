@@ -16,20 +16,18 @@
 
 package models.subscription.requests
 
+import base.SpecBase
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import builders.UserBuilder.aUser
 import models.BusinessType.{LimitedCompany, SoleTrader}
 import models.subscription.*
 import models.{BusinessType, IndividualName, SoleTraderName, Utr}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages.*
 
 import scala.util.Right
 
-class SubscriptionRequestSpec extends AnyFreeSpec
-  with Matchers
+class SubscriptionRequestSpec extends SpecBase
   with TryValues
   with OptionValues
   with EitherValues {

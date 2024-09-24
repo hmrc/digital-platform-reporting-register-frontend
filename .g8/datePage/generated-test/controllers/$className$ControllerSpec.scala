@@ -20,7 +20,7 @@ import views.html.$className$View
 import java.time.{LocalDate, ZoneOffset}
 import scala.concurrent.Future
 
-class $className$ControllerSpec extends SpecBase with MockitoSugar {
+class $className$ControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private implicit val messages: Messages = stubMessages()
 

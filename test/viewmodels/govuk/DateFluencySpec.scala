@@ -16,18 +16,17 @@
 
 package viewmodels.govuk
 
+import base.SpecBase
 import forms.mappings.Mappings
 import org.scalatest.OptionValues
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
-import viewmodels.govuk.all._
+import viewmodels.govuk.all.*
 
 import java.time.LocalDate
 
-class DateFluencySpec extends AnyFreeSpec with Matchers with Mappings with OptionValues {
+class DateFluencySpec extends SpecBase with Mappings with OptionValues {
 
   ".apply"- {
 

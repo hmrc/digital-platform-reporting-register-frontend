@@ -49,6 +49,6 @@ class SubscriptionConnector @Inject()(appConfig: AppConfig,
 
 object SubscriptionConnector {
   final case class SubscribeFailure(statusCode: Int) extends Throwable {
-    override def getMessage(): String = s"Error with code: $statusCode"
+    override def getMessage: String = s"Error with code: $statusCode"
   }
 }

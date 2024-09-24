@@ -16,5 +16,8 @@
 
 package models
 
+import models.eacd.requests.GroupEnrolment
+
 case class User(id: String,
+                groupEnrolment: Option[GroupEnrolment] = None, // TODO: Refactor to make it non optional
                 taxIdentifier: Option[TaxIdentifier] = None)

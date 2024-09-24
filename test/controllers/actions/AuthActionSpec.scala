@@ -27,7 +27,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
+import uk.gov.hmrc.auth.core.retrieve.{Credentials, Retrieval}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -40,6 +40,7 @@ class AuthActionSpec extends ControllerSpecBase {
   private val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
   private val appConfig = application.injector.instanceOf[AppConfig]
   private val emptyEnrolments = Enrolments(Set.empty)
+  private val credentials = Credentials("some-provider-id", "some-provider-type")
 
   class Harness(authAction: IdentifierAction) {
     def onPageLoad(): Action[AnyContent] = authAction { request =>
@@ -72,7 +73,8 @@ class AuthActionSpec extends ControllerSpecBase {
 
     "when the user is an agent" - {
       "must redirect the user to the `cannot use service - agent` page" in {
-        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some(Agent) ~ None ~ None ~ None ~ emptyEnrolments), appConfig, bodyParsers)
+        val authConnector = new FakeAuthConnector(Some(Agent) ~ None ~ None ~ None ~ emptyEnrolments ~ Some("some-group-identifier") ~ Some(credentials))
+        val authAction = new AuthenticatedIdentifierAction(authConnector, appConfig, bodyParsers)
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(FakeRequest())
 
@@ -83,11 +85,9 @@ class AuthActionSpec extends ControllerSpecBase {
 
     "when the user is an organisation assistant" - {
       "must redirect the user to the `cannot use service - assistant` page" in {
-        val authAction = new AuthenticatedIdentifierAction(
-          new FakeAuthConnector(Some(Organisation) ~ Some(Assistant) ~ None ~ None ~ emptyEnrolments),
-          appConfig,
-          bodyParsers
-        )
+        val authConnector =
+          new FakeAuthConnector(Some(Organisation) ~ Some(Assistant) ~ None ~ None ~ emptyEnrolments ~ Some("some-group-identifier") ~ Some(credentials))
+        val authAction = new AuthenticatedIdentifierAction(authConnector, appConfig, bodyParsers)
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(FakeRequest())
 
@@ -101,7 +101,7 @@ class AuthActionSpec extends ControllerSpecBase {
         "when the user has a CT UTR enrolment" in {
           val enrolments = Enrolments(Set(Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)))
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments),
+            new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments ~ Some("some-group-identifier") ~ Some(credentials)),
             appConfig,
             bodyParsers
           )
@@ -113,8 +113,8 @@ class AuthActionSpec extends ControllerSpecBase {
         }
 
         "when the user has no CT UTR enrolment" in {
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ emptyEnrolments),
+          val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(
+            Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ emptyEnrolments ~ Some("some-group-identifier") ~ Some(credentials)),
             appConfig,
             bodyParsers
           )
@@ -130,8 +130,8 @@ class AuthActionSpec extends ControllerSpecBase {
     "when the user is an individual" - {
       "must succeed" - {
         "when the user's NINO is attached to their auth record" in {
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeAuthConnector(Some(Individual) ~ None ~ Some("internalId") ~ Some(" nino") ~ emptyEnrolments),
+          val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(
+            Some(Individual) ~ None ~ Some("internalId") ~ Some(" nino") ~ emptyEnrolments ~ Some("some-group-identifier") ~ Some(credentials)),
             appConfig,
             bodyParsers
           )
@@ -144,7 +144,7 @@ class AuthActionSpec extends ControllerSpecBase {
 
         "when the user's NINO is not attached to their auth record" in {
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeAuthConnector(Some(Individual) ~ None ~ Some("internalId") ~ None ~ emptyEnrolments),
+            new FakeAuthConnector(Some(Individual) ~ None ~ Some("internalId") ~ None ~ emptyEnrolments ~ Some("some-group-identifier") ~ Some(credentials)),
             appConfig,
             bodyParsers
           )
@@ -161,7 +161,7 @@ class AuthActionSpec extends ControllerSpecBase {
       "when the user has no DPRS enrollment should continue" in {
         val enrolments = Enrolments(Set(Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)))
         val identifierActionProvider = new AuthenticatedIdentifierActionProvider(
-          new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments),
+          new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments ~ Some("some-group-identifier") ~ Some(credentials)),
           appConfig,
           bodyParsers
         )
@@ -176,7 +176,7 @@ class AuthActionSpec extends ControllerSpecBase {
       "when the user has DPRS enrollment should redirect to Manage Frontend" in {
         val enrolments = Enrolments(Set(Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", " some-dprs-id")), "activated", None)))
         val identifierActionProvider = new AuthenticatedIdentifierActionProvider(
-          new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments),
+          new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments ~ Some("some-group-identifier") ~ Some(credentials)),
           appConfig,
           bodyParsers
         )
@@ -193,7 +193,7 @@ class AuthActionSpec extends ControllerSpecBase {
       "when the user has DPRS enrollment should redirect to Manage Frontend" in {
         val enrolments = Enrolments(Set(Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)))
         val identifierActionProvider = new AuthenticatedIdentifierActionProvider(
-          new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments),
+          new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments ~ Some("some-group-identifier") ~ Some(credentials)),
           appConfig,
           bodyParsers
         )
@@ -208,7 +208,8 @@ class AuthActionSpec extends ControllerSpecBase {
 
     "when auth gives us back an unexpected set of retrievals" - {
       "must go to Unauthorised" in {
-        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(None ~ None ~ None ~ None ~ emptyEnrolments), appConfig, bodyParsers)
+        val authConnector = new FakeAuthConnector(None ~ None ~ None ~ None ~ emptyEnrolments ~ Some("some-group-identifier") ~ Some(credentials))
+        val authAction = new AuthenticatedIdentifierAction(authConnector, appConfig, bodyParsers)
         val controller = new Harness(authAction)
         val result = controller.onPageLoad()(FakeRequest())
 

@@ -16,11 +16,10 @@
 
 package models.subscription
 
+import base.SpecBase
 import models.{IndividualName, SoleTraderName}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 
-class IndividualSpec extends AnyFreeSpec with Matchers {
+class IndividualSpec extends SpecBase {
 
   private val underTest = Individual
 

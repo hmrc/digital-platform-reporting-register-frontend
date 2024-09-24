@@ -16,11 +16,10 @@
 
 package models
 
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import base.SpecBase
 import play.api.libs.json.Json
 
-class TaxIdentifierSpec extends AnyFreeSpec with Matchers {
+class TaxIdentifierSpec extends SpecBase {
 
   "must write/read a NINO" in {
 

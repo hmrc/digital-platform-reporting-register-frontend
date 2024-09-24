@@ -16,6 +16,7 @@
 
 package models
 
+import base.SpecBase
 import builders.AddressBuilder.anAddress
 import builders.SubscriptionRequestBuilder.aSubscriptionRequest
 import builders.UserAnswersBuilder.aUserAnswers
@@ -27,8 +28,6 @@ import models.subscription.responses.SubscribedResponse
 import models.subscription.{Individual, IndividualContact}
 import org.scalactic.source.Position
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import pages.{BusinessNameNoUtrPage, BusinessTypePage, IsThisYourBusinessPage, RegistrationTypePage}
 import play.api.Configuration
 import play.api.libs.json.Json
@@ -38,7 +37,7 @@ import java.security.SecureRandom
 import java.time.Instant
 import java.util.Base64
 
-class SubscriptionDetailsSpec extends AnyFreeSpec with Matchers {
+class SubscriptionDetailsSpec extends SpecBase {
 
   private val aesKey = {
     val aesKey = new Array[Byte](32)

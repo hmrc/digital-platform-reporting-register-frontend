@@ -16,12 +16,14 @@
 
 package builders
 
+import builders.GroupEnrolmentBuilder.aGroupEnrolment
 import models.User
 
 object UserBuilder {
 
   val aUser: User = User(
     id = "default-user-id",
+    groupEnrolment = Some(aGroupEnrolment),
     taxIdentifier = None
   )
 }

@@ -16,9 +16,8 @@
 
 package models.registration.responses
 
+import base.SpecBase
 import builders.AddressBuilder.anAddress
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import play.api.Configuration
 import play.api.libs.json.Json
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, SymmetricCryptoFactory}
@@ -26,7 +25,7 @@ import uk.gov.hmrc.crypto.{Decrypter, Encrypter, SymmetricCryptoFactory}
 import java.security.SecureRandom
 import java.util.Base64
 
-class RegistrationResponseSpec extends AnyFreeSpec with Matchers {
+class RegistrationResponseSpec extends SpecBase {
 
   "registration response" - {
     "must serialise / deserialise" - {

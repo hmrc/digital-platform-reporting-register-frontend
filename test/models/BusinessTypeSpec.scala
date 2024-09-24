@@ -16,23 +16,22 @@
 
 package models
 
-import models.BusinessType._
+import base.SpecBase
+import models.BusinessType.*
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.OptionValues
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
 import play.api.test.Helpers.stubMessages
 
-class BusinessTypeSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
+class BusinessTypeSpec extends SpecBase with ScalaCheckPropertyChecks with OptionValues {
 
   "BusinessType" - {
 
     "must deserialise valid values" in {
 
-      val gen = Gen.oneOf(BusinessType.values.toSeq)
+      val gen = Gen.oneOf(BusinessType.values)
 
       forAll(gen) {
         businessType =>

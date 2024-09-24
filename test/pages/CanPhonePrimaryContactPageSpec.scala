@@ -16,14 +16,13 @@
 
 package pages
 
+import base.SpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.{CheckMode, NormalMode}
 import org.scalatest.{OptionValues, TryValues}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 
-class CanPhonePrimaryContactPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
+class CanPhonePrimaryContactPageSpec extends SpecBase with TryValues with OptionValues {
 
   ".nextPage" - {
     "in Normal Mode" - {

@@ -16,6 +16,7 @@
 
 package pages
 
+import base.SpecBase
 import builders.SubscriptionDetailsBuilder
 import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
 import builders.SubscriptionRequestBuilder.aSubscriptionRequest
@@ -27,13 +28,11 @@ import models.subscription.requests.SubscriptionRequest
 import models.subscription.responses as subscriptionResponses
 import models.{BusinessType, NormalMode, RegistrationType, SubscriptionDetails}
 import org.scalacheck.Gen
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 
 import java.time.Instant
 
-class CheckYourAnswersPageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
+class CheckYourAnswersPageSpec extends SpecBase with TryValues with OptionValues {
 
   ".nextPage" - {
     "must go to journey recovery when there is no registration response" in {

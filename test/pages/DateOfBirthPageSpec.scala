@@ -16,16 +16,15 @@
 
 package pages
 
+import base.SpecBase
 import builders.MatchResponseWithIdBuilder.aMatchResponseWithId
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithoutId, NoMatchResponse}
 import models.{CheckMode, NormalMode, UserAnswers}
 import org.scalatest.TryValues
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 
-class DateOfBirthPageSpec extends AnyFreeSpec with Matchers with TryValues {
+class DateOfBirthPageSpec extends SpecBase with TryValues {
 
   ".nextPage" - {
     "in Normal Mode" - {

@@ -16,16 +16,15 @@
 
 package pages
 
+import base.SpecBase
 import builders.AddressBuilder.anAddress
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.registration.responses.{AlreadySubscribedResponse, MatchResponseWithId, NoMatchResponse}
 import models.{BusinessType, CheckMode, NormalMode}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
 
-class BusinessNamePageSpec extends AnyFreeSpec with Matchers with TryValues with OptionValues {
+class BusinessNamePageSpec extends SpecBase with TryValues with OptionValues {
 
   ".nextPage" - {
     val noResponseAnswer = anEmptyAnswer.copy(registrationResponse = Some(NoMatchResponse()))

@@ -16,26 +16,21 @@
 
 package models.registration.requests
 
+import base.SpecBase
 import builders.UserBuilder.aUser
 import cats.data.*
 import models.{SoleTraderName, UserAnswers}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages.{SoleTraderNamePage, UtrPage}
 import play.api.libs.json.Json
 
-class IndividualWithUtrSpec
-  extends AnyFreeSpec
-    with Matchers
-    with TryValues
-    with OptionValues
-    with EitherValues {
+class IndividualWithUtrSpec extends SpecBase
+  with TryValues
+  with OptionValues
+  with EitherValues {
 
   "individual with UTR" - {
-
     "must serialise" in {
-
       val individual = IndividualWithUtr("123", IndividualDetails("first", "last"))
       val json = Json.toJson(individual)
 

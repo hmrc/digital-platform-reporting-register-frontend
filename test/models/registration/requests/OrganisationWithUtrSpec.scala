@@ -16,21 +16,18 @@
 
 package models.registration.requests
 
+import base.SpecBase
 import builders.UserBuilder.aUser
 import cats.data.*
 import models.{BusinessType, Nino, UserAnswers, Utr}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages.{BusinessNamePage, BusinessTypePage, UtrPage}
 import play.api.libs.json.Json
 
-class OrganisationWithUtrSpec
-  extends AnyFreeSpec
-    with Matchers
-    with TryValues
-    with OptionValues
-    with EitherValues {
+class OrganisationWithUtrSpec extends SpecBase
+  with TryValues
+  with OptionValues
+  with EitherValues {
 
   "organisation with UTR" - {
 

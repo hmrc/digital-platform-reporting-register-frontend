@@ -16,19 +16,18 @@
 
 package forms.mappings
 
-import java.time.LocalDate
+import base.SpecBase
 
+import java.time.LocalDate
 import generators.Generators
 import org.scalacheck.Gen
 import org.scalatest.OptionValues
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
 
-class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with Generators with OptionValues
+class DateMappingsSpec extends SpecBase with ScalaCheckPropertyChecks with Generators with OptionValues
   with Mappings {
 
   private implicit val messages: Messages = stubMessages()
