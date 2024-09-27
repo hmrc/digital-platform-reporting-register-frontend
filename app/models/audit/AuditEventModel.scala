@@ -27,10 +27,9 @@ case class AuditEventModel(auditType: String, requestData: JsObject, responseDat
 
 object AuditEventModel {
 
-  implicit lazy val writes: OWrites[AuditEventModel] = (o: AuditEventModel) => Json.obj(
-    "requestData" -> o.requestData,
-    "responseData" -> o.responseData
-  )
+  implicit lazy val writes: OWrites[AuditEventModel] = (o: AuditEventModel) =>
+    o.requestData + ("outcome" -> Json.toJson(o.responseData))
+
 
   def apply(isAutoSubscription: Boolean, requestData: JsObject, subscribeFailure: SubscribeFailure): AuditEventModel = {
     val localDateTime = LocalDateTime.ofInstant(Instant.now, ZoneId.of("UTC"))
