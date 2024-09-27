@@ -44,8 +44,9 @@ class AuditEventModelSpec extends SpecBase {
       )
 
       Json.toJson(auditEventModel) mustBe Json.obj(
-        "requestData" -> Json.obj("type" -> "individual", "utr" -> "123"),
-        "responseData" -> Json.obj(
+        "type" -> "individual",
+        "utr" -> "123",
+        "outcome" -> Json.obj(
           "statusCode" -> 201,
           "status" -> "success",
           "processedAt" -> "2001-01-01T02:30:23",
@@ -66,8 +67,9 @@ class AuditEventModelSpec extends SpecBase {
       )
 
       Json.toJson(auditEventModel) mustBe Json.obj(
-        "requestData" -> Json.obj("type" -> "individual", "utr" -> "123"),
-        "responseData" -> Json.obj(
+        "type" -> "individual",
+        "utr" -> "123",
+        "outcome" -> Json.obj(
           "statusCode" -> 500,
           "status" -> "failure",
           "processedAt" -> "2001-01-01T02:30:23",
