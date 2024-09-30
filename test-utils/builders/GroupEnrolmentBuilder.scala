@@ -22,8 +22,10 @@ import models.eacd.requests.GroupEnrolment
 object GroupEnrolmentBuilder {
 
   val aGroupEnrolment: GroupEnrolment = GroupEnrolment(
-    userId = "default-internal-id",
+    providerId = "default-provider-id",
+    verifierKey = "UTR",
+    verifierValue = "1234567890",
     groupId = "default-group-id",
-    identifier = Some(anIdentifier)
+    identifier = anIdentifier
   )
 }

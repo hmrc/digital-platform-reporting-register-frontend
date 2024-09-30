@@ -18,11 +18,11 @@ package controllers
 
 import com.google.inject.Inject
 import connectors.SubscriptionConnector.SubscribeFailure
-import connectors.{EnrolmentStoreConnector, RegistrationConnector, SubscriptionConnector}
+import connectors.{RegistrationConnector, SubscriptionConnector, TaxEnrolmentConnector}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierActionProvider}
 import models.BusinessType.*
 import models.audit.AuditEventModel
-import models.eacd.Identifier
+import models.eacd.requests.{EnrolmentKnownFacts, GroupEnrolment}
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
 import models.registration.responses as registrationResponses
@@ -49,7 +49,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
                                            organisationView: CheckYourAnswersOrganisationView,
                                            registrationConnector: RegistrationConnector,
                                            subscriptionConnector: SubscriptionConnector,
-                                           enrolmentStoreConnector: EnrolmentStoreConnector,
+                                           taxEnrolmentConnector: TaxEnrolmentConnector,
                                            auditService: AuditService,
                                            sessionRepository: SessionRepository)
                                           (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
@@ -72,23 +72,26 @@ class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
         Future.failed(new Exception("Registration response is No Match"))
 
       case matchResponse: registrationResponses.MatchResponse =>
-        val answersWithRegistration = request.userAnswers.copy(registrationResponse = Some(matchResponse))
+        EnrolmentKnownFacts(request.userAnswers) match {
+          case None => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          case Some(enrolmentKnownFacts) =>
+            val answersWithRegistration = request.userAnswers.copy(registrationResponse = Some(matchResponse))
 
-        subscribe(matchResponse.safeId, answersWithRegistration, request.userAnswers).flatMap { subscriptionDetails =>
-          val answersWithSubscription = answersWithRegistration.copy(
-            subscriptionDetails = Some(subscriptionDetails),
-            data = Json.obj()
-          )
-          subscriptionDetails.subscriptionResponse match {
-            case subscribedResponse: SubscribedResponse =>
-              val enrolmentWithDprsId = request.user.groupEnrolment.get.copy(identifier = Some(Identifier(subscribedResponse.dprsId)))
-              enrolmentStoreConnector.allocateEnrolmentToGroup(enrolmentWithDprsId)
-            case _ =>
-          }
+            subscribe(matchResponse.safeId, answersWithRegistration, request.userAnswers).flatMap { subscriptionDetails =>
+              val answersWithSubscription = answersWithRegistration.copy(
+                subscriptionDetails = Some(subscriptionDetails),
+                data = Json.obj()
+              )
+              subscriptionDetails.subscriptionResponse match {
+                case subscribedResponse: SubscribedResponse =>
+                  taxEnrolmentConnector.allocateEnrolmentToGroup(GroupEnrolment(enrolmentKnownFacts, subscribedResponse.dprsId))
+                case _ =>
+              }
 
-          sessionRepository.set(answersWithSubscription).map { _ =>
-            Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithSubscription))
-          }
+              sessionRepository.set(answersWithSubscription).map { _ =>
+                Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithSubscription))
+              }
+            }
         }
     }
   }

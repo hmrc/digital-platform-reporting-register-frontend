@@ -20,9 +20,13 @@ import models.eacd.Identifier
 import models.eacd.requests.GroupEnrolment.serviceName
 import play.api.libs.json.{Json, Writes}
 
-case class GroupEnrolment(userId: String, groupId: String, identifier: Option[Identifier] = None) {
+case class GroupEnrolment(providerId: String,
+                          verifierKey: String,
+                          verifierValue: String,
+                          groupId: String,
+                          identifier: Identifier) {
 
-  lazy val enrolmentKey: String = s"$serviceName~" + identifier.map(identifier => s"${identifier.key}~${identifier.value}").mkString("~")
+  lazy val enrolmentKey: String = s"$serviceName~" + s"${identifier.key}~${identifier.value}"
 }
 
 object GroupEnrolment {
@@ -30,8 +34,20 @@ object GroupEnrolment {
   private val serviceName: String = "HMRC-DPRS"
 
   implicit val writes: Writes[GroupEnrolment] = (o: GroupEnrolment) => Json.obj(
-    "userId" -> o.userId,
+    "userId" -> o.providerId,
+    "friendlyName" -> "Digital Platform Reporting",
     "type" -> "principal",
-    "action" -> "enrolAndActivate"
+    "verifiers" -> Json.arr(Json.obj(
+      "key" -> o.verifierKey,
+      "value" -> o.verifierValue
+    ))
+  )
+
+  def apply(enrolmentKnownFacts: EnrolmentKnownFacts, dprsId: String): GroupEnrolment = GroupEnrolment(
+    providerId = enrolmentKnownFacts.providerId,
+    verifierKey = enrolmentKnownFacts.verifierKey,
+    verifierValue = enrolmentKnownFacts.verifierValue,
+    groupId = enrolmentKnownFacts.groupId,
+    identifier = Identifier(dprsId)
   )
 }

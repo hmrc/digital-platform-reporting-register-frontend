@@ -16,14 +16,14 @@
 
 package builders
 
-import models.User
+import models.eacd.requests.EnrolmentKnownFacts
 
-object UserBuilder {
+object EnrolmentKnownFactsBuilder {
 
-  val aUser: User = User(
-    id = "default-user-id",
-    providerId = Some("default-provider-id"),
-    groupId = Some("default-group-id"),
-    taxIdentifier = None
+  val anEnrolmentKnownFacts: EnrolmentKnownFacts = EnrolmentKnownFacts(
+    providerId = "default-provider-id",
+    verifierKey = "UTR",
+    verifierValue = "1234567890",
+    groupId = "default-group-id"
   )
 }

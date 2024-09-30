@@ -17,36 +17,47 @@
 package models.eacd.requests
 
 import base.SpecBase
+import builders.EnrolmentKnownFactsBuilder.anEnrolmentKnownFacts
 import builders.GroupEnrolmentBuilder.aGroupEnrolment
 import models.eacd.Identifier
+import org.scalatest.TryValues
 import play.api.libs.json.Json
 
-class GroupEnrolmentSpec extends SpecBase {
+class GroupEnrolmentSpec extends SpecBase with TryValues {
 
   ".enrolmentKey" - {
     "must generate correct enrolmentKey when identifier provided" in {
-      val identifier = Identifier("some-key", "some-value")
-      val underTest = aGroupEnrolment.copy(identifier = Some(identifier))
+      val underTest = aGroupEnrolment.copy(identifier = Identifier("some-key", "some-value"))
 
       underTest.enrolmentKey mustBe "HMRC-DPRS~some-key~some-value"
-    }
-
-    "must generate correct enrolmentKey when identifier is None" in {
-      val underTest = aGroupEnrolment.copy(identifier = None)
-
-      underTest.enrolmentKey mustBe "HMRC-DPRS~"
     }
   }
 
   "a GroupEnrolment" - {
     "must write correct json" in {
-      val groupEnrolment = aGroupEnrolment.copy(userId = "some-internal-id")
+      val groupEnrolment = aGroupEnrolment.copy(providerId = "some-internal-id")
       val json = Json.toJson(groupEnrolment)
 
       json mustBe Json.obj(
         "userId" -> "some-internal-id",
         "type" -> "principal",
-        "action" -> "enrolAndActivate"
+        "friendlyName" -> "Digital Platform Reporting",
+        "verifiers" -> Json.arr(Json.obj(
+          "key" -> aGroupEnrolment.verifierKey,
+          "value" -> aGroupEnrolment.verifierValue
+        ))
+      )
+    }
+  }
+
+  ".apply(...)" - {
+    "must create GroupEnrolment from EnrolmentKnownFacts" in {
+      GroupEnrolment.apply(anEnrolmentKnownFacts, "some-dprs-id") mustBe GroupEnrolment(
+        providerId = anEnrolmentKnownFacts.providerId,
+        verifierKey = anEnrolmentKnownFacts.verifierKey,
+        verifierValue = anEnrolmentKnownFacts.verifierValue,
+        groupId = anEnrolmentKnownFacts.groupId,
+        identifier = Identifier("some-dprs-id"),
       )
     }
   }

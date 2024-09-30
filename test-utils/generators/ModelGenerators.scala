@@ -31,7 +31,7 @@ trait ModelGenerators {
       fourth <- Gen.numChar.map(_.toString)
       fifth <- Gen.listOfN(2, Gen.alphaUpperChar).map(_.mkString)
     } yield s"$first$second$third$fourth$fifth"
-  
+
   implicit lazy val arbitraryBusinessAddress: Arbitrary[BusinessAddress] =
     Arbitrary {
       for {
