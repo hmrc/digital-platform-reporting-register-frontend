@@ -18,7 +18,6 @@ package controllers.actions
 
 import config.AppConfig
 import controllers.routes
-import models.eacd.requests.GroupEnrolment
 import models.requests.IdentifierRequest
 import models.{Nino, Utr}
 import play.api.mvc.*
@@ -64,12 +63,10 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
         Future.successful(Redirect(routes.CannotUseServiceAssistantController.onPageLoad()))
 
       case Some(Individual) ~ _ ~ Some(internalId) ~ maybeNino ~ _ ~ Some(groupIdentifier) ~ Some(credentials) =>
-        val groupEnrolment = GroupEnrolment(credentials.providerId, groupIdentifier)
-        block(IdentifierRequest(models.User(internalId, Some(groupEnrolment), maybeNino.map(Nino.apply)), request))
+        block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), maybeNino.map(Nino.apply)), request))
 
       case Some(Organisation) ~ _ ~ Some(internalId) ~ _ ~ enrolments ~ Some(groupIdentifier) ~ Some(credentials) =>
-        val groupEnrolment = GroupEnrolment(credentials.providerId, groupIdentifier)
-        block(IdentifierRequest(models.User(internalId, Some(groupEnrolment), getCtUtrEnrolment(enrolments)), request))
+        block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), getCtUtrEnrolment(enrolments)), request))
 
       case _ => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     } recover {

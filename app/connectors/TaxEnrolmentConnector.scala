@@ -30,8 +30,8 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EnrolmentStoreConnector @Inject()(appConfig: AppConfig, httpClient: HttpClientV2)
-                                       (implicit ec: ExecutionContext) {
+class TaxEnrolmentConnector @Inject()(appConfig: AppConfig, httpClient: HttpClientV2)
+                                     (implicit ec: ExecutionContext) {
 
   /**
    * ES8 (admin)

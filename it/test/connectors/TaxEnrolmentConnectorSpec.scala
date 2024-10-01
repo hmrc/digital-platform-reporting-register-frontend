@@ -22,13 +22,13 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 
-class EnrolmentStoreConnectorSpec extends ConnectorSpecBase {
+class TaxEnrolmentConnectorSpec extends ConnectorSpecBase {
 
   private lazy val app: Application = new GuiceApplicationBuilder()
     .configure("microservice.services.tax-enrolments.port" -> wireMockPort)
     .build()
 
-  private lazy val underTest = app.injector.instanceOf[EnrolmentStoreConnector]
+  private lazy val underTest = app.injector.instanceOf[TaxEnrolmentConnector]
 
   ".allocateEnrolmentToGroup" - {
     "must succeed when the server returns CREATED" in {
