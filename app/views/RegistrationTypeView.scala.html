@@ -19,7 +19,8 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    govukWarningText : GovukWarningText
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -39,6 +40,11 @@
                 items  = RegistrationType.options
             )
         )
+
+        @govukWarningText(WarningText(
+            iconFallbackText = Some("Warning"),
+            content = messages("registrationType.warning")
+        ))
 
         @govukButton(
             ButtonViewModel(messages("site.continue"))
