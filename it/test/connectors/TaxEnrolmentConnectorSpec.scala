@@ -18,6 +18,7 @@ package connectors
 
 import base.ConnectorSpecBase
 import builders.GroupEnrolmentBuilder.aGroupEnrolment
+import builders.UpsertKnownFactsBuilder.anUpsertKnownFacts
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -53,6 +54,24 @@ class TaxEnrolmentConnectorSpec extends ConnectorSpecBase {
           .willReturn(serverError()))
 
       underTest.allocateEnrolmentToGroup(aGroupEnrolment).failed.futureValue
+    }
+  }
+
+  ".upsert" - {
+    "must succeed when the server returns NO_CONTENT" in {
+      wireMockServer
+        .stubFor(put(urlMatching(s"/tax-enrolments/enrolments/${anUpsertKnownFacts.enrolmentKey}"))
+          .willReturn(noContent()))
+
+      underTest.upsert(anUpsertKnownFacts).futureValue
+    }
+
+    "must return a failed future when the server returns an error" in {
+      wireMockServer
+        .stubFor(put(urlMatching(s"/tax-enrolments/enrolments/${anUpsertKnownFacts.enrolmentKey}"))
+          .willReturn(badRequest()))
+
+      underTest.upsert(anUpsertKnownFacts).failed.futureValue
     }
   }
 }

@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package builders
+package models.eacd.requests
 
-import models.eacd.EnrolmentKnownFacts
+import base.SpecBase
+import models.eacd.Identifier
 
-object EnrolmentKnownFactsBuilder {
+class EnrolmentRequestSpec extends SpecBase {
 
-  val anEnrolmentKnownFacts: EnrolmentKnownFacts = EnrolmentKnownFacts(
-    providerId = "default-provider-id",
-    verifierKey = "UTR",
-    verifierValue = "1234567890",
-    groupId = "default-group-id"
-  )
+  private val underTest = new EnrolmentRequest {
+    override val identifier: Identifier = Identifier("some-key", "some-value")
+  }
+
+  ".enrolmentKey" - {
+    "must generate correct enrolmentKey when identifier provided" in {
+      underTest.enrolmentKey mustBe "HMRC-DPRS~some-key~some-value"
+    }
+  }
 }

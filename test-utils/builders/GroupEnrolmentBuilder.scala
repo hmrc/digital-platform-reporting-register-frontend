@@ -23,8 +23,6 @@ object GroupEnrolmentBuilder {
 
   val aGroupEnrolment: GroupEnrolment = GroupEnrolment(
     providerId = "default-provider-id",
-    verifierKey = "UTR",
-    verifierValue = "1234567890",
     groupId = "default-group-id",
     identifier = anIdentifier
   )

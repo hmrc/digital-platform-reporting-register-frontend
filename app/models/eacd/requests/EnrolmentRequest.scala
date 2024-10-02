@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package builders
+package models.eacd.requests
 
-import models.eacd.EnrolmentKnownFacts
+import models.eacd.Identifier
+import models.eacd.requests.EnrolmentRequest.serviceName
 
-object EnrolmentKnownFactsBuilder {
+trait EnrolmentRequest {
+  val identifier: Identifier
 
-  val anEnrolmentKnownFacts: EnrolmentKnownFacts = EnrolmentKnownFacts(
-    providerId = "default-provider-id",
-    verifierKey = "UTR",
-    verifierValue = "1234567890",
-    groupId = "default-group-id"
-  )
+  lazy val enrolmentKey: String = s"$serviceName~" + s"${identifier.key}~${identifier.value}"
+}
+
+object EnrolmentRequest {
+
+  private val serviceName: String = "HMRC-DPRS"
 }

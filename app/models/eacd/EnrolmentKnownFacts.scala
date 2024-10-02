@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.eacd.requests
+package models.eacd
 
 import models.{Nino, UserAnswers, Utr}
 import pages.*
@@ -50,5 +50,4 @@ object EnrolmentKnownFacts {
       )
     }
   }
-
 }

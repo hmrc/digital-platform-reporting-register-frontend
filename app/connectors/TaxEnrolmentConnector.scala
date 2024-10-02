@@ -17,9 +17,9 @@
 package connectors
 
 import config.AppConfig
-import models.eacd.requests.GroupEnrolment
+import models.eacd.requests.{GroupEnrolment, UpsertKnownFacts}
 import org.apache.pekko.Done
-import play.api.http.Status.{CONFLICT, CREATED}
+import play.api.http.Status.{CONFLICT, CREATED, NO_CONTENT}
 import play.api.libs.json.Json
 import play.api.libs.ws.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -33,18 +33,19 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaxEnrolmentConnector @Inject()(appConfig: AppConfig, httpClient: HttpClientV2)
                                      (implicit ec: ExecutionContext) {
 
-  /**
-   * ES8 (admin)
-   *
-   * e.g. POST /enrolment-store/groups/83d19215-dddb-43bf-972d-740a11157557/enrolments/HMRC-DPRS~DPRSID~XSP1234567890
-   * {
-   * "userId" : "0000000021313132",
-   * "type":         "principal",
-   * "action" :       "enrolAndActivate"
-   * }
-   * Can return 409 Conflict (if enrolment already exists)
-   */
-  def allocateEnrolmentToGroup(groupEnrolment: GroupEnrolment)(implicit hc: HeaderCarrier): Future[Done] = {
+  def upsert(upsertKnownFacts: UpsertKnownFacts)
+            (implicit hc: HeaderCarrier): Future[Done] =
+    httpClient.put(url"${appConfig.taxEnrolmentsBaseUrl}/tax-enrolments/enrolments/${upsertKnownFacts.enrolmentKey}")
+      .withBody(Json.toJson(upsertKnownFacts))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case NO_CONTENT => Future.successful(Done)
+        }
+      }
+
+  def allocateEnrolmentToGroup(groupEnrolment: GroupEnrolment)
+                              (implicit hc: HeaderCarrier): Future[Done] =
     httpClient.post(url"${appConfig.taxEnrolmentsBaseUrl}/tax-enrolments/groups/${groupEnrolment.groupId}/enrolments/${groupEnrolment.enrolmentKey}")
       .withBody(Json.toJson(groupEnrolment))
       .execute[HttpResponse]
@@ -53,5 +54,4 @@ class TaxEnrolmentConnector @Inject()(appConfig: AppConfig, httpClient: HttpClie
           case CREATED | CONFLICT => Future.successful(Done)
         }
       }
-  }
 }

@@ -18,31 +18,28 @@ package models.eacd.requests
 
 import base.SpecBase
 import builders.EnrolmentDetailsBuilder.anEnrolmentDetails
-import builders.GroupEnrolmentBuilder.aGroupEnrolment
-import org.scalatest.TryValues
+import builders.UpsertKnownFactsBuilder.anUpsertKnownFacts
 import play.api.libs.json.Json
 
-class GroupEnrolmentSpec extends SpecBase with TryValues {
+class UpsertKnownFactsSpec extends SpecBase {
 
-  "a GroupEnrolment" - {
+  "a UpsertKnownFacts" - {
     "must write correct json" in {
-      val groupEnrolment = aGroupEnrolment.copy(providerId = "some-internal-id")
-      val json = Json.toJson(groupEnrolment)
-
-      json mustBe Json.obj(
-        "userId" -> "some-internal-id",
-        "type" -> "principal",
-        "action" -> "enrolAndActivate"
+      Json.toJson(anUpsertKnownFacts) mustBe Json.obj(
+        "verifiers" -> Json.arr(Json.obj(
+          "key" -> anUpsertKnownFacts.verifierKey,
+          "value" -> anUpsertKnownFacts.verifierValue
+        ))
       )
     }
   }
 
   ".apply(enrolmentDetails: EnrolmentDetails)" - {
-    "must create GroupEnrolment from EnrolmentDetails" in {
-      GroupEnrolment.apply(anEnrolmentDetails) mustBe GroupEnrolment(
-        providerId = anEnrolmentDetails.providerId,
-        groupId = anEnrolmentDetails.groupId,
-        identifier = anEnrolmentDetails.identifier,
+    "must create UpsertKnownFacts object from enrolment details" in {
+      UpsertKnownFacts.apply(anEnrolmentDetails) mustBe UpsertKnownFacts(
+        verifierKey = anEnrolmentDetails.verifierKey,
+        verifierValue = anEnrolmentDetails.verifierValue,
+        identifier = anEnrolmentDetails.identifier
       )
     }
   }
