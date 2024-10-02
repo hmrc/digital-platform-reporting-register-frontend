@@ -25,10 +25,10 @@ import builders.SubscribedResponseBuilder.aSubscribedResponse
 import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
 import builders.UkAddressBuilder.aUkAddress
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
-import connectors.{RegistrationConnector, SubscriptionConnector, TaxEnrolmentConnector}
+import connectors.{RegistrationConnector, SubscriptionConnector}
 import models.BusinessType.*
 import models.audit.{AuditEventModel, FailureResponseData}
-import models.eacd.requests.{EnrolmentKnownFacts, GroupEnrolment}
+import models.eacd.{EnrolmentDetails, EnrolmentKnownFacts}
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.Address
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
@@ -51,7 +51,7 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.AuditService
+import services.{AuditService, EnrolmentService}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import views.html.{CheckYourAnswersIndividualView, CheckYourAnswersOrganisationView}
 
@@ -67,7 +67,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
 
   private val mockRegistrationConnector = mock[RegistrationConnector]
   private val mockSubscriptionConnector = mock[SubscriptionConnector]
-  private val mockTaxEnrolmentConnector = mock[TaxEnrolmentConnector]
+  private val mockEnrolmentService = mock[EnrolmentService]
   private val mockAuditService = mock[AuditService]
   private val mockSessionRepository = mock[SessionRepository]
 
@@ -75,7 +75,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
     Mockito.reset(
       mockRegistrationConnector,
       mockSubscriptionConnector,
-      mockTaxEnrolmentConnector,
+      mockEnrolmentService,
       mockAuditService,
       mockSessionRepository
     )
@@ -224,14 +224,14 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
           val expectedFinalAnswers = answers.copy(data = Json.obj(), subscriptionDetails = Some(subscriptionDetails))
 
           when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionDetails.subscriptionResponse))
-          when(mockTaxEnrolmentConnector.allocateEnrolmentToGroup(any())(any())).thenReturn(Future.successful(Done))
+          when(mockEnrolmentService.enrol(any())(any())).thenReturn(Future.successful(Done))
           when(mockAuditService.sendAudit(any())(any())).thenReturn(Future.successful(AuditResult.Success))
           when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
           val application = applicationBuilder(userAnswers = Some(answers)).overrides(
             bind[RegistrationConnector].toInstance(mockRegistrationConnector),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-            bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+            bind[EnrolmentService].toInstance(mockEnrolmentService),
             bind[AuditService].toInstance(mockAuditService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           ).build()
@@ -244,9 +244,44 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
             redirectLocation(result).value mustEqual CheckYourAnswersPage.nextPage(NormalMode, expectedFinalAnswers).url
             verify(mockRegistrationConnector, never()).register(any())(any())
             verify(mockSubscriptionConnector, times(1)).subscribe(eqTo(expectedSubscriptionRequest))(any())
-            verify(mockTaxEnrolmentConnector, times(1)).allocateEnrolmentToGroup(eqTo(GroupEnrolment(EnrolmentKnownFacts(answers).get, aSubscribedResponse.dprsId)))(any())
+            verify(mockEnrolmentService, times(1)).enrol(eqTo(EnrolmentDetails(EnrolmentKnownFacts(answers).get, aSubscribedResponse.dprsId)))(any())
             verify(mockAuditService, times(1)).sendAudit(eqTo(AuditEventModel(false, answers.data, aSubscribedResponse)))(any())
             verify(mockSessionRepository, times(1)).set(eqTo(expectedFinalAnswers))
+          }
+        }
+
+        "must return a failed future when enrolment fails" in {
+          val registrationResponse = MatchResponseWithId("safeId", anyAddress, None)
+          val answers = anEmptyAnswer
+            .copy(registrationResponse = Some(registrationResponse))
+            .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
+            .set(BusinessTypePage, BusinessType.SoleTrader).success.value
+            .set(RegisteredInUkPage, true).success.value
+            .set(IndividualEmailAddressPage, "email").success.value
+            .set(CanPhoneIndividualPage, false).success.value
+            .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
+            .set(UkAddressPage, aUkAddress).success.value
+
+          val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "email", None)
+          val expectedSubscriptionRequest = SubscriptionRequest("safeId", true, None, expectedContact, None)
+          val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, businessType = Some(BusinessType.SoleTrader))
+
+          when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionDetails.subscriptionResponse))
+          when(mockEnrolmentService.enrol(any())(any())).thenReturn(Future.failed(new RuntimeException("any-error")))
+          when(mockAuditService.sendAudit(any())(any())).thenReturn(Future.successful(AuditResult.Success))
+          when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+          val application = applicationBuilder(userAnswers = Some(answers)).overrides(
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[EnrolmentService].toInstance(mockEnrolmentService),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          ).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+            route(application, request).value.failed.futureValue
           }
         }
 
@@ -264,7 +299,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
           val application = applicationBuilder(userAnswers = Some(answers)).overrides(
             bind[RegistrationConnector].toInstance(mockRegistrationConnector),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-            bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+            bind[EnrolmentService].toInstance(mockEnrolmentService),
             bind[AuditService].toInstance(mockAuditService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           ).build()
@@ -277,7 +312,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
             verify(mockRegistrationConnector, never()).register(any())(any())
             verify(mockSubscriptionConnector, never).subscribe(any())(any())
-            verify(mockTaxEnrolmentConnector, never).allocateEnrolmentToGroup(any())(any())
+            verify(mockEnrolmentService, never).enrol(any())(any())
             verify(mockAuditService, never).sendAudit(any())(any())
             verify(mockSessionRepository, never).set(any())
           }
@@ -291,7 +326,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
           val application = applicationBuilder(userAnswers = Some(answers)).overrides(
             bind[RegistrationConnector].toInstance(mockRegistrationConnector),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-            bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+            bind[EnrolmentService].toInstance(mockEnrolmentService),
             bind[AuditService].toInstance(mockAuditService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           ).build()
@@ -304,7 +339,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
             redirectLocation(result).value mustEqual CheckYourAnswersPage.nextPage(NormalMode, answers).url
             verify(mockRegistrationConnector, never()).register(any())(any())
             verify(mockSubscriptionConnector, never()).subscribe(any())(any())
-            verify(mockTaxEnrolmentConnector, never()).allocateEnrolmentToGroup(any())(any())
+            verify(mockEnrolmentService, never()).enrol(any())(any())
             verify(mockAuditService, never()).sendAudit(any())(any())
             verify(mockSessionRepository, never()).set(any())
           }
@@ -318,7 +353,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
           val application = applicationBuilder(userAnswers = Some(answers)).overrides(
             bind[RegistrationConnector].toInstance(mockRegistrationConnector),
             bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-            bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+            bind[EnrolmentService].toInstance(mockEnrolmentService),
             bind[AuditService].toInstance(mockAuditService),
             bind[SessionRepository].toInstance(mockSessionRepository)
           ).build()
@@ -329,7 +364,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
 
             verify(mockRegistrationConnector, never()).register(any())(any())
             verify(mockSubscriptionConnector, never()).subscribe(any())(any())
-            verify(mockTaxEnrolmentConnector, never()).allocateEnrolmentToGroup(any())(any())
+            verify(mockEnrolmentService, never()).enrol(any())(any())
             verify(mockAuditService, never()).sendAudit(any())(any())
             verify(mockSessionRepository, never()).set(any())
           }
@@ -367,14 +402,14 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
 
               when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
               when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionDetails.subscriptionResponse))
-              when(mockTaxEnrolmentConnector.allocateEnrolmentToGroup(any())(any())).thenReturn(Future.successful(Done))
+              when(mockEnrolmentService.enrol(any())(any())).thenReturn(Future.successful(Done))
               when(mockAuditService.sendAudit(any())(any())).thenReturn(Future.successful(AuditResult.Success))
               when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
               val application = applicationBuilder(userAnswers = Some(answers)).overrides(
                 bind[RegistrationConnector].toInstance(mockRegistrationConnector),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-                bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+                bind[EnrolmentService].toInstance(mockEnrolmentService),
                 bind[AuditService].toInstance(mockAuditService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
               ).build()
@@ -387,7 +422,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
                 redirectLocation(result).value mustEqual CheckYourAnswersPage.nextPage(NormalMode, expectedFinalAnswers).url
                 verify(mockRegistrationConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
                 verify(mockSubscriptionConnector, times(1)).subscribe(eqTo(expectedSubscriptionRequest))(any())
-                verify(mockTaxEnrolmentConnector, times(1)).allocateEnrolmentToGroup(eqTo(GroupEnrolment(EnrolmentKnownFacts(answers).get, aSubscribedResponse.dprsId)))(any())
+                verify(mockEnrolmentService, times(1)).enrol(eqTo(EnrolmentDetails(EnrolmentKnownFacts(answers).get, aSubscribedResponse.dprsId)))(any())
                 val answersWithRegistrationResponse = answers.copy(registrationResponse = Some(registrationResponse))
                 verify(mockAuditService, times(1)).sendAudit(eqTo(AuditEventModel.apply(true, answersWithRegistrationResponse.data, aSubscribedResponse)))(any())
                 verify(mockSessionRepository, times(1)).set(eqTo(expectedFinalAnswers))
@@ -415,7 +450,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
             val application = applicationBuilder(userAnswers = Some(answers)).overrides(
               bind[RegistrationConnector].toInstance(mockRegistrationConnector),
               bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-              bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+              bind[EnrolmentService].toInstance(mockEnrolmentService),
               bind[AuditService].toInstance(mockAuditService),
               bind[SessionRepository].toInstance(mockSessionRepository)
             ).build()
@@ -428,7 +463,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               redirectLocation(result).value mustEqual CheckYourAnswersPage.nextPage(NormalMode, expectedFinalAnswers).url
               verify(mockRegistrationConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
               verify(mockSubscriptionConnector, never()).subscribe(any())(any())
-              verify(mockTaxEnrolmentConnector, never()).allocateEnrolmentToGroup(any())(any())
+              verify(mockEnrolmentService, never()).enrol(any())(any())
               verify(mockAuditService, never()).sendAudit(any())(any())
               verify(mockSessionRepository, never()).set(any())
             }
@@ -461,14 +496,14 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
 
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
             when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionDetails.subscriptionResponse))
-            when(mockTaxEnrolmentConnector.allocateEnrolmentToGroup(any())(any())).thenReturn(Future.successful(Done))
+            when(mockEnrolmentService.enrol(any())(any())).thenReturn(Future.successful(Done))
             when(mockAuditService.sendAudit(any())(any())).thenReturn(Future.successful(AuditResult.Success))
             when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
             val application = applicationBuilder(userAnswers = Some(answers)).overrides(
               bind[RegistrationConnector].toInstance(mockRegistrationConnector),
               bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-              bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+              bind[EnrolmentService].toInstance(mockEnrolmentService),
               bind[AuditService].toInstance(mockAuditService),
               bind[SessionRepository].toInstance(mockSessionRepository)
             ).build()
@@ -481,7 +516,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               redirectLocation(result).value mustEqual CheckYourAnswersPage.nextPage(NormalMode, expectedFinalAnswers).url
               verify(mockRegistrationConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
               verify(mockSubscriptionConnector, times(1)).subscribe(eqTo(expectedSubscriptionRequest))(any())
-              verify(mockTaxEnrolmentConnector, never()).allocateEnrolmentToGroup(any())(any())
+              verify(mockEnrolmentService, never()).enrol(any())(any())
               val answersWithRegistrationResponse = answers.copy(registrationResponse = Some(registrationResponse))
               verify(mockAuditService, times(1)).sendAudit(AuditEventModel("Subscription", answersWithRegistrationResponse.data, FailureResponseData(422, any(), "Duplicate submission")))(any())
             }
@@ -506,7 +541,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
             val application = applicationBuilder(userAnswers = Some(answers)).overrides(
               bind[RegistrationConnector].toInstance(mockRegistrationConnector),
               bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-              bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+              bind[EnrolmentService].toInstance(mockEnrolmentService),
               bind[AuditService].toInstance(mockAuditService),
               bind[SessionRepository].toInstance(mockSessionRepository)
             ).build()
@@ -517,7 +552,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
 
               verify(mockRegistrationConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
               verify(mockSubscriptionConnector, never()).subscribe(any())(any())
-              verify(mockTaxEnrolmentConnector, never()).allocateEnrolmentToGroup(any())(any())
+              verify(mockEnrolmentService, never()).enrol(any())(any())
               verify(mockAuditService, never()).sendAudit(any())(any())
               verify(mockSessionRepository, never()).set(any())
             }
@@ -553,14 +588,14 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
 
               when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
               when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscriptionDetails.subscriptionResponse))
-              when(mockTaxEnrolmentConnector.allocateEnrolmentToGroup(any())(any())).thenReturn(Future.successful(Done))
+              when(mockEnrolmentService.enrol(any())(any())).thenReturn(Future.successful(Done))
               when(mockAuditService.sendAudit(any())(any())).thenReturn(Future.successful(AuditResult.Success))
               when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
               val application = applicationBuilder(userAnswers = Some(answers)).overrides(
                 bind[RegistrationConnector].toInstance(mockRegistrationConnector),
                 bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-                bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+                bind[EnrolmentService].toInstance(mockEnrolmentService),
                 bind[AuditService].toInstance(mockAuditService),
                 bind[SessionRepository].toInstance(mockSessionRepository)
               ).build()
@@ -573,7 +608,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
                 redirectLocation(result).value mustEqual CheckYourAnswersPage.nextPage(NormalMode, expectedFinalAnswers).url
                 verify(mockRegistrationConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
                 verify(mockSubscriptionConnector, times(1)).subscribe(eqTo(expectedSubscriptionRequest))(any())
-                verify(mockTaxEnrolmentConnector, times(1)).allocateEnrolmentToGroup(eqTo(GroupEnrolment(EnrolmentKnownFacts(answers).get, aSubscribedResponse.dprsId)))(any())
+                verify(mockEnrolmentService, times(1)).enrol(eqTo(EnrolmentDetails(EnrolmentKnownFacts(answers).get, aSubscribedResponse.dprsId)))(any())
                 val answersWithRegistrationResponse = answers.copy(registrationResponse = Some(registrationResponse))
                 verify(mockAuditService, times(1)).sendAudit(eqTo(AuditEventModel.apply(true, answersWithRegistrationResponse.data, aSubscribedResponse)))(any())
                 verify(mockSessionRepository, times(1)).set(eqTo(expectedFinalAnswers))
@@ -601,7 +636,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
             val application = applicationBuilder(userAnswers = Some(answers)).overrides(
               bind[RegistrationConnector].toInstance(mockRegistrationConnector),
               bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-              bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+              bind[EnrolmentService].toInstance(mockEnrolmentService),
               bind[AuditService].toInstance(mockAuditService),
               bind[SessionRepository].toInstance(mockSessionRepository)
             ).build()
@@ -614,7 +649,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               redirectLocation(result).value mustEqual CheckYourAnswersPage.nextPage(NormalMode, expectedFinalAnswers).url
               verify(mockRegistrationConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
               verify(mockSubscriptionConnector, never()).subscribe(any())(any())
-              verify(mockTaxEnrolmentConnector, never()).allocateEnrolmentToGroup(any())(any())
+              verify(mockEnrolmentService, never()).enrol(any())(any())
               verify(mockAuditService, never()).sendAudit(any())(any())
               verify(mockSessionRepository, never()).set(any())
             }
@@ -648,14 +683,14 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
 
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
             when(mockSubscriptionConnector.subscribe(any())(any())).thenReturn(Future.successful(subscribedResponse))
-            when(mockTaxEnrolmentConnector.allocateEnrolmentToGroup(any())(any())).thenReturn(Future.successful(Done))
+            when(mockEnrolmentService.enrol(any())(any())).thenReturn(Future.successful(Done))
             when(mockAuditService.sendAudit(any())(any())).thenReturn(Future.successful(AuditResult.Success))
             when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
             val application = applicationBuilder(userAnswers = Some(answers)).overrides(
               bind[RegistrationConnector].toInstance(mockRegistrationConnector),
               bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-              bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+              bind[EnrolmentService].toInstance(mockEnrolmentService),
               bind[AuditService].toInstance(mockAuditService),
               bind[SessionRepository].toInstance(mockSessionRepository)
             ).build()
@@ -668,7 +703,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               redirectLocation(result).value mustEqual CheckYourAnswersPage.nextPage(NormalMode, expectedFinalAnswers).url
               verify(mockRegistrationConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
               verify(mockSubscriptionConnector, times(1)).subscribe(eqTo(expectedSubscriptionRequest))(any())
-              verify(mockTaxEnrolmentConnector, never()).allocateEnrolmentToGroup(any())(any())
+              verify(mockEnrolmentService, never()).enrol(any())(any())
               val answersWithRegistrationResponse = answers.copy(registrationResponse = Some(registrationResponse))
               verify(mockAuditService, times(1)).sendAudit(AuditEventModel("Subscription", answersWithRegistrationResponse.data, FailureResponseData(422, any(), "Duplicate submission")))(any())
             }
@@ -693,7 +728,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
             val application = applicationBuilder(userAnswers = Some(answers)).overrides(
               bind[RegistrationConnector].toInstance(mockRegistrationConnector),
               bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-              bind[TaxEnrolmentConnector].toInstance(mockTaxEnrolmentConnector),
+              bind[EnrolmentService].toInstance(mockEnrolmentService),
               bind[AuditService].toInstance(mockAuditService),
               bind[SessionRepository].toInstance(mockSessionRepository)
             ).build()
@@ -704,7 +739,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
 
               verify(mockRegistrationConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
               verify(mockSubscriptionConnector, never()).subscribe(any())(any())
-              verify(mockTaxEnrolmentConnector, never()).allocateEnrolmentToGroup(any())(any())
+              verify(mockEnrolmentService, never()).enrol(any())(any())
               verify(mockAuditService, never()).sendAudit(any())(any())
               verify(mockSessionRepository, never()).set(any())
             }

@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package builders
+package models.eacd
 
-import models.eacd.EnrolmentKnownFacts
+import base.SpecBase
+import builders.EnrolmentKnownFactsBuilder.anEnrolmentKnownFacts
 
-object EnrolmentKnownFactsBuilder {
+class EnrolmentDetailsSpec extends SpecBase {
 
-  val anEnrolmentKnownFacts: EnrolmentKnownFacts = EnrolmentKnownFacts(
-    providerId = "default-provider-id",
-    verifierKey = "UTR",
-    verifierValue = "1234567890",
-    groupId = "default-group-id"
-  )
+  ".apply(...)" - {
+    "must create correct object" in {
+      EnrolmentDetails.apply(anEnrolmentKnownFacts, "some-dprs-id") mustBe EnrolmentDetails(
+        providerId = anEnrolmentKnownFacts.providerId,
+        verifierKey = anEnrolmentKnownFacts.verifierKey,
+        verifierValue = anEnrolmentKnownFacts.verifierValue,
+        groupId = anEnrolmentKnownFacts.groupId,
+        identifier = Identifier("some-dprs-id")
+      )
+    }
+  }
 }

@@ -16,14 +16,14 @@
 
 package builders
 
-import models.eacd.EnrolmentKnownFacts
+import builders.IdentifierBuilder.anIdentifier
+import models.eacd.requests.UpsertKnownFacts
 
-object EnrolmentKnownFactsBuilder {
+object UpsertKnownFactsBuilder {
 
-  val anEnrolmentKnownFacts: EnrolmentKnownFacts = EnrolmentKnownFacts(
-    providerId = "default-provider-id",
-    verifierKey = "UTR",
-    verifierValue = "1234567890",
-    groupId = "default-group-id"
+  val anUpsertKnownFacts: UpsertKnownFacts = UpsertKnownFacts(
+    verifierKey = "default-verifier-key",
+    verifierValue = "default-verifier-value",
+    identifier = anIdentifier,
   )
 }

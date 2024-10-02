@@ -22,6 +22,7 @@ import builders.InternationalAddressBuilder.anInternationalAddress
 import builders.UkAddressBuilder.aUkAddress
 import builders.UserAnswersBuilder.aUserAnswers
 import builders.UserBuilder.aUser
+import models.eacd.EnrolmentKnownFacts
 import models.{Nino, Utr}
 import org.scalatest.TryValues
 import pages.*

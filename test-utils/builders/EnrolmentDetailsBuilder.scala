@@ -16,14 +16,16 @@
 
 package builders
 
-import models.eacd.EnrolmentKnownFacts
+import builders.IdentifierBuilder.anIdentifier
+import models.eacd.EnrolmentDetails
 
-object EnrolmentKnownFactsBuilder {
+object EnrolmentDetailsBuilder {
 
-  val anEnrolmentKnownFacts: EnrolmentKnownFacts = EnrolmentKnownFacts(
+  val anEnrolmentDetails: EnrolmentDetails = EnrolmentDetails(
     providerId = "default-provider-id",
-    verifierKey = "UTR",
-    verifierValue = "1234567890",
-    groupId = "default-group-id"
+    verifierKey = "default-verifier-key",
+    verifierValue = "default-verifier-value",
+    groupId = "default-group-id",
+    identifier = anIdentifier
   )
 }

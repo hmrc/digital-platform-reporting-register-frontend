@@ -18,11 +18,11 @@ package controllers
 
 import com.google.inject.Inject
 import connectors.SubscriptionConnector.SubscribeFailure
-import connectors.{RegistrationConnector, SubscriptionConnector, TaxEnrolmentConnector}
+import connectors.{RegistrationConnector, SubscriptionConnector}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierActionProvider}
 import models.BusinessType.*
 import models.audit.AuditEventModel
-import models.eacd.requests.{EnrolmentKnownFacts, GroupEnrolment}
+import models.eacd.{EnrolmentDetails, EnrolmentKnownFacts}
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
 import models.registration.responses as registrationResponses
@@ -36,7 +36,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import repositories.SessionRepository
-import services.AuditService
+import services.{AuditService, EnrolmentService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.{CheckYourAnswersIndividualView, CheckYourAnswersOrganisationView}
 
@@ -49,7 +49,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
                                            organisationView: CheckYourAnswersOrganisationView,
                                            registrationConnector: RegistrationConnector,
                                            subscriptionConnector: SubscriptionConnector,
-                                           taxEnrolmentConnector: TaxEnrolmentConnector,
+                                           enrolmentService: EnrolmentService,
                                            auditService: AuditService,
                                            sessionRepository: SessionRepository)
                                           (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
@@ -84,12 +84,14 @@ class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
               )
               subscriptionDetails.subscriptionResponse match {
                 case subscribedResponse: SubscribedResponse =>
-                  taxEnrolmentConnector.allocateEnrolmentToGroup(GroupEnrolment(enrolmentKnownFacts, subscribedResponse.dprsId))
-                case _ =>
-              }
-
-              sessionRepository.set(answersWithSubscription).map { _ =>
-                Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithSubscription))
+                  enrolmentService.enrol(EnrolmentDetails(enrolmentKnownFacts, subscribedResponse.dprsId)).flatMap { _ =>
+                    sessionRepository.set(answersWithSubscription).map { _ =>
+                      Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithSubscription))
+                    }
+                  }
+                case _ => sessionRepository.set(answersWithSubscription).map { _ =>
+                  Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithSubscription))
+                }
               }
             }
         }

@@ -19,22 +19,22 @@ package models.eacd.requests
 import models.eacd.{EnrolmentDetails, Identifier}
 import play.api.libs.json.{Json, Writes}
 
-case class GroupEnrolment(providerId: String,
-                          groupId: String,
-                          identifier: Identifier) extends EnrolmentRequest {
-}
+case class UpsertKnownFacts(verifierKey: String,
+                            verifierValue: String,
+                            identifier: Identifier) extends EnrolmentRequest
 
-object GroupEnrolment {
+object UpsertKnownFacts {
 
-  implicit val writes: Writes[GroupEnrolment] = (o: GroupEnrolment) => Json.obj(
-    "userId" -> o.providerId,
-    "type" -> "principal",
-    "action" -> "enrolAndActivate"
+  implicit val writes: Writes[UpsertKnownFacts] = (o: UpsertKnownFacts) => Json.obj(
+    "verifiers" -> Json.arr(Json.obj(
+      "key" -> o.verifierKey,
+      "value" -> o.verifierValue
+    ))
   )
 
-  def apply(enrolmentDetails: EnrolmentDetails): GroupEnrolment = GroupEnrolment(
-    providerId = enrolmentDetails.providerId,
-    groupId = enrolmentDetails.groupId,
+  def apply(enrolmentDetails: EnrolmentDetails): UpsertKnownFacts = UpsertKnownFacts(
+    verifierKey = enrolmentDetails.verifierKey,
+    verifierValue = enrolmentDetails.verifierValue,
     identifier = enrolmentDetails.identifier,
   )
 }
