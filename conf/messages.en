@@ -79,10 +79,11 @@ registrationType.heading = What are you registering for this service as?
 registrationType.platformOperator = An operator of a digital platform
 registrationType.platformOperator.hint = You manage or work within a website or app that allows sellers to connect to customers for the sale of goods and services.
 registrationType.thirdParty = A third party reporting on behalf of a digital platform
-registrationType.thirdParty.hint = You could be an agent, accountant, solicitor, or other third party reporting for a Digital Platform Operator.
+registrationType.thirdParty.hint = You could be an agent, accountant, solicitor, or other third party reporting for a digital platform operator.
 registrationType.checkYourAnswersLabel = What are you registering for this service as?
 registrationType.error.required = Select if you are a Digital Platform Operator or a third party
 registrationType.change.hidden = what you are registering for this service as
+registrationType.warning = If you are a third party, you must not sign in with your agent services account or the credentials of the digital platform you are reporting for. Sign in with the individual or organisation credentials of your own business.
 
 businessType.title.platformOperator = What type of business are you?
 businessType.heading.platformOperator = What type of business are you?
