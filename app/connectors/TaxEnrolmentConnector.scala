@@ -22,6 +22,7 @@ import org.apache.pekko.Done
 import play.api.http.Status.{CONFLICT, CREATED, NO_CONTENT}
 import play.api.libs.json.Json
 import play.api.libs.ws.writeableOf_JsValue
+import services.UuidService
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
@@ -30,12 +31,17 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TaxEnrolmentConnector @Inject()(appConfig: AppConfig, httpClient: HttpClientV2)
+class TaxEnrolmentConnector @Inject()(appConfig: AppConfig,
+                                      httpClient: HttpClientV2,
+                                      uuidService: UuidService)
                                      (implicit ec: ExecutionContext) {
 
   def upsert(upsertKnownFacts: UpsertKnownFacts)
             (implicit hc: HeaderCarrier): Future[Done] =
     httpClient.put(url"${appConfig.taxEnrolmentsBaseUrl}/tax-enrolments/enrolments/${upsertKnownFacts.enrolmentKey}")
+      .setHeader("X-Correlation-ID" -> uuidService.generate())
+      .setHeader("X-Conversation-ID" -> uuidService.generate())
+      .setHeader("X-Forwarded-Host" -> appConfig.appName)
       .withBody(Json.toJson(upsertKnownFacts))
       .execute[HttpResponse]
       .flatMap { response =>
@@ -47,6 +53,9 @@ class TaxEnrolmentConnector @Inject()(appConfig: AppConfig, httpClient: HttpClie
   def allocateEnrolmentToGroup(groupEnrolment: GroupEnrolment)
                               (implicit hc: HeaderCarrier): Future[Done] =
     httpClient.post(url"${appConfig.taxEnrolmentsBaseUrl}/tax-enrolments/groups/${groupEnrolment.groupId}/enrolments/${groupEnrolment.enrolmentKey}")
+      .setHeader("X-Correlation-ID" -> uuidService.generate())
+      .setHeader("X-Conversation-ID" -> uuidService.generate())
+      .setHeader("X-Forwarded-Host" -> appConfig.appName)
       .withBody(Json.toJson(groupEnrolment))
       .execute[HttpResponse]
       .flatMap { response =>
