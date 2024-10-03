@@ -19,6 +19,7 @@ package controllers
 import connectors.RegistrationConnector
 import controllers.actions.*
 import forms.BusinessNameFormProvider
+import models.pageviews.BusinessNameViewModel
 import models.registration.requests.OrganisationWithUtr
 import models.registration.responses.RegistrationResponse
 import models.{Mode, UserAnswers}
@@ -43,17 +44,12 @@ class BusinessNameController @Inject()(sessionRepository: SessionRepository,
   extends FrontendController(mcc) with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
-    val preparedForm = request.userAnswers.get(BusinessNamePage) match {
-      case None => formProvider()
-      case Some(value) => formProvider().fill(value)
-    }
-
-    Ok(view(preparedForm, mode))
+    Ok(view(BusinessNameViewModel(mode, request.userAnswers, formProvider())))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData andThen requireData).async { implicit request =>
     formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+      formWithErrors => Future.successful(BadRequest(view(BusinessNameViewModel(mode, request.userAnswers, formWithErrors)))),
       value =>
         for {
           updatedAnswers <- Future.fromTry(request.userAnswers.set(BusinessNamePage, value))
