@@ -63,7 +63,7 @@ cannotUseServiceAgent.p2.link1.text = sign in with your own or your organisation
 cannotUseServiceAgent.p2.link1.href = https://www.tax.service.gov.uk/account
 cannotUseServiceAgent.p2.2 = You can also
 cannotUseServiceAgent.p2.link2.text = create new sign in details
-cannotUseServiceAgent.p2.link2.href = https://www.access.service.gov.uk/login/create-account
+cannotUseServiceAgent.p2.link2.href = https://www.gov.uk/log-in-register-hmrc-online-services/register
 
 cannotUseServiceAssistant.title = You are unable to use this service
 cannotUseServiceAssistant.heading = You are unable to use this service
@@ -515,4 +515,12 @@ registrationConfirmation.privateBeta.link.text = manage your digital platform re
 
 individualIdentityNotConfirmed.title = We could not confirm your identity
 individualIdentityNotConfirmed.heading = We could not confirm your identity
-individualIdentityNotConfirmed.p1 = The information you have entered does not match our records.
+individualIdentityNotConfirmed.p1 = The information you have entered does not match our records. Check if you have entered the right details.
+individualIdentityNotConfirmed.h2.1 = Try entering your NINO again
+individualIdentityNotConfirmed.p2 = If entering your NINO again does not work, you can
+individualIdentityNotConfirmed.p2.link.text = find your NINO
+individualIdentityNotConfirmed.h2.2 = Try entering your name again
+individualIdentityNotConfirmed.p3 = Check if you have entered your first name and last name correctly.
+individualIdentityNotConfirmed.h2.3 = Contact HMRC to help us find you
+individualIdentityNotConfirmed.p4 = If you have checked and entered your NINO and name again and we still cannot find your business, you can
+individualIdentityNotConfirmed.p4.link.text = contact HMRC
