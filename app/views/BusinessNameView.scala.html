@@ -15,7 +15,9 @@
  *@
 
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+@import models.pageviews.BusinessNameViewModel
 @import viewmodels.InputWidth._
+@import models.BusinessType.*
 
 @this(
     layout: templates.Layout,
@@ -26,33 +28,35 @@
     newTabLink: HmrcNewTabLinkHelper
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(viewModel: BusinessNameViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("businessName.title"))) {
+@layout(pageTitle = title(viewModel.form, messages(s"businessName.${viewModel.businessType}.title"))) {
 
-    @formHelper(action = routes.BusinessNameController.onSubmit(mode)) {
+    @formHelper(action = routes.BusinessNameController.onSubmit(viewModel.mode)) {
 
-        @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form))
+        @if(viewModel.form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(viewModel.form))
         }
 
-        <h1 class="govuk-heading-xl">@messages("businessName.heading")</h1>
+        <h1 class="govuk-heading-xl">@messages(s"businessName.${viewModel.businessType}.heading")</h1>
 
         <p class="govuk-body">
-            @messages("businessName.p1")
-            @newTabLink(NewTabLinkHelper(
-                text = messages("businessName.p1.link.text"),
-                href = Some(messages("businessName.p1.link.href"))
-            )).
+            @Messages(s"businessName.${viewModel.businessType}.p1")
+            @if(viewModel.businessType.equals(LimitedCompany)) {
+                @newTabLink(NewTabLinkHelper(
+                    text = messages(s"businessName.${viewModel.businessType}.p1.link.text"),
+                    href = Some(messages(s"businessName.${viewModel.businessType}.p1.link.href"))
+                ))
+            }
         </p>
 
         @govukInput(
             InputViewModel(
-                field = form("value"),
-                label = LabelViewModel(messages("businessName.heading")).withCssClass("govuk-visually-hidden")
+                field = viewModel.form("value"),
+                label = LabelViewModel(messages(s"businessName.${viewModel.businessType}.title")).withCssClass("govuk-visually-hidden")
             )
             .withWidth(Fixed20)
-            .withHint(HintViewModel(messages("businessName.hint")))
+            .withHint(HintViewModel(messages(if(viewModel.showLimitedCompanyHint) s"businessName.${LimitedCompany}.hint" else "")))
         )
 
         @govukButton(
