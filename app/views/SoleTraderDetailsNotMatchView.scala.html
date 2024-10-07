@@ -14,7 +14,11 @@
  * limitations under the License.
  *@
 
-@this(layout: templates.Layout)
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+
+@this(layout: templates.Layout,
+    newTabLink: HmrcNewTabLinkHelper
+    )
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("soleTraderDetailsNotMatch.title"))) {
@@ -27,7 +31,10 @@
 
     <p class="govuk-body">
         @messages("soleTraderDetailsNotMatch.p3")
-        <a class="govuk-link" href="https://www.gov.uk/find-utr-number">@messages("soleTraderDetailsNotMatch.p3.link.text")</a>
+        @newTabLink(NewTabLinkHelper(
+            text = messages("soleTraderDetailsNotMatch.p3.link.text"),
+            href = Some("https://www.gov.uk/find-utr-number")
+        )).
     </p>
 
     <h2 class="govuk-heading-m">@messages("soleTraderDetailsNotMatch.p4")</h2>
@@ -38,7 +45,9 @@
 
     <p class="govuk-body">
         @messages("soleTraderDetailsNotMatch.p7.1")
-        <a class="govuk-link" href= "TODO: add correct link when confirmed">[support].enquiries&commat;hmrc.gov.uk</a>
-        @messages("soleTraderDetailsNotMatch.p7.2")
+        @newTabLink(NewTabLinkHelper(
+            text = messages("soleTraderDetailsNotMatch.p7.2"),
+            href = Some("https://www.gov.uk/government/organisations/hm-revenue-customs/contact/income-tax-enquiries-for-individuals-pensioners-and-employees")
+        )).
     </p>
 }

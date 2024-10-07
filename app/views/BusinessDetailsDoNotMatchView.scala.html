@@ -33,7 +33,10 @@
 
     <p class="govuk-body">
         @messages("businessDetailsDoNotMatch.p2")
-        <a class="govuk-link" href="https://www.gov.uk/find-utr-number">@messages("businessDetailsDoNotMatch.p2.link.text")</a>
+        @newTabLink(NewTabLinkHelper(
+            text = messages("businessDetailsDoNotMatch.p2.link.text"),
+            href = Some("https://www.gov.uk/find-utr-number")
+        )).
     </p>
 
     <h2 class="govuk-heading-m">@messages("businessDetailsDoNotMatch.h2.2")</h2>
@@ -51,14 +54,16 @@
         @newTabLink(NewTabLinkHelper(
             text = messages("businessDetailsDoNotMatch.p5.link.text"),
             href = Some("https://find-and-update.company-information.service.gov.uk/")
-        ))
+        )).
     </p>
 
     <h2 class="govuk-heading-m">@messages("businessDetailsDoNotMatch.h2.3")</h2>
 
     <p class="govuk-body">
         @messages("businessDetailsDoNotMatch.p6.1")
-        <a class="govuk-link" href= "TODO: add correct link when confirmed">[support].enquiries&commat;hmrc.gov.uk</a>
-        @messages("businessDetailsDoNotMatch.p6.2")
+        @newTabLink(NewTabLinkHelper(
+            text = messages("businessDetailsDoNotMatch.p6.2"),
+            href = Some("https://www.gov.uk/government/organisations/hm-revenue-customs/contact/corporation-tax-enquiries")
+        )).
     </p>
 }
