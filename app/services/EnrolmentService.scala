@@ -31,8 +31,15 @@ class EnrolmentService @Inject()(taxEnrollmentConnector: TaxEnrolmentConnector)
                                 (implicit ec: ExecutionContext) extends Logging {
 
   def enrol(enrolmentDetails: EnrolmentDetails)
-           (implicit hc: HeaderCarrier): Future[Done] = for {
-    _ <- taxEnrollmentConnector.upsert(UpsertKnownFacts(enrolmentDetails))
-    result <- taxEnrollmentConnector.allocateEnrolmentToGroup(GroupEnrolment(enrolmentDetails))
-  } yield result
+           (implicit hc: HeaderCarrier): Future[Done] = {
+    val eventualDone = for {
+      _ <- taxEnrollmentConnector.upsert(UpsertKnownFacts(enrolmentDetails))
+      result <- taxEnrollmentConnector.allocateEnrolmentToGroup(GroupEnrolment(enrolmentDetails))
+    } yield result
+    eventualDone.recover {
+      case error =>
+        // TODO: Save as pending enrolment
+        Done
+    }
+  }
 }
