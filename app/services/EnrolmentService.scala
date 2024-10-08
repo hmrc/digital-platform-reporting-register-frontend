@@ -16,9 +16,10 @@
 
 package services
 
-import connectors.TaxEnrolmentConnector
+import connectors.{PendingEnrolmentConnector, TaxEnrolmentConnector}
 import models.eacd.EnrolmentDetails
 import models.eacd.requests.{GroupEnrolment, UpsertKnownFacts}
+import models.enrolment.requests.PendingEnrolmentRequest
 import org.apache.pekko.Done
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
@@ -27,19 +28,17 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EnrolmentService @Inject()(taxEnrollmentConnector: TaxEnrolmentConnector)
+class EnrolmentService @Inject()(taxEnrollmentConnector: TaxEnrolmentConnector,
+                                 pendingEnrolmentConnector: PendingEnrolmentConnector)
                                 (implicit ec: ExecutionContext) extends Logging {
 
   def enrol(enrolmentDetails: EnrolmentDetails)
            (implicit hc: HeaderCarrier): Future[Done] = {
-    val eventualDone = for {
+    (for {
       _ <- taxEnrollmentConnector.upsert(UpsertKnownFacts(enrolmentDetails))
       result <- taxEnrollmentConnector.allocateEnrolmentToGroup(GroupEnrolment(enrolmentDetails))
-    } yield result
-    eventualDone.recover {
-      case error =>
-        // TODO: Save as pending enrolment
-        Done
+    } yield result).recoverWith {
+      case error => pendingEnrolmentConnector.save(PendingEnrolmentRequest(enrolmentDetails))
     }
   }
 }
