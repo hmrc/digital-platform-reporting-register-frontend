@@ -18,12 +18,13 @@ package services
 
 import base.SpecBase
 import builders.EnrolmentDetailsBuilder.anEnrolmentDetails
-import connectors.TaxEnrolmentConnector
+import connectors.{PendingEnrolmentConnector, TaxEnrolmentConnector}
 import models.eacd.requests.{GroupEnrolment, UpsertKnownFacts}
+import models.enrolment.requests.PendingEnrolmentRequest
 import org.apache.pekko.Done
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
@@ -41,37 +42,45 @@ class EnrolmentServiceSpec extends SpecBase
   with BeforeAndAfterEach {
 
   override def beforeEach(): Unit = {
-    Mockito.reset(mockConnector)
+    Mockito.reset(mockTaxEnrolmentConnector, mockPendingEnrolmentConnector)
     super.beforeEach()
   }
 
   private implicit val headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  private val mockConnector = mock[TaxEnrolmentConnector]
+  private val mockTaxEnrolmentConnector = mock[TaxEnrolmentConnector]
+  private val mockPendingEnrolmentConnector = mock[PendingEnrolmentConnector]
 
-  private val underTest = EnrolmentService(mockConnector)
+  private val underTest = EnrolmentService(mockTaxEnrolmentConnector, mockPendingEnrolmentConnector)
 
   ".enrol(...)" - {
     "must upsert and allocate enrolment to a group" in {
-      when(mockConnector.upsert(UpsertKnownFacts(anEnrolmentDetails))).thenReturn(Future.successful(Done))
-      when(mockConnector.allocateEnrolmentToGroup(GroupEnrolment(anEnrolmentDetails))).thenReturn(Future.successful(Done))
+      when(mockTaxEnrolmentConnector.upsert(UpsertKnownFacts(anEnrolmentDetails))).thenReturn(Future.successful(Done))
+      when(mockTaxEnrolmentConnector.allocateEnrolmentToGroup(GroupEnrolment(anEnrolmentDetails))).thenReturn(Future.successful(Done))
 
       underTest.enrol(anEnrolmentDetails).futureValue
+
+      verify(mockPendingEnrolmentConnector, never()).save(any())(any())
     }
 
-    "must error when upsert fails" in {
-      when(mockConnector.upsert(UpsertKnownFacts(anEnrolmentDetails))).thenReturn(Future.failed(new RuntimeException()))
+    "must call save pending enrolment when when upsert fails" in {
+      when(mockTaxEnrolmentConnector.upsert(UpsertKnownFacts(anEnrolmentDetails))).thenReturn(Future.failed(new RuntimeException()))
+      when(mockPendingEnrolmentConnector.save(PendingEnrolmentRequest(anEnrolmentDetails))).thenReturn(Future.successful(Done))
 
-      underTest.enrol(anEnrolmentDetails).failed
+      underTest.enrol(anEnrolmentDetails).futureValue
 
-      verify(mockConnector, never()).allocateEnrolmentToGroup(any())(any())
+      verify(mockTaxEnrolmentConnector, never()).allocateEnrolmentToGroup(any())(any())
+      verify(mockPendingEnrolmentConnector, times(1)).save(any())(any())
     }
 
-    "must error when upsert passes" in {
-      when(mockConnector.upsert(UpsertKnownFacts(anEnrolmentDetails))).thenReturn(Future.successful(Done))
-      when(mockConnector.allocateEnrolmentToGroup(GroupEnrolment(anEnrolmentDetails))).thenReturn(Future.failed(new RuntimeException()))
+    "must call save pending enrolment when allocation fails" in {
+      when(mockTaxEnrolmentConnector.upsert(UpsertKnownFacts(anEnrolmentDetails))).thenReturn(Future.successful(Done))
+      when(mockTaxEnrolmentConnector.allocateEnrolmentToGroup(GroupEnrolment(anEnrolmentDetails))).thenReturn(Future.failed(new RuntimeException()))
+      when(mockPendingEnrolmentConnector.save(PendingEnrolmentRequest(anEnrolmentDetails))).thenReturn(Future.successful(Done))
 
-      underTest.enrol(anEnrolmentDetails).failed
+      underTest.enrol(anEnrolmentDetails).futureValue
+
+      verify(mockPendingEnrolmentConnector, times(1)).save(any())(any())
     }
   }
 }
