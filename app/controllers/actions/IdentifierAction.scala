@@ -22,6 +22,7 @@ import models.requests.IdentifierRequest
 import models.{Nino, Utr}
 import play.api.mvc.*
 import play.api.mvc.Results.*
+import services.UserAllowListService
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -35,11 +36,13 @@ import scala.concurrent.{ExecutionContext, Future}
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
 
 class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
+                                    userAllowListService: UserAllowListService,
                                     appConfig: AppConfig,
                                     val parser: BodyParsers.Default,
                                     withDprsEnrollmentCheck: Boolean = false)
                                    (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions {
 
+  // scalastyle:off
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
@@ -62,11 +65,17 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
       case Some(Organisation) ~ Some(Assistant) ~ _ ~ _ ~ _ ~ _ ~ _ =>
         Future.successful(Redirect(routes.CannotUseServiceAssistantController.onPageLoad()))
 
-      case Some(Individual) ~ _ ~ Some(internalId) ~ maybeNino ~ _ ~ Some(groupIdentifier) ~ Some(credentials) =>
-        block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), maybeNino.map(Nino.apply)), request))
-
+      case Some(Individual) ~ _ ~ Some(internalId) ~ maybeNino ~ enrolments ~ Some(groupIdentifier) ~ Some(credentials) =>
+        userAllowListService.isUserAllowed(enrolments).flatMap {
+          case true => block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), maybeNino.map(Nino.apply)), request))
+          case false => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
+        }
+        
       case Some(Organisation) ~ _ ~ Some(internalId) ~ _ ~ enrolments ~ Some(groupIdentifier) ~ Some(credentials) =>
-        block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), getCtUtrEnrolment(enrolments)), request))
+        userAllowListService.isUserAllowed(enrolments).flatMap {
+          case true => block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), getCtUtrEnrolment(enrolments)), request))
+          case false => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
+        }
 
       case _ => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     } recover {
@@ -74,7 +83,7 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
       case _: AuthorisationException => Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
-
+  
   private def getCtUtrEnrolment(enrolments: Enrolments): Option[Utr] =
     enrolments.getEnrolment("IR-CT")
       .flatMap { enrolment =>
@@ -82,7 +91,7 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
           .find(_.key == "UTR")
           .map(identifier => Utr(identifier.value))
       }
-
+  
   private def hasDprsEnrolment(enrolments: Enrolments): Boolean =
     enrolments.getEnrolment("HMRC-DPRS")
       .flatMap(_.identifiers.find(_.key == "DPRSID"))
@@ -95,6 +104,7 @@ trait IdentifierActionProvider {
 }
 
 class AuthenticatedIdentifierActionProvider @Inject()(authConnector: AuthConnector,
+                                                      userAllowListService: UserAllowListService,
                                                       appConfig: AppConfig,
                                                       parser: BodyParsers.Default)
                                                      (implicit val executionContext: ExecutionContext)
@@ -103,6 +113,7 @@ class AuthenticatedIdentifierActionProvider @Inject()(authConnector: AuthConnect
   def apply(withDprsEnrollmentCheck: Boolean = true) = new AuthenticatedIdentifierAction(
     withDprsEnrollmentCheck = withDprsEnrollmentCheck,
     authConnector = authConnector,
+    userAllowListService = userAllowListService,
     appConfig = appConfig,
     parser = parser
   )
