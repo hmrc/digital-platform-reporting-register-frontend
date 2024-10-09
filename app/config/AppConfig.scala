@@ -69,4 +69,9 @@ class AppConfig @Inject()(configuration: Configuration) {
     "en" -> Lang("en"),
     "cy" -> Lang("cy")
   )
+  
+  val userAllowListEnabled: Boolean = configuration.get[Boolean]("features.user-allow-list")
+  
+  val utrAllowListFeature = "UTR"
+  val vrnAllowListFeature = "VRN"
 }
