@@ -22,22 +22,31 @@ import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class UserAllowListService @Inject()(connector: UserAllowListConnector, appConfig: AppConfig) {
+class UserAllowListService @Inject()(connector: UserAllowListConnector, appConfig: AppConfig)
+                                    (implicit ec: ExecutionContext) {
+
 
   def isUserAllowed(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Boolean] =
     if (appConfig.userAllowListEnabled) {
-      getCtUtrEnrolment(enrolments).map { utr =>
-        connector.check(appConfig.utrAllowListFeature, utr)
-      }.getOrElse {
-        getVatEnrolment(enrolments).map { vrn =>
-          connector.check(appConfig.vrnAllowListFeature, vrn)
-        }.getOrElse(Future.successful(false))
+      allowListedByUtr(enrolments).flatMap {
+        case true  => Future.successful(true)
+        case false => allowListedByVrn(enrolments)
       }
     } else {
       Future.successful(true)
     }
+  
+  private def allowListedByUtr(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Boolean] =
+    getCtUtrEnrolment(enrolments)
+      .map(utr => connector.check(appConfig.utrAllowListFeature, utr))
+      .getOrElse(Future.successful(false))
+
+  private def allowListedByVrn(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Boolean] =
+    getVatEnrolment(enrolments)
+      .map(vrn => connector.check(appConfig.vrnAllowListFeature, vrn))
+      .getOrElse(Future.successful(false))
 
   private def getCtUtrEnrolment(enrolments: Enrolments): Option[String] =
     enrolments.getEnrolment("IR-CT")

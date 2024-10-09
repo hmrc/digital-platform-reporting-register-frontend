@@ -28,6 +28,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach with ScalaFutures {
@@ -76,13 +77,15 @@ class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAnd
           service.isUserAllowed(enrolments).futureValue mustEqual true
         }
 
-        "when the user has an HMRC_MTD-VAT enrolment in the list" in {
+        "when the user has an HMRC_MTD-VAT enrolment in the VRN list" in {
 
           when(mockAppConfig.userAllowListEnabled) thenReturn true
           when(mockAppConfig.vrnAllowListFeature) thenReturn "VRN"
+          when(mockAppConfig.utrAllowListFeature) thenReturn "UTR"
+          when(mockConnector.check(eqTo("UTR"), any())(any())) thenReturn Future.successful(false)
           when(mockConnector.check(eqTo("VRN"), any())(any())) thenReturn Future.successful(true)
 
-          val enrolments = Enrolments(Set(mtdEnrolment))
+          val enrolments = Enrolments(Set(ctEnrolment, mtdEnrolment))
 
           service.isUserAllowed(enrolments).futureValue mustEqual true
         }
@@ -91,9 +94,11 @@ class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAnd
 
           when(mockAppConfig.userAllowListEnabled) thenReturn true
           when(mockAppConfig.vrnAllowListFeature) thenReturn "VRN"
+          when(mockAppConfig.utrAllowListFeature) thenReturn "UTR"
+          when(mockConnector.check(eqTo("UTR"), any())(any())) thenReturn Future.successful(false)
           when(mockConnector.check(eqTo("VRN"), any())(any())) thenReturn Future.successful(true)
 
-          val enrolments = Enrolments(Set(vatEnrolment))
+          val enrolments = Enrolments(Set(ctEnrolment, vatEnrolment))
 
           service.isUserAllowed(enrolments).futureValue mustEqual true
         }
@@ -114,7 +119,7 @@ class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAnd
           when(mockAppConfig.utrAllowListFeature) thenReturn "UTR"
           when(mockConnector.check(eqTo("UTR"), any())(any())) thenReturn Future.successful(false)
 
-          val enrolments = Enrolments(Set(ctEnrolment, mtdEnrolment))
+          val enrolments = Enrolments(Set(ctEnrolment))
 
           service.isUserAllowed(enrolments).futureValue mustEqual false
         }
@@ -123,6 +128,7 @@ class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAnd
 
           when(mockAppConfig.userAllowListEnabled) thenReturn true
           when(mockAppConfig.vrnAllowListFeature) thenReturn "VRN"
+          
           when(mockConnector.check(eqTo("VRN"), any())(any())) thenReturn Future.successful(false)
 
           val enrolments = Enrolments(Set(mtdEnrolment))
@@ -137,6 +143,19 @@ class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAnd
           when(mockConnector.check(eqTo("VRN"), any())(any())) thenReturn Future.successful(false)
 
           val enrolments = Enrolments(Set(vatEnrolment))
+
+          service.isUserAllowed(enrolments).futureValue mustEqual false
+        }
+
+        "when the user has a CT enrolment and VAT enrolment but neither is on the list" in {
+
+          when(mockAppConfig.userAllowListEnabled) thenReturn true
+          when(mockAppConfig.utrAllowListFeature) thenReturn "UTR"
+          when(mockAppConfig.vrnAllowListFeature) thenReturn "VRN"
+          when(mockConnector.check(eqTo("UTR"), any())(any())) thenReturn Future.successful(false)
+          when(mockConnector.check(eqTo("VRN"), any())(any())) thenReturn Future.successful(false)
+
+          val enrolments = Enrolments(Set(ctEnrolment, mtdEnrolment))
 
           service.isUserAllowed(enrolments).futureValue mustEqual false
         }
