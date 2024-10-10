@@ -40,7 +40,7 @@ class AppConfig @Inject()(configuration: Configuration) {
 
   lazy val taxEnrolmentsBaseUrl: String = configuration.get[Service](TaxEnrolmentsUrlKey).baseUrl
 
-  private lazy val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
+  private lazy val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.host")
   lazy val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/digital-platform-reporting-register-frontend"
 
   lazy val auditSource: String = configuration.get[String]("auditing.auditSource")
