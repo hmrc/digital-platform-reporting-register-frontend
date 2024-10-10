@@ -14,21 +14,41 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+
 @this(
         layout: templates.Layout,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        newTabLink: HmrcNewTabLinkHelper
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("individualIdentityNotConfirmed.title"))) {
 
-   <h1 class="govuk-heading-xl">@messages("individualIdentityNotConfirmed.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("individualIdentityNotConfirmed.heading")</h1>
 
-   <p class="govuk-body">@messages("individualIdentityNotConfirmed.p1")</p>
+    <p class="govuk-body">@messages("individualIdentityNotConfirmed.p1")</p>
 
-   @govukButton(
-      ButtonViewModel(messages("site.tryAgain"))
-      .asLink(routes.HasNinoController.onPageLoad(NormalMode).url)
-  )
+    <h2 class="govuk-heading-m">@messages("individualIdentityNotConfirmed.h2.1")</h2>
+
+    <p class="govuk-body">@messages("individualIdentityNotConfirmed.p2")
+        @newTabLink(NewTabLinkHelper(
+            text = messages("individualIdentityNotConfirmed.p2.link.text"),
+            href = Some("https://www.gov.uk/find-national-insurance-number")
+        )).
+    </p>
+
+    <h2 class="govuk-heading-m">@messages("individualIdentityNotConfirmed.h2.2")</h2>
+
+    <p class="govuk-body">@messages("individualIdentityNotConfirmed.p3")</p>
+
+    <h2 class="govuk-heading-m">@messages("individualIdentityNotConfirmed.h2.3")</h2>
+
+    <p class="govuk-body">@messages("individualIdentityNotConfirmed.p4")
+        @newTabLink(NewTabLinkHelper(
+            text = messages("individualIdentityNotConfirmed.p4.link.text"),
+            href = Some("https://www.gov.uk/government/organisations/hm-revenue-customs/contact/income-tax-enquiries-for-individuals-pensioners-and-employees")
+        )).
+    </p>
 }
