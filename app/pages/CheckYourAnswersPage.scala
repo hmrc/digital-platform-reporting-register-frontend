@@ -35,7 +35,7 @@ case object CheckYourAnswersPage extends Page {
 
       case _ =>
         answers.subscriptionDetails.map {
-          case SubscriptionDetails(subscriptionResponses.AlreadySubscribedResponse(), _, _, _, _) =>
+          case SubscriptionDetails(subscriptionResponses.AlreadySubscribedResponse(), _, _, _, _, _) =>
             alreadySubscribedRoute(answers)
 
           case _ =>

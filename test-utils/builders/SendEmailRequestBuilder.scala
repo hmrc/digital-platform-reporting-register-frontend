@@ -16,18 +16,16 @@
 
 package builders
 
-import builders.SubscribedResponseBuilder.aSubscribedResponse
-import builders.SubscriptionRequestBuilder.aSubscriptionRequest
-import models.{RegistrationType, SubscriptionDetails}
+import models.email.requests.SendEmailRequest
 
-object SubscriptionDetailsBuilder {
+object SendEmailRequestBuilder {
 
-  val aSubscriptionDetails: SubscriptionDetails = SubscriptionDetails(
-    subscriptionResponse = aSubscribedResponse,
-    subscriptionRequest = aSubscriptionRequest,
-    registrationType = RegistrationType.PlatformOperator,
-    businessType = None,
-    businessName = None,
-    emailSent = false
+  val aSendEmailRequest: SendEmailRequest = SendEmailRequest(
+    to = List("default.email@example.com"),
+    templateId = "default-template-id",
+    parameters = Map(
+      "param-1" -> "value-1",
+      "param-" -> "value-2"
+    )
   )
 }

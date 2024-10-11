@@ -31,13 +31,17 @@ final case class SubscriptionDetails(subscriptionResponse: SubscriptionResponse,
                                      subscriptionRequest: SubscriptionRequest,
                                      registrationType: RegistrationType,
                                      businessType: Option[BusinessType],
-                                     businessName: Option[String])
+                                     businessName: Option[String],
+                                     emailSent: Boolean)
 
 object SubscriptionDetails {
 
   implicit lazy val format: OFormat[SubscriptionDetails] = Json.format
 
-  def apply(response: SubscriptionResponse, request: SubscriptionRequest, userAnswers: UserAnswers): SubscriptionDetails = {
+  def apply(response: SubscriptionResponse,
+            request: SubscriptionRequest,
+            userAnswers: UserAnswers,
+            emailSent: Boolean): SubscriptionDetails = {
     val registrationType = userAnswers.get(RegistrationTypePage).getOrElse(RegistrationType.ThirdParty)
     val businessName = getBusinessName(userAnswers)
 
@@ -46,7 +50,8 @@ object SubscriptionDetails {
       subscriptionRequest = request,
       registrationType = registrationType,
       businessType = userAnswers.get(BusinessTypePage),
-      businessName = businessName
+      businessName = businessName,
+      emailSent = emailSent
     )
   }
 

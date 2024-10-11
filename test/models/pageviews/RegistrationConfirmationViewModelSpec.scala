@@ -23,7 +23,6 @@ import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
 import builders.SubscriptionRequestBuilder.aSubscriptionRequest
 import builders.UserAnswersBuilder.aUserAnswers
 import forms.RegistrationConfirmationFormProvider
-import models.RegistrationType.ThirdParty
 import models.{BusinessType, NormalMode, RegistrationType, SubscriptionDetails}
 import pages.RegistrationConfirmationPage
 
@@ -61,7 +60,8 @@ class RegistrationConfirmationViewModelSpec extends SpecBase {
           primaryEmail = "primary.email@example.com",
           secondaryEmail = None,
           isThirdParty = true,
-          businessName = Some("some-business-name")
+          businessName = Some("some-business-name"),
+          emailSent = subscriptionDetails.emailSent
         ))
     }
 
@@ -79,7 +79,8 @@ class RegistrationConfirmationViewModelSpec extends SpecBase {
           primaryEmail = "primary.email@example.com",
           secondaryEmail = None,
           isThirdParty = true,
-          businessName = Some("some-business-name")
+          businessName = Some("some-business-name"),
+          emailSent = subscriptionDetails.emailSent
         ))
     }
 
@@ -97,7 +98,8 @@ class RegistrationConfirmationViewModelSpec extends SpecBase {
           primaryEmail = "primary.email@example.com",
           secondaryEmail = None,
           isThirdParty = true,
-          businessName = Some("some-business-name")
+          businessName = Some("some-business-name"),
+          emailSent = subscriptionDetails.emailSent
         ))
     }
   }

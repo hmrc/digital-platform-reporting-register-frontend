@@ -25,28 +25,28 @@ import play.api.libs.json.Json
 
 class UserAllowListConnectorSpec extends ConnectorSpecBase {
 
-  private lazy val app: Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure("microservice.services.user-allow-list.port" -> wireMockPort)
     .build()
-  
+
   private lazy val connector = app.injector.instanceOf[UserAllowListConnector]
-  
+
   ".check" - {
-    
+
     "must return true when the server returns OK" in {
 
       val checkRequest = CheckRequest("value")
-      
+
       wireMockServer.stubFor(
         post(urlMatching("/user-allow-list/digital-platform-reporting/feature-name/check"))
           .withRequestBody(equalTo(Json.toJson(checkRequest).toString))
           .willReturn(ok())
       )
-      
+
       val result = connector.check("feature-name", "value").futureValue
       result mustEqual true
     }
-    
+
     "must return false when the server returns NOT_FOUND" in {
 
       val checkRequest = CheckRequest("value")
@@ -60,7 +60,7 @@ class UserAllowListConnectorSpec extends ConnectorSpecBase {
       val result = connector.check("feature-name", "value").futureValue
       result mustEqual false
     }
-    
+
     "must return a failed future when the server returns an error" in {
 
       val checkRequest = CheckRequest("value")
@@ -73,7 +73,7 @@ class UserAllowListConnectorSpec extends ConnectorSpecBase {
 
       val result = connector.check("feature-name", "value").failed.futureValue
       result mustBe an[UnexpectedResponseException]
-      
+
       val failure = result.asInstanceOf[UnexpectedResponseException]
       failure.status mustEqual 500
     }

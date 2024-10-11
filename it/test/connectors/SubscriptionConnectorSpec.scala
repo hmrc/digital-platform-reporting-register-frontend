@@ -29,7 +29,7 @@ import java.time.Instant
 
 class SubscriptionConnectorSpec extends ConnectorSpecBase {
 
-  private lazy val app: Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure("microservice.services.digital-platform-reporting.port" -> wireMockPort)
     .build()
 

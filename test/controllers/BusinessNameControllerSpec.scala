@@ -20,7 +20,6 @@ import base.ControllerSpecBase
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import connectors.RegistrationConnector
 import forms.BusinessNameFormProvider
-import models.BusinessType.LimitedCompany
 import models.pageviews.BusinessNameViewModel
 import models.registration.requests.{OrganisationDetails, OrganisationWithUtr}
 import models.registration.responses.NoMatchResponse
