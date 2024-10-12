@@ -30,17 +30,15 @@ case object DateOfBirthPage extends QuestionPage[LocalDate] {
 
   override def toString: String = "dateOfBirth"
 
-  override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.get(HasNinoPage) match {
-    case Some(true) => answers.registrationResponse match {
-      case Some(value) => value match {
-        case _: AlreadySubscribedResponse => routes.IndividualAlreadyRegisteredController.onPageLoad()
-        case _: MatchResponseWithId => routes.IndividualIdentityConfirmedController.onPageLoad()
-        case _: NoMatchResponse => routes.IndividualIdentityNotConfirmedController.onPageLoad()
-        case _ => routes.JourneyRecoveryController.onPageLoad()
-      }
-      case None => routes.JourneyRecoveryController.onPageLoad()
+  override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.registrationResponse match {
+    case Some(value) =>
+      value match {
+      case _: AlreadySubscribedResponse => routes.IndividualAlreadyRegisteredController.onPageLoad()
+      case _: MatchResponseWithId => routes.IndividualIdentityConfirmedController.onPageLoad()
+      case _: NoMatchResponse => routes.IndividualIdentityNotConfirmedController.onPageLoad()
+      case _ => routes.JourneyRecoveryController.onPageLoad()
     }
-    case Some(false) => routes.AddressInUkController.onPageLoad(NormalMode)
-    case None => routes.JourneyRecoveryController.onPageLoad()
+    case None =>
+      routes.AddressInUkController.onPageLoad(NormalMode)
   }
 }

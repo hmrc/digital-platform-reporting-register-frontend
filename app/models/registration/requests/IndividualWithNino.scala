@@ -18,7 +18,7 @@ package models.registration.requests
 
 import cats.data.*
 import cats.implicits.*
-import models.UserAnswers
+import models.{Nino, UserAnswers}
 import pages.{DateOfBirthPage, IndividualNamePage, NinoPage}
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
@@ -32,11 +32,17 @@ object IndividualWithNino {
 
   def build(answers: UserAnswers): EitherNec[Query, IndividualWithNino] =
     (
-      answers.getEither(NinoPage),
+      getNino(answers),
       answers.getEither(IndividualNamePage)
         .map(name => IndividualDetails(name.firstName, name.lastName)),
       answers.getEither(DateOfBirthPage)
     ).parMapN(IndividualWithNino.apply)
+    
+  private def getNino(answers: UserAnswers): EitherNec[Query, String] =
+    answers.user.taxIdentifier match {
+      case Some(Nino(nino)) => Right(nino)
+      case _                => answers.getEither(NinoPage)
+    }
 
   implicit lazy val writes: OWrites[IndividualWithNino] =
     (
