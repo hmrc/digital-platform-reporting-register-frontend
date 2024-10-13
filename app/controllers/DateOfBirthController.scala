@@ -21,8 +21,8 @@ import controllers.actions.*
 import forms.DateOfBirthFormProvider
 import models.registration.requests.IndividualWithNino
 import models.registration.responses.RegistrationResponse
-import models.{Mode, UserAnswers}
-import pages.{DateOfBirthPage, HasNinoPage}
+import models.{Mode, Nino, UserAnswers}
+import pages.{DateOfBirthPage, NinoPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import repositories.SessionRepository
@@ -55,16 +55,20 @@ class DateOfBirthController @Inject()(sessionRepository: SessionRepository,
     formProvider().bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
       value =>
-        val hasNino = request.userAnswers.get(HasNinoPage).getOrElse(false)
+        val hasNino: Boolean = (request.userAnswers.user.taxIdentifier match {
+          case Some(Nino(_)) => true
+          case _             => false
+        }) || request.userAnswers.isDefined(NinoPage)
+
         for {
           updatedAnswers <- Future.fromTry(request.userAnswers.set(DateOfBirthPage, value))
-          fullAnswers <- if (hasNino) registerAndSave(updatedAnswers) else Future.successful(updatedAnswers)
-          _ <- sessionRepository.set(fullAnswers)
+          fullAnswers    <- if (hasNino) register(updatedAnswers) else Future.successful(updatedAnswers)
+          _              <- sessionRepository.set(fullAnswers)
         } yield Redirect(DateOfBirthPage.nextPage(mode, fullAnswers))
     )
   }
 
-  private def registerAndSave(answers: UserAnswers)(implicit request: Request[_]): Future[UserAnswers] =
+  private def register(answers: UserAnswers)(implicit request: Request[_]): Future[UserAnswers] =    
     IndividualWithNino.build(answers).fold(
       errors => Future.failed(Exception(s"Unable to build registration request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),
       details => registrationConnector.register(details).map {

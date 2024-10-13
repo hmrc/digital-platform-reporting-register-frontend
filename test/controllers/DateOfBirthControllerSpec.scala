@@ -18,12 +18,19 @@ package controllers
 
 import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
+import builders.UserBuilder.aUser
+import connectors.RegistrationConnector
 import forms.DateOfBirthFormProvider
-import models.NormalMode
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import generators.ModelGenerators
+import models.{IndividualName, Nino, NormalMode, UserAnswers}
+import models.registration.responses.MatchResponseWithId
+import models.registration.Address
+import models.registration.requests.{IndividualDetails, IndividualWithNino}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.DateOfBirthPage
+import pages.{DateOfBirthPage, IndividualNamePage, NinoPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
@@ -35,7 +42,7 @@ import views.html.DateOfBirthView
 import java.time.{LocalDate, ZoneOffset}
 import scala.concurrent.Future
 
-class DateOfBirthControllerSpec extends ControllerSpecBase with MockitoSugar {
+class DateOfBirthControllerSpec extends ControllerSpecBase with MockitoSugar with ModelGenerators {
 
   private implicit val messages: Messages = stubMessages()
 
@@ -86,8 +93,100 @@ class DateOfBirthControllerSpec extends ControllerSpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode)(getRequest(), messages(application)).toString
       }
     }
+    
+    "must register the user, save answers, and redirect to the next page when the user signed in with CL 250" in {
 
-    "must redirect to the next page when valid data is submitted" in {
+      val nino = arbitraryNino.sample.value
+      val address = Address("line 1", None, None, None, None, "GB")
+      val individualDetails = IndividualDetails("first", "last")
+      val registrationResponse = MatchResponseWithId("id", address, None)
+      val answers =
+        anEmptyAnswer
+          .copy(user = aUser.copy(taxIdentifier = Some(Nino(nino))))
+          .set(IndividualNamePage, IndividualName("first", "last")).success.value
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockConnector = mock[RegistrationConnector]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockConnector.register(any())(any())) thenReturn Future.successful(registrationResponse)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[RegistrationConnector].toInstance(mockConnector)
+          )
+          .build()
+
+      running(application) {
+        val expectedRegistrationRequest = IndividualWithNino(nino, individualDetails, validAnswer)
+        val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        val finalAnswers =
+          answers
+            .copy(registrationResponse = Some(registrationResponse))
+            .set(DateOfBirthPage, validAnswer).success.value
+
+        val result = route(application, postRequest()).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual DateOfBirthPage.nextPage(NormalMode, finalAnswers).url
+
+        verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+        verify(mockConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
+
+        val savedAnswers = answersCaptor.getValue
+        savedAnswers.registrationResponse.value mustEqual registrationResponse
+      }
+    }
+    
+    "must register the user, save answers, and redirect to the next page when the user provided a NINO" in {
+
+      val nino = arbitraryNino.sample.value
+      val address = Address("line 1", None, None, None, None, "GB")
+      val individualDetails = IndividualDetails("first", "last")
+      val registrationResponse = MatchResponseWithId("id", address, None)
+      val answers =
+        anEmptyAnswer
+          .set(NinoPage, nino).success.value
+          .set(IndividualNamePage, IndividualName("first", "last")).success.value
+      
+      val mockSessionRepository = mock[SessionRepository]
+      val mockConnector = mock[RegistrationConnector]
+      
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockConnector.register(any())(any())) thenReturn Future.successful(registrationResponse)
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[RegistrationConnector].toInstance(mockConnector)
+          )
+          .build()
+
+      running(application) {
+        val expectedRegistrationRequest = IndividualWithNino(nino, individualDetails, validAnswer)
+        val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        val finalAnswers =
+          answers
+            .copy(registrationResponse = Some(registrationResponse))
+            .set(DateOfBirthPage, validAnswer).success.value
+        
+        val result = route(application, postRequest()).value
+        
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual DateOfBirthPage.nextPage(NormalMode, finalAnswers).url
+        
+        verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+        verify(mockConnector, times(1)).register(eqTo(expectedRegistrationRequest))(any())
+        
+        val savedAnswers = answersCaptor.getValue
+        savedAnswers.registrationResponse.value mustEqual registrationResponse
+      }
+    }
+    
+    "must redirect to the next page when valid data is submitted and the user has not provided a NINO" in {
 
       val mockSessionRepository = mock[SessionRepository]
 

@@ -22,6 +22,14 @@ import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
 
+  implicit lazy val arbitraryNino: Gen[String] =
+    for {
+      firstChar <- Gen.oneOf('A', 'C', 'E', 'H', 'J', 'L', 'M', 'O', 'P', 'R', 'S', 'W', 'X', 'Y').map(_.toString)
+      secondChar <- Gen.oneOf('A', 'B', 'C', 'E', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z').map(_.toString)
+      digits <- Gen.listOfN(6, Gen.numChar)
+      lastChar <- Gen.oneOf('A', 'B', 'C', 'D')
+    } yield firstChar ++ secondChar ++ (digits :+ lastChar).mkString
+
   def ukPostcodeGen: Gen[String] =
     for {
       firstChars <- Gen.choose(1, 2)
