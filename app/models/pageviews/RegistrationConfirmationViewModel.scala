@@ -30,7 +30,6 @@ case class RegistrationConfirmationViewModel(mode: Mode,
                                              dprsId: String,
                                              subscribedDateTime: String,
                                              primaryEmail: String,
-                                             secondaryEmail: Option[String],
                                              isThirdParty: Boolean,
                                              businessName: Option[String],
                                              emailSent: Boolean)
@@ -52,7 +51,6 @@ object RegistrationConfirmationViewModel {
           dprsId = subscriptionResponse.dprsId,
           subscribedDateTime = subscribedDateTime,
           primaryEmail = subscriptionRequest.primaryContact.email,
-          secondaryEmail = subscriptionRequest.secondaryContact.map(_.email),
           isThirdParty = userAnswers.subscriptionDetails.map(_.registrationType).contains(ThirdParty),
           businessName = userAnswers.subscriptionDetails.flatMap(_.businessName),
           emailSent = userAnswers.subscriptionDetails.get.emailSent
