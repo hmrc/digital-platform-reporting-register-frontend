@@ -45,12 +45,21 @@
         @messages("registrationConfirmation.p1.1", viewModel.subscribedDateTime)
     </p>
 
-    @govukWarning(WarningText(
-        iconFallbackText = Some("Warning"),
-        content = messages("registrationConfirmation.privateBeta.warning")
-    ))
+    @if(viewModel.emailSent){
+        <p class="govuk-body">
+            @{viewModel.secondaryEmail match {
+            case Some(email) => messages("registrationConfirmation.p2.1", viewModel.primaryEmail, email)
+            case None        => messages("registrationConfirmation.p2.2", viewModel.primaryEmail)
+            }}
+        </p>
+    } else {
+        @govukWarning(WarningText(
+            iconFallbackText = Some("Warning"),
+            content = messages("registrationConfirmation.privateBeta.warning")
+        ))
 
-    <p class="govuk-body">@messages("registrationConfirmation.p2.0")</p>
+        <p class="govuk-body">@messages("registrationConfirmation.p2.0")</p>
+    }
 
     <p class="govuk-body">
         <a class="govuk-link" href="#" data-module="hmrc-print-link">@messages("registrationConfirmation.print.link.text")</a>
@@ -80,12 +89,21 @@
             @messages("registrationConfirmation.p1.1", viewModel.subscribedDateTime)
         </p>
 
-        <p class="govuk-body">
-            @{viewModel.secondaryEmail match {
-                case Some(email) => messages("registrationConfirmation.p2.1", viewModel.primaryEmail, email)
-                case None        => messages("registrationConfirmation.p2.2", viewModel.primaryEmail)
-            }}
-        </p>
+        @if(viewModel.emailSent){
+            <p class="govuk-body">
+                @{viewModel.secondaryEmail match {
+                    case Some(email) => messages("registrationConfirmation.p2.1", viewModel.primaryEmail, email)
+                    case None        => messages("registrationConfirmation.p2.2", viewModel.primaryEmail)
+                }}
+            </p>
+        } else {
+            @govukWarning(WarningText(
+                iconFallbackText = Some("Warning"),
+                content = messages("registrationConfirmation.privateBeta.warning")
+            ))
+
+            <p class="govuk-body">@messages("registrationConfirmation.p2.0")</p>
+        }
 
         <h2 class="govuk-heading-m">@messages("registrationConfirmation.h2.1")</h2>
 

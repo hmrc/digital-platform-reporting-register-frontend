@@ -76,7 +76,7 @@ class CheckYourAnswersPageSpec extends SpecBase with TryValues with OptionValues
 
       "must go to registration confirmation when the subscription was successful" in {
         val subscriptionResponse = subscriptionResponses.SubscribedResponse("dprsId", Instant.now())
-        val subscriptionDetails = SubscriptionDetails(subscriptionResponse, aSubscriptionRequest, RegistrationType.PlatformOperator, None, Some(""))
+        val subscriptionDetails = SubscriptionDetails(subscriptionResponse, aSubscriptionRequest, RegistrationType.PlatformOperator, None, Some(""), false)
         val answers = baseAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
 
         CheckYourAnswersPage.nextPage(NormalMode, answers) mustEqual routes.RegistrationConfirmationController.onPageLoad(NormalMode)
@@ -85,7 +85,7 @@ class CheckYourAnswersPageSpec extends SpecBase with TryValues with OptionValues
       "must go to Individual Already Registered when the subscription response is AlreadySubscribed and the user is an individual type" in {
         val subscriptionResponse = subscriptionResponses.AlreadySubscribedResponse()
         val businessType = Gen.oneOf(Individual, SoleTrader).sample.value
-        val subscriptionDetails = SubscriptionDetails(subscriptionResponse, aSubscriptionRequest, RegistrationType.PlatformOperator, Some(businessType), None)
+        val subscriptionDetails = SubscriptionDetails(subscriptionResponse, aSubscriptionRequest, RegistrationType.PlatformOperator, Some(businessType), None, false)
         val answers = baseAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
 
         CheckYourAnswersPage.nextPage(NormalMode, answers) mustEqual routes.IndividualAlreadyRegisteredController.onPageLoad()
@@ -94,7 +94,7 @@ class CheckYourAnswersPageSpec extends SpecBase with TryValues with OptionValues
       "must go to Organisation Already Registered when the subscription response is AlreadySubscribed and the user is an organisation type" in {
         val subscriptionResponse = subscriptionResponses.AlreadySubscribedResponse()
         val businessType = Gen.oneOf(LimitedCompany, Llp, Partnership, AssociationOrTrust).sample.value
-        val subscriptionDetails = SubscriptionDetails(subscriptionResponse, aSubscriptionRequest, RegistrationType.PlatformOperator, Some(businessType), None)
+        val subscriptionDetails = SubscriptionDetails(subscriptionResponse, aSubscriptionRequest, RegistrationType.PlatformOperator, Some(businessType), None, false)
         val answers = baseAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
 
         CheckYourAnswersPage.nextPage(NormalMode, answers) mustEqual routes.BusinessAlreadyRegisteredController.onPageLoad()
@@ -102,7 +102,7 @@ class CheckYourAnswersPageSpec extends SpecBase with TryValues with OptionValues
 
       "must go to Business Already Registered when the subscription response is AlreadySubscribed and business type is not answered" in {
         val subscriptionResponse = subscriptionResponses.AlreadySubscribedResponse()
-        val subscriptionDetails = SubscriptionDetails(subscriptionResponse, aSubscriptionRequest, RegistrationType.PlatformOperator, None, None)
+        val subscriptionDetails = SubscriptionDetails(subscriptionResponse, aSubscriptionRequest, RegistrationType.PlatformOperator, None, None, false)
         val answers = baseAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
 
         CheckYourAnswersPage.nextPage(NormalMode, answers) mustEqual routes.BusinessAlreadyRegisteredController.onPageLoad()

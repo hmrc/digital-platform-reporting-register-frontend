@@ -17,13 +17,15 @@
 package base
 
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.test.WireMockSupport
 
 trait ConnectorSpecBase extends SpecBase
   with ScalaFutures
   with IntegrationPatience
-  with WireMockSupport {
+  with WireMockSupport
+  with GuiceOneAppPerSuite {
 
   implicit protected lazy val hc: HeaderCarrier = HeaderCarrier()
 }

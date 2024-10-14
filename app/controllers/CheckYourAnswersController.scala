@@ -18,11 +18,12 @@ package controllers
 
 import com.google.inject.Inject
 import connectors.SubscriptionConnector.SubscribeFailure
-import connectors.{RegistrationConnector, SubscriptionConnector}
+import connectors.{EmailConnector, RegistrationConnector, SubscriptionConnector}
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierActionProvider}
 import models.BusinessType.*
 import models.audit.AuditEventModel
 import models.eacd.{EnrolmentDetails, EnrolmentKnownFacts}
+import models.email.requests.SendEmailRequest
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
 import models.registration.responses as registrationResponses
@@ -32,6 +33,7 @@ import models.subscription.requests.SubscriptionRequest
 import models.subscription.responses.SubscribedResponse
 import models.{NormalMode, SubscriptionDetails, UserAnswers}
 import pages.{BusinessTypePage, CheckYourAnswersPage}
+import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -49,11 +51,12 @@ class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
                                            organisationView: CheckYourAnswersOrganisationView,
                                            registrationConnector: RegistrationConnector,
                                            subscriptionConnector: SubscriptionConnector,
+                                           emailConnector: EmailConnector,
                                            enrolmentService: EnrolmentService,
                                            auditService: AuditService,
                                            sessionRepository: SessionRepository)
                                           (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
-  extends FrontendController(mcc) with I18nSupport with AnswerExtractor {
+  extends FrontendController(mcc) with I18nSupport with AnswerExtractor with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify() andThen getData andThen requireData) { implicit request =>
     request.userAnswers.get(BusinessTypePage).map {
@@ -84,9 +87,19 @@ class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
               )
               subscriptionDetails.subscriptionResponse match {
                 case subscribedResponse: SubscribedResponse =>
-                  enrolmentService.enrol(EnrolmentDetails(enrolmentKnownFacts, subscribedResponse.dprsId)).flatMap { _ =>
-                    sessionRepository.set(answersWithSubscription).map { _ =>
-                      Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithSubscription))
+                  SendEmailRequest.build(request.userAnswers, subscribedResponse.dprsId).fold(
+                    errors => {
+                      logger.warn(s"Unable to send email, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")
+                      Future.successful(false)
+                    },
+                    request => emailConnector.send(request)
+                  ).flatMap { emailSent =>
+                    val subscriptionDetailsWithEmailSentStatus = subscriptionDetails.copy(emailSent = emailSent)
+                    val answersWithSubscriptionAndEmailSentStatus = answersWithSubscription.copy(subscriptionDetails = Some(subscriptionDetailsWithEmailSentStatus))
+                    enrolmentService.enrol(EnrolmentDetails(enrolmentKnownFacts, subscribedResponse.dprsId)).flatMap { _ =>
+                      sessionRepository.set(answersWithSubscriptionAndEmailSentStatus).map { _ =>
+                        Redirect(CheckYourAnswersPage.nextPage(NormalMode, answersWithSubscriptionAndEmailSentStatus))
+                      }
                     }
                   }
                 case _ => sessionRepository.set(answersWithSubscription).map { _ =>
@@ -124,7 +137,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
           .subscribe(request)
           .map { response =>
             auditService.sendAudit(AuditEventModel(isAutoSubscription, answersWithRegistration.data, response))
-            SubscriptionDetails(response, request, answersWithRegistration)
+            SubscriptionDetails(response, request, answersWithRegistration, false)
           }
           .recover {
             case error =>

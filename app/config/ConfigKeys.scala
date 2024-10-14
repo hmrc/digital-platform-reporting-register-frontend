@@ -20,6 +20,7 @@ object ConfigKeys {
 
   val DigitalPlatformReportingUrlKey: String = "microservice.services.digital-platform-reporting"
   val TaxEnrolmentsUrlKey: String = "microservice.services.tax-enrolments"
+  val EmailServiceUrlKey: String = "microservice.services.email"
   val ManageFrontendBaseUrlKey: String = "microservice.services.digital-platform-reporting-manage-frontend"
   val PlatformOperatorFrontendBaseUrlKey: String = "microservice.services.digital-platform-reporting-operator-frontend"
 }

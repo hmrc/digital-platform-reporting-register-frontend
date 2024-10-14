@@ -25,7 +25,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 
 class TaxEnrolmentConnectorSpec extends ConnectorSpecBase {
 
-  private lazy val app: Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure("microservice.services.tax-enrolments.port" -> wireMockPort)
     .build()
 

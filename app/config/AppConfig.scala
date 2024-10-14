@@ -17,7 +17,7 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import config.ConfigKeys.{DigitalPlatformReportingUrlKey, ManageFrontendBaseUrlKey, PlatformOperatorFrontendBaseUrlKey, TaxEnrolmentsUrlKey}
+import config.ConfigKeys.*
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
@@ -38,21 +38,23 @@ class AppConfig @Inject()(configuration: Configuration) {
   val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
   val signOutUrl: String = configuration.get[String]("urls.signOut")
 
-  lazy val taxEnrolmentsBaseUrl: String = configuration.get[Service](TaxEnrolmentsUrlKey).baseUrl
+  val taxEnrolmentsBaseUrl: String = configuration.get[Service](TaxEnrolmentsUrlKey).baseUrl
 
-  private lazy val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.host")
-  lazy val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/digital-platform-reporting-register-frontend"
+  val emailServiceUrl: String = configuration.get[Service](EmailServiceUrlKey).baseUrl
 
-  lazy val auditSource: String = configuration.get[String]("auditing.auditSource")
+  private val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.host")
+  val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/digital-platform-reporting-register-frontend"
 
-  lazy val digitalPlatformReportingUrl: String = configuration.get[Service](DigitalPlatformReportingUrlKey).baseUrl
+  val auditSource: String = configuration.get[String]("auditing.auditSource")
 
-  private lazy val platformOperatorFrontendBaseUrl: String = configuration.get[Service](PlatformOperatorFrontendBaseUrlKey).baseUrl
-  lazy val platformOperatorFrontendUrl: String = s"$platformOperatorFrontendBaseUrl/digital-platform-reporting"
-  lazy val addPlatformOperatorUrl: String = s"$platformOperatorFrontendUrl/platform-operator/add-platform-operator/start"
+  val digitalPlatformReportingUrl: String = configuration.get[Service](DigitalPlatformReportingUrlKey).baseUrl
 
-  private lazy val manageFrontendBaseUrl: String = configuration.get[Service](ManageFrontendBaseUrlKey).baseUrl
-  lazy val manageFrontendUrl: String = s"$manageFrontendBaseUrl/digital-platform-reporting/manage-reporting"
+  private val platformOperatorFrontendBaseUrl: String = configuration.get[Service](PlatformOperatorFrontendBaseUrlKey).baseUrl
+  private val platformOperatorFrontendUrl: String = s"$platformOperatorFrontendBaseUrl/digital-platform-reporting"
+  val addPlatformOperatorUrl: String = s"$platformOperatorFrontendUrl/platform-operator/add-platform-operator/start"
+
+  private val manageFrontendBaseUrl: String = configuration.get[Service](ManageFrontendBaseUrlKey).baseUrl
+  val manageFrontendUrl: String = s"$manageFrontendBaseUrl/digital-platform-reporting/manage-reporting"
 
   val timeout: Int = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
@@ -61,7 +63,7 @@ class AppConfig @Inject()(configuration: Configuration) {
 
   val dataEncryptionEnabled: Boolean = configuration.get[Boolean]("features.use-encryption")
 
-  lazy val isPrivateBeta: Boolean = configuration.getOptional("features.private-beta").getOrElse(false)
+  val isPrivateBeta: Boolean = configuration.getOptional("features.private-beta").getOrElse(false)
 
   val languageTranslationEnabled: Boolean = configuration.get[Boolean]("features.welsh-translation")
 
@@ -69,9 +71,9 @@ class AppConfig @Inject()(configuration: Configuration) {
     "en" -> Lang("en"),
     "cy" -> Lang("cy")
   )
-  
+
   val userAllowListEnabled: Boolean = configuration.get[Boolean]("features.user-allow-list")
-  
+
   val utrAllowListFeature = "UTR"
   val vrnAllowListFeature = "VRN"
 }

@@ -54,7 +54,7 @@ class SubscriptionDetailsSpec extends SpecBase {
     "must serialise/deserialise to/from JSON with encrypted formats" in {
       val request = SubscriptionRequest("safeId", true, None, IndividualContact(Individual("first", "last"), "email", None), None)
       val response = SubscribedResponse("dprsId", Instant.now())
-      val subscriptionDetails = SubscriptionDetails(response, request, RegistrationType.PlatformOperator, None, None)
+      val subscriptionDetails = SubscriptionDetails(response, request, RegistrationType.PlatformOperator, None, None, false)
 
       val json = Json.toJson(subscriptionDetails)(SubscriptionDetails.encryptedFormat(implicitly))
       json.as[SubscriptionDetails](SubscriptionDetails.encryptedFormat(implicitly)) mustEqual subscriptionDetails
@@ -68,9 +68,9 @@ class SubscriptionDetailsSpec extends SpecBase {
         .copy(registrationResponse = Some(registrationResponse))
         .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
         .set(BusinessTypePage, BusinessType.AssociationOrTrust).success.value
-      val subscriptionDetails = SubscriptionDetails(response, request, PlatformOperator, Some(AssociationOrTrust), Some("Testing 1 Ltd"))
+      val subscriptionDetails = SubscriptionDetails(response, request, PlatformOperator, Some(AssociationOrTrust), Some("Testing 1 Ltd"), false)
 
-      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+      SubscriptionDetails.apply(response, request, userAnswers, false) mustEqual subscriptionDetails
     }
 
     "must correctly create SubscriptionDetails when Org, MatchResponseWithoutID" in {
@@ -82,9 +82,9 @@ class SubscriptionDetailsSpec extends SpecBase {
         .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
         .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
         .set(BusinessNameNoUtrPage, "Testing 2 Ltd").success.value
-      val subscriptionDetails = SubscriptionDetails(response, request, PlatformOperator, Some(LimitedCompany), Some("Testing 2 Ltd"))
+      val subscriptionDetails = SubscriptionDetails(response, request, PlatformOperator, Some(LimitedCompany), Some("Testing 2 Ltd"), false)
 
-      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+      SubscriptionDetails.apply(response, request, userAnswers, false) mustEqual subscriptionDetails
     }
 
     "must correctly create SubscriptionDetails ThirdParty Individual, MatchResponseWithoutId" in {
@@ -95,9 +95,9 @@ class SubscriptionDetailsSpec extends SpecBase {
         .copy(registrationResponse = Some(registrationResponse))
         .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
         .set(BusinessTypePage, BusinessType.Individual).success.value
-      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Individual), None)
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Individual), None, false)
 
-      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+      SubscriptionDetails.apply(response, request, userAnswers, false) mustEqual subscriptionDetails
     }
 
     "must correctly create SubscriptionDetails when ThirdParty Sole Trader, MatchResponseWithoutId" in {
@@ -108,9 +108,9 @@ class SubscriptionDetailsSpec extends SpecBase {
         .copy(registrationResponse = Some(registrationResponse))
         .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
         .set(BusinessTypePage, BusinessType.SoleTrader).success.value
-      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.SoleTrader), None)
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.SoleTrader), None, false)
 
-      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+      SubscriptionDetails.apply(response, request, userAnswers, false) mustEqual subscriptionDetails
     }
 
     "must correctly create SubscriptionDetails when ThirdParty Sole Trader, MatchResponseWithId" in {
@@ -121,9 +121,9 @@ class SubscriptionDetailsSpec extends SpecBase {
         .copy(registrationResponse = Some(registrationResponse))
         .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
         .set(BusinessTypePage, BusinessType.SoleTrader).success.value
-      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.SoleTrader), None)
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.SoleTrader), None, false)
 
-      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+      SubscriptionDetails.apply(response, request, userAnswers, false) mustEqual subscriptionDetails
     }
 
     "must correctly create SubscriptionDetails when ThirdParty Individual, MatchResponseWithId" in {
@@ -134,9 +134,9 @@ class SubscriptionDetailsSpec extends SpecBase {
         .copy(registrationResponse = Some(registrationResponse))
         .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
         .set(BusinessTypePage, BusinessType.Individual).success.value
-      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Individual), None)
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Individual), None, false)
 
-      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+      SubscriptionDetails.apply(response, request, userAnswers, false) mustEqual subscriptionDetails
     }
 
     "must correctly create SubscriptionDetails when ThirdParty Org, MatchResponseWithoutId" in {
@@ -148,9 +148,9 @@ class SubscriptionDetailsSpec extends SpecBase {
         .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
         .set(BusinessTypePage, BusinessType.Partnership).success.value
         .set(BusinessNameNoUtrPage, "Testing 3 Ltd").success.value
-      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Partnership), Some("Testing 3 Ltd"))
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Partnership), Some("Testing 3 Ltd"), true)
 
-      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+      SubscriptionDetails.apply(response, request, userAnswers, true) mustEqual subscriptionDetails
     }
 
     "must correctly create SubscriptionDetails when ThirdParty Individual MatchResponseWithId" in {
@@ -161,9 +161,9 @@ class SubscriptionDetailsSpec extends SpecBase {
         .copy(registrationResponse = Some(registrationResponse))
         .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
         .set(BusinessTypePage, BusinessType.Llp).success.value
-      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Llp), Some("Testing 4 Ltd"))
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, Some(BusinessType.Llp), Some("Testing 4 Ltd"), false)
 
-      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+      SubscriptionDetails.apply(response, request, userAnswers, false) mustEqual subscriptionDetails
     }
 
     "must correctly create SubscriptionDetails when Auto-matched enrollment" in {
@@ -174,9 +174,9 @@ class SubscriptionDetailsSpec extends SpecBase {
         .copy(registrationResponse = Some(registrationResponse))
         .set(RegistrationTypePage, RegistrationType.ThirdParty).success.value
         .set(IsThisYourBusinessPage, true).success.value
-      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, None, Some("Testing 5 Ltd"))
+      val subscriptionDetails = SubscriptionDetails(response, request, ThirdParty, None, Some("Testing 5 Ltd"), false)
 
-      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+      SubscriptionDetails.apply(response, request, userAnswers, false) mustEqual subscriptionDetails
     }
 
     "must correctly create SubscriptionDetails when registrationResponse is not a Match" in {
@@ -187,9 +187,9 @@ class SubscriptionDetailsSpec extends SpecBase {
         .copy(registrationResponse = Some(registrationResponse))
         .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
         .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
-      val subscriptionDetails = SubscriptionDetails(response, request, PlatformOperator, Some(LimitedCompany), None)
+      val subscriptionDetails = SubscriptionDetails(response, request, PlatformOperator, Some(LimitedCompany), None, false)
 
-      SubscriptionDetails.apply(response, request, userAnswers) mustEqual subscriptionDetails
+      SubscriptionDetails.apply(response, request, userAnswers, false) mustEqual subscriptionDetails
     }
   }
 }

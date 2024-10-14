@@ -32,7 +32,8 @@ case class RegistrationConfirmationViewModel(mode: Mode,
                                              primaryEmail: String,
                                              secondaryEmail: Option[String],
                                              isThirdParty: Boolean,
-                                             businessName: Option[String])
+                                             businessName: Option[String],
+                                             emailSent: Boolean)
 
 object RegistrationConfirmationViewModel {
 
@@ -42,7 +43,6 @@ object RegistrationConfirmationViewModel {
     val optAnswerValue = userAnswers.get(RegistrationConfirmationPage)
     val subscriptionResponse = userAnswers.subscriptionDetails.map(_.subscriptionResponse).get.asInstanceOf[SubscribedResponse]
     val subscribedDateTime = Formatter.format(subscriptionResponse.subscribedDateTime).replace("AM", "am").replace("PM", "pm")
-
     userAnswers.subscriptionDetails
       .map(_.subscriptionRequest)
       .map { subscriptionRequest =>
@@ -54,7 +54,8 @@ object RegistrationConfirmationViewModel {
           primaryEmail = subscriptionRequest.primaryContact.email,
           secondaryEmail = subscriptionRequest.secondaryContact.map(_.email),
           isThirdParty = userAnswers.subscriptionDetails.map(_.registrationType).contains(ThirdParty),
-          businessName = userAnswers.subscriptionDetails.flatMap(_.businessName)
+          businessName = userAnswers.subscriptionDetails.flatMap(_.businessName),
+          emailSent = userAnswers.subscriptionDetails.get.emailSent
         )
       }
   }
