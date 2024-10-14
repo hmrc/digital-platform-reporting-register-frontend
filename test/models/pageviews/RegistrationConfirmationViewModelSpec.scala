@@ -58,7 +58,6 @@ class RegistrationConfirmationViewModelSpec extends SpecBase {
           dprsId = "some-dprs-id",
           subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
           primaryEmail = "primary.email@example.com",
-          secondaryEmail = None,
           isThirdParty = true,
           businessName = Some("some-business-name"),
           emailSent = subscriptionDetails.emailSent
@@ -77,7 +76,6 @@ class RegistrationConfirmationViewModelSpec extends SpecBase {
           dprsId = "some-dprs-id",
           subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
           primaryEmail = "primary.email@example.com",
-          secondaryEmail = None,
           isThirdParty = true,
           businessName = Some("some-business-name"),
           emailSent = subscriptionDetails.emailSent
@@ -96,7 +94,6 @@ class RegistrationConfirmationViewModelSpec extends SpecBase {
           dprsId = "some-dprs-id",
           subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
           primaryEmail = "primary.email@example.com",
-          secondaryEmail = None,
           isThirdParty = true,
           businessName = Some("some-business-name"),
           emailSent = subscriptionDetails.emailSent

@@ -46,12 +46,7 @@
     </p>
 
     @if(viewModel.emailSent){
-        <p class="govuk-body">
-            @{viewModel.secondaryEmail match {
-            case Some(email) => messages("registrationConfirmation.p2.1", viewModel.primaryEmail, email)
-            case None        => messages("registrationConfirmation.p2.2", viewModel.primaryEmail)
-            }}
-        </p>
+        <p class="govuk-body">@messages("registrationConfirmation.p2.1", viewModel.primaryEmail)</p>
     } else {
         @govukWarning(WarningText(
             iconFallbackText = Some("Warning"),
@@ -61,15 +56,15 @@
         <p class="govuk-body">@messages("registrationConfirmation.p2.0")</p>
     }
 
-    <p class="govuk-body">
-        <a class="govuk-link" href="#" data-module="hmrc-print-link">@messages("registrationConfirmation.print.link.text")</a>
-    </p>
-
     <h2 class="govuk-heading-m">@messages("registrationConfirmation.privateBeta.h2")</h2>
 
     <p class="govuk-body">
         @messages("registrationConfirmation.privateBeta.p1")
         <a class="govuk-link" href= @appConfig.manageFrontendUrl>@messages("registrationConfirmation.privateBeta.link.text")</a>.
+    </p>
+
+    <p class="govuk-body">
+        <a class="govuk-link" href="#" data-module="hmrc-print-link">@messages("registrationConfirmation.print.link.text")</a>
     </p>
 } else {
     @formHelper(action = routes.RegistrationConfirmationController.onSubmit(viewModel.mode), Symbol("autoComplete") -> "off") {
@@ -90,12 +85,7 @@
         </p>
 
         @if(viewModel.emailSent){
-            <p class="govuk-body">
-                @{viewModel.secondaryEmail match {
-                    case Some(email) => messages("registrationConfirmation.p2.1", viewModel.primaryEmail, email)
-                    case None        => messages("registrationConfirmation.p2.2", viewModel.primaryEmail)
-                }}
-            </p>
+            <p class="govuk-body">@messages("registrationConfirmation.p2.1", viewModel.primaryEmail)</p>
         } else {
             @govukWarning(WarningText(
                 iconFallbackText = Some("Warning"),
