@@ -41,7 +41,7 @@ object RegistrationResponse {
       }
   }
 
-  def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[RegistrationResponse] = {
+  def encryptedFormat(implicit crypto: Encrypter & Decrypter): OFormat[RegistrationResponse] = {
 
     implicit val sensitiveFormat: Format[SensitiveString] =
       JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)

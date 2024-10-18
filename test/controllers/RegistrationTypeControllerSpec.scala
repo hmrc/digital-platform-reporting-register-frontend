@@ -77,9 +77,9 @@ class RegistrationTypeControllerSpec extends ControllerSpecBase with MockitoSuga
         val mockConnector = mock[RegistrationConnector]
         val mockTaxIdentifierProvider = mock[FakeTaxIdentifierProvider]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-        when(mockConnector.register(any())(any())) thenReturn Future.successful(NoMatchResponse())
-        when(mockTaxIdentifierProvider.taxIdentifier) thenReturn Some(Utr("123"))
+        when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+        when(mockConnector.register(any())(any())).thenReturn(Future.successful(NoMatchResponse()))
+        when(mockTaxIdentifierProvider.taxIdentifier).thenReturn(Some(Utr("123")))
 
         val application = applicationBuilder(userAnswers = None)
           .overrides(
@@ -111,7 +111,7 @@ class RegistrationTypeControllerSpec extends ControllerSpecBase with MockitoSuga
         val mockSessionRepository = mock[SessionRepository]
         val mockConnector = mock[RegistrationConnector]
 
-        when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+        when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
         val application = applicationBuilder(userAnswers = Some(anEmptyAnswer))
           .overrides(

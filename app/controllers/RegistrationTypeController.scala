@@ -71,7 +71,7 @@ class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
   }
 
   private def matchIfNecessary(answers: UserAnswers)
-                              (implicit request: Request[_]): Future[Option[RegistrationResponse]] = answers.user.taxIdentifier
+                              (implicit request: Request[?]): Future[Option[RegistrationResponse]] = answers.user.taxIdentifier
     .map {
       case Utr(utr) => registrationConnector.register(OrganisationWithUtr(utr, None)).map(Some(_))
       case _ => Future.successful(None)

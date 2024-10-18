@@ -25,14 +25,14 @@ import java.time.Clock
 
 class Module extends play.api.inject.Module {
 
-  override def bindings(environment: Environment, configuration: Configuration): collection.Seq[Binding[_]] = {
+  override def bindings(environment: Environment, configuration: Configuration): collection.Seq[Binding[?]] = {
 
     Seq(
       bind[DataRetrievalAction].to[DataRetrievalActionImpl].eagerly(),
       bind[DataRequiredAction].to[DataRequiredActionImpl].eagerly(),
       bind[IdentifierActionProvider].to[AuthenticatedIdentifierActionProvider],
       bind[Clock].toInstance(Clock.systemUTC()),
-      bind[Encrypter with Decrypter].toProvider[CryptoProvider]
+      bind[Encrypter & Decrypter].toProvider[CryptoProvider]
     )
   }
 }

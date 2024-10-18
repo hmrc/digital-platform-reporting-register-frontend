@@ -40,7 +40,7 @@ class DataRetrievalActionSpec extends ControllerSpecBase with MockitoSugar {
         val sessionRepository = mock[SessionRepository]
         val action = new Harness(sessionRepository)
 
-        when(sessionRepository.get(aUser)) thenReturn Future(None)
+        when(sessionRepository.get(aUser)).thenReturn(Future(None))
 
         action.callTransform(IdentifierRequest(aUser, FakeRequest())).futureValue.userAnswers must not be defined
       }
@@ -53,7 +53,7 @@ class DataRetrievalActionSpec extends ControllerSpecBase with MockitoSugar {
           val action = new Harness(sessionRepository)
           val user = aUser.copy(taxIdentifier = Some(Nino("some-nino")))
 
-          when(sessionRepository.get(user)) thenReturn Future(Some(UserAnswers(user = user)))
+          when(sessionRepository.get(user)).thenReturn(Future(Some(UserAnswers(user = user))))
 
           val result = action.callTransform(IdentifierRequest(user, FakeRequest())).futureValue
           result.userAnswers mustBe defined
@@ -65,7 +65,7 @@ class DataRetrievalActionSpec extends ControllerSpecBase with MockitoSugar {
           val action = new Harness(sessionRepository)
           val user = aUser.copy(taxIdentifier = None)
 
-          when(sessionRepository.get(user)) thenReturn Future(Some(UserAnswers(user = user)))
+          when(sessionRepository.get(user)).thenReturn(Future(Some(UserAnswers(user = user))))
 
           val result = action.callTransform(IdentifierRequest(user, FakeRequest())).futureValue
           result.userAnswers mustBe defined

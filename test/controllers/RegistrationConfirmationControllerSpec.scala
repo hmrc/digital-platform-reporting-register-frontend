@@ -127,7 +127,7 @@ class RegistrationConfirmationControllerSpec extends ControllerSpecBase with Moc
     "must redirect to operating-frontend when true option submitted" in {
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder(userAnswers = Some(aUserAnswers))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
@@ -147,7 +147,7 @@ class RegistrationConfirmationControllerSpec extends ControllerSpecBase with Moc
     "must redirect to manage-frontend when false option submitted" in {
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder(userAnswers = Some(aUserAnswers))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
@@ -167,7 +167,7 @@ class RegistrationConfirmationControllerSpec extends ControllerSpecBase with Moc
     "must not redirect to Manage Frontend on POST when when DPRS enrollment exists" in {
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder(userAnswers = Some(aUserAnswers), hasDprsEnrollment = true)
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))

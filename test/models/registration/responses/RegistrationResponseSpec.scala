@@ -67,7 +67,7 @@ class RegistrationResponseSpec extends SpecBase {
 
       val configuration = Configuration("crypto.key" -> aesKey)
 
-      implicit val crypto: Encrypter with Decrypter =
+      implicit val crypto: Encrypter & Decrypter =
         SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
 
       "a match with Id" in {

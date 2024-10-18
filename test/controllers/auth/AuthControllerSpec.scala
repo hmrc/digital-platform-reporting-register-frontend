@@ -36,7 +36,7 @@ class AuthControllerSpec extends ControllerSpecBase with MockitoSugar {
     "must clear user answers and redirect to sign out, specifying the exit survey as the continue URL" in {
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.clear(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.clear(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder(None)
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
@@ -61,7 +61,7 @@ class AuthControllerSpec extends ControllerSpecBase with MockitoSugar {
     "must clear users answers and redirect to sign out, specifying SignedOut as the continue URL" in {
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.clear(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.clear(any())).thenReturn(Future.successful(true))
 
       val application = applicationBuilder(None)
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))

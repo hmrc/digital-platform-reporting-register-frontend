@@ -79,8 +79,8 @@ class BusinessNameControllerSpec extends ControllerSpecBase with MockitoSugar {
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[RegistrationConnector]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockConnector.register(any())(any())) thenReturn Future.successful(NoMatchResponse())
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockConnector.register(any())(any())).thenReturn(Future.successful(NoMatchResponse()))
 
       val baseAnswers =
         anEmptyAnswer

@@ -81,7 +81,7 @@ class UkAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(anEmptyAnswer))
@@ -96,7 +96,7 @@ class UkAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
           getParam("postCode", Some(validUkAddress.postCode)) ++
           getParam("country", Some(validUkAddress.country.code))
         val request = FakeRequest(POST, ukAddressRoute)
-          .withFormUrlEncodedBody(params.flatten: _*)
+          .withFormUrlEncodedBody(params.flatten *)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

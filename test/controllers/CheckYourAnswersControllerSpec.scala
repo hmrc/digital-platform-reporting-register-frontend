@@ -407,7 +407,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress), contactDetails)
               val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "some.email@example.com", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
-              val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, registrationType = RegistrationType.ThirdParty, businessType = Some(BusinessType.SoleTrader), None, true)
+              val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, registrationType = RegistrationType.ThirdParty, businessType = Some(BusinessType.SoleTrader), businessName = None, emailSent = true)
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),
@@ -464,7 +464,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress), contactDetails)
               val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "some.email@example.com", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
-              val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, registrationType = RegistrationType.ThirdParty, businessType = Some(BusinessType.SoleTrader), None, false)
+              val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, registrationType = RegistrationType.ThirdParty, businessType = Some(BusinessType.SoleTrader), businessName = None, emailSent = false)
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),
@@ -660,7 +660,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               val expectedRegistrationRequest = OrganisationWithoutId("name", Address.apply(aBusinessAddress), aContactDetails)
               val expectedContact = OrganisationContact(models.subscription.Organisation("contact name"), aContactDetails.emailAddress, None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
-              val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, businessType = Some(BusinessType.LimitedCompany), businessName = Some("name"), true)
+              val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, businessType = Some(BusinessType.LimitedCompany), businessName = Some("name"), emailSent = true)
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),
@@ -719,7 +719,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               val expectedRegistrationRequest = OrganisationWithoutId("name", Address.apply(aBusinessAddress), aContactDetails)
               val expectedContact = OrganisationContact(models.subscription.Organisation("contact name"), aContactDetails.emailAddress, None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
-              val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, businessType = Some(BusinessType.LimitedCompany), businessName = Some("name"), false)
+              val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, businessType = Some(BusinessType.LimitedCompany), businessName = Some("name"), emailSent = false)
               val expectedFinalAnswers = answers.copy(
                 data = Json.obj(),
                 registrationResponse = Some(registrationResponse),
