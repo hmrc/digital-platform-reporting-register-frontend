@@ -32,7 +32,18 @@ Navigate to http://localhost:9949/auth-login-stub/gg-sign-in which redirects to 
 
 ***Redirect URL:*** http://localhost:20003/digital-platform-reporting/register
 
-***Affinity Group:*** Organisation
+***Affinity Group:*** Organisation or Individual
+
+## Stopping the service
+
+
+You can use service manage to stop all dependent microservices using the command below
+
+    sm2 --stop DPRS_ALL
+
+Or you could stop this microservice locally using
+
+    sm2 --stop DIGITAL_PLATFORM_REPORTING_REGISTER_FRONTEND
 
 ## Integration and unit tests
 
