@@ -42,7 +42,7 @@ final case class UserAnswers(user: User,
   def getEither[A](page: Gettable[A])(implicit rds: Reads[A]): EitherNec[Query, A] =
     get(page).toRight(NonEmptyChain.one(page))
 
-  def isDefined(gettable: Gettable[_]): Boolean =
+  def isDefined(gettable: Gettable[?]): Boolean =
     Reads.optionNoError(Reads.at[JsValue](gettable.path)).reads(data)
       .map(_.isDefined)
       .getOrElse(false)
@@ -74,7 +74,7 @@ final case class UserAnswers(user: User,
 
 object UserAnswers {
 
-  def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[UserAnswers] = {
+  def encryptedFormat(implicit crypto: Encrypter & Decrypter): OFormat[UserAnswers] = {
     implicit val sensitiveFormat: Format[SensitiveString] =
       JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)
 

@@ -39,7 +39,7 @@ object SubscriptionResponse {
     }
   }
 
-  def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[SubscriptionResponse] = {
+  def encryptedFormat(implicit crypto: Encrypter & Decrypter): OFormat[SubscriptionResponse] = {
 
     implicit val sensitiveFormat: Format[SensitiveString] =
       JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)

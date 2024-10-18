@@ -77,7 +77,7 @@ class InternationalAddressControllerSpec extends ControllerSpecBase with Mockito
 
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))

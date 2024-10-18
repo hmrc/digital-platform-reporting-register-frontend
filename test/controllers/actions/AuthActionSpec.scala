@@ -117,7 +117,7 @@ class AuthActionSpec extends ControllerSpecBase with MockitoSugar with BeforeAnd
       "and is allowed into the service" - {
         "must succeed" - {
           "when the user has a CT UTR enrolment" in {
-            when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
+            when(mockAllowListService.isUserAllowed(any())(any())).thenReturn(Future.successful(true))
             val enrolments = Enrolments(Set(Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)))
             val authAction = new AuthenticatedIdentifierAction(
               new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments ~ Some("some-group-identifier") ~ Some(credentials)),
@@ -133,7 +133,7 @@ class AuthActionSpec extends ControllerSpecBase with MockitoSugar with BeforeAnd
           }
 
           "when the user has no CT UTR enrolment" in {
-            when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
+            when(mockAllowListService.isUserAllowed(any())(any())).thenReturn(Future.successful(true))
             val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(
               Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ emptyEnrolments ~ Some("some-group-identifier") ~ Some(credentials)),
               mockAllowListService,
@@ -151,7 +151,7 @@ class AuthActionSpec extends ControllerSpecBase with MockitoSugar with BeforeAnd
       
       "and is not allowed into the service" - {
         "must redirect the user to `unauthorised`" in {
-          when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(false)
+          when(mockAllowListService.isUserAllowed(any())(any())).thenReturn(Future.successful(false))
           val enrolments = Enrolments(Set(Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)))
           val authAction = new AuthenticatedIdentifierAction(
             new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments ~ Some("some-group-identifier") ~ Some(credentials)),
@@ -223,7 +223,7 @@ class AuthActionSpec extends ControllerSpecBase with MockitoSugar with BeforeAnd
 
     "when dprs enrollment check true passed" - {
       "when the user has no DPRS enrollment should continue" in {
-        when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
+        when(mockAllowListService.isUserAllowed(any())(any())).thenReturn(Future.successful(true))
         val enrolments = Enrolments(Set(Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)))
         val identifierActionProvider = new AuthenticatedIdentifierActionProvider(
           new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments ~ Some("some-group-identifier") ~ Some(credentials)),
@@ -240,7 +240,7 @@ class AuthActionSpec extends ControllerSpecBase with MockitoSugar with BeforeAnd
       }
 
       "when the user has DPRS enrollment should redirect to Manage Frontend" in {
-        when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
+        when(mockAllowListService.isUserAllowed(any())(any())).thenReturn(Future.successful(true))
         val enrolments = Enrolments(Set(Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", " some-dprs-id")), "activated", None)))
         val identifierActionProvider = new AuthenticatedIdentifierActionProvider(
           new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments ~ Some("some-group-identifier") ~ Some(credentials)),
@@ -259,7 +259,7 @@ class AuthActionSpec extends ControllerSpecBase with MockitoSugar with BeforeAnd
 
     "when dprs enrollment check false passed" - {
       "when the user has DPRS enrollment should continue" in {
-        when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
+        when(mockAllowListService.isUserAllowed(any())(any())).thenReturn(Future.successful(true))
         val enrolments = Enrolments(Set(Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)))
         val identifierActionProvider = new AuthenticatedIdentifierActionProvider(
           new FakeAuthConnector(Some(Organisation) ~ Some(User) ~ Some("internalId") ~ None ~ enrolments ~ Some("some-group-identifier") ~ Some(credentials)),

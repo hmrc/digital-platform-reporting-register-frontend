@@ -47,7 +47,7 @@ class SubscriptionDetailsSpec extends SpecBase {
 
   private val configuration = Configuration("crypto.key" -> aesKey)
 
-  private implicit val crypto: Encrypter with Decrypter =
+  private implicit val crypto: Encrypter & Decrypter =
     SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
 
   "Subscription Details" - {

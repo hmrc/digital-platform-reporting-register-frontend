@@ -71,8 +71,8 @@ class HasUtrController @Inject()(sessionRepository: SessionRepository,
     }
   }
 
-  private def renderView(businessType: BusinessType, form: Form[_], mode: Mode)
-                        (implicit request: Request[_]): Option[Html] = businessType match {
+  private def renderView(businessType: BusinessType, form: Form[?], mode: Mode)
+                        (implicit request: Request[?]): Option[Html] = businessType match {
     case LimitedCompany | AssociationOrTrust => Some(corporationTaxView(form, mode))
     case Llp | Partnership => Some(partnershipView(form, mode))
     case SoleTrader => Some(selfAssessmentView(form, mode))
