@@ -22,7 +22,7 @@ import play.api.data.{Form, FormError}
 
 trait FormSpec extends SpecBase with OptionValues {
 
-  def checkForError(form: Form[_], data: Map[String, String], expectedErrors: Seq[FormError]): Assertion = {
+  def checkForError(form: Form[?], data: Map[String, String], expectedErrors: Seq[FormError]): Assertion = {
     form.bind(data).fold(
       formWithErrors => {
         for (error <- expectedErrors) formWithErrors.errors must contain(FormError(error.key, error.message, error.args))

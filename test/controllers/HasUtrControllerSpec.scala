@@ -127,7 +127,7 @@ class HasUtrControllerSpec extends ControllerSpecBase with MockitoSugar {
         .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
         .build()
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       running(application) {
         val request = FakeRequest(POST, hasUtrRoute).withFormUrlEncodedBody(("value", "true"))

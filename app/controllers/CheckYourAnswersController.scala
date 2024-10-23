@@ -111,7 +111,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
     }
   }
 
-  private def getRegistrationResponse(answers: UserAnswers)(implicit request: Request[_]): Future[RegistrationResponse] =
+  private def getRegistrationResponse(answers: UserAnswers)(implicit request: Request[?]): Future[RegistrationResponse] =
     answers.registrationResponse
       .map(x => Future.successful(x))
       .getOrElse {
@@ -128,7 +128,7 @@ class CheckYourAnswersController @Inject()(identify: IdentifierActionProvider,
       }
 
   private def subscribe(safeId: String, answersWithRegistration: UserAnswers, originalAnswers: UserAnswers)
-                       (implicit request: Request[_]): Future[SubscriptionDetails] =
+                       (implicit request: Request[?]): Future[SubscriptionDetails] =
     lazy val isAutoSubscription = originalAnswers.registrationResponse.isEmpty
     SubscriptionRequest.build(safeId, answersWithRegistration).fold(
       errors => Future.failed(Exception(s"Unable to build a subscription request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}")),

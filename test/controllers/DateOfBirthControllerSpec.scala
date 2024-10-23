@@ -108,8 +108,8 @@ class DateOfBirthControllerSpec extends ControllerSpecBase with MockitoSugar wit
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[RegistrationConnector]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockConnector.register(any())(any())) thenReturn Future.successful(registrationResponse)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
@@ -154,8 +154,8 @@ class DateOfBirthControllerSpec extends ControllerSpecBase with MockitoSugar wit
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[RegistrationConnector]
       
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockConnector.register(any())(any())) thenReturn Future.successful(registrationResponse)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+      when(mockConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
@@ -190,7 +190,7 @@ class DateOfBirthControllerSpec extends ControllerSpecBase with MockitoSugar wit
 
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(anEmptyAnswer))

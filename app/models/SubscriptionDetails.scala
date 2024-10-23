@@ -68,7 +68,7 @@ object SubscriptionDetails {
     }
   }
 
-  def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[SubscriptionDetails] = {
+  def encryptedFormat(implicit crypto: Encrypter & Decrypter): OFormat[SubscriptionDetails] = {
 
     implicit val sensitiveFormat: Format[SensitiveString] =
       JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)
