@@ -79,7 +79,7 @@ class CheckYourAnswersPageSpec extends SpecBase with TryValues with OptionValues
         val subscriptionDetails = SubscriptionDetails(subscriptionResponse, aSubscriptionRequest, RegistrationType.PlatformOperator, None, Some(""), false)
         val answers = baseAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
 
-        CheckYourAnswersPage.nextPage(NormalMode, answers) mustEqual routes.RegistrationConfirmationController.onPageLoad(NormalMode)
+        CheckYourAnswersPage.nextPage(NormalMode, answers) mustEqual routes.RegistrationConfirmationController.onPageLoad()
       }
 
       "must go to Individual Already Registered when the subscription response is AlreadySubscribed and the user is an individual type" in {
