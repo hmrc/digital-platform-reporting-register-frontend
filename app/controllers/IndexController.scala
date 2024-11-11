@@ -16,7 +16,6 @@
 
 package controllers
 
-import controllers.actions.IdentifierActionProvider
 import models.NormalMode
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -24,10 +23,10 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
 
-class IndexController @Inject()(identify: IdentifierActionProvider)
+class IndexController @Inject()()
                                (implicit mcc: MessagesControllerComponents) extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify() { implicit request =>
+  def onPageLoad(): Action[AnyContent] = Action {
     Redirect(routes.RegistrationTypeController.onPageLoad(NormalMode))
   }
 }

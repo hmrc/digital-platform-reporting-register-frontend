@@ -16,64 +16,32 @@
 
 package controllers
 
-import connectors.RegistrationConnector
-import controllers.actions.*
 import forms.RegistrationTypeFormProvider
-import models.registration.requests.OrganisationWithUtr
-import models.registration.responses.RegistrationResponse
-import models.{Mode, UserAnswers, Utr}
-import pages.RegistrationTypePage
+import models.{Mode, RegistrationType}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
-import repositories.SessionRepository
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.RegistrationTypeView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
-                                           identify: IdentifierActionProvider,
-                                           getData: DataRetrievalAction,
-                                           formProvider: RegistrationTypeFormProvider,
-                                           view: RegistrationTypeView,
-                                           registrationConnector: RegistrationConnector)
-                                          (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
+class RegistrationTypeController @Inject()(formProvider: RegistrationTypeFormProvider,
+                                           view: RegistrationTypeView)
+                                          (implicit mcc: MessagesControllerComponents)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData) { implicit request =>
-    val answers = request.userAnswers
-      .getOrElse(UserAnswers(request.user))
-      .get(RegistrationTypePage)
-
-    val preparedForm = answers match {
-      case None => formProvider()
-      case Some(value) => formProvider().fill(value)
-    }
-
-    Ok(view(preparedForm, mode))
+  def onPageLoad(mode: Mode): Action[AnyContent] = Action { implicit request =>
+    Ok(view(formProvider(), mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = Action { implicit request =>
     formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-      value => {
-        val baseAnswers = request.userAnswers.getOrElse(UserAnswers(request.user))
-
-        for {
-          matchResult <- matchIfNecessary(baseAnswers)
-          answers = baseAnswers.copy(registrationResponse = matchResult)
-          updatedAnswers <- Future.fromTry(answers.set(RegistrationTypePage, value))
-          _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(RegistrationTypePage.nextPage(mode, updatedAnswers))
+      formWithErrors => BadRequest(view(formWithErrors, mode)),
+      {
+        case RegistrationType.PlatformOperator => Redirect(routes.RegistrationTypeContinueController.platformOperator())
+        case RegistrationType.ThirdParty => Redirect(routes.RegistrationTypeContinueController.thirdParty())
       }
     )
   }
 
-  private def matchIfNecessary(answers: UserAnswers)
-                              (implicit request: Request[?]): Future[Option[RegistrationResponse]] = answers.user.taxIdentifier
-    .map {
-      case Utr(utr) => registrationConnector.register(OrganisationWithUtr(utr, None)).map(Some(_))
-      case _ => Future.successful(None)
-    }.getOrElse(Future.successful(None))
 }
