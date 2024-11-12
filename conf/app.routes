@@ -205,7 +205,4 @@ GET        /confirmed-identity                                      controllers.
 
 GET        /individual-identity-not-confirmed                       controllers.IndividualIdentityNotConfirmedController.onPageLoad()
 
-GET        /registration-successful                        controllers.RegistrationConfirmationController.onPageLoad(mode: Mode = NormalMode)
-POST       /registration-successful                        controllers.RegistrationConfirmationController.onSubmit(mode: Mode = NormalMode)
-GET        /change-registration-successful                  controllers.RegistrationConfirmationController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-registration-successful                  controllers.RegistrationConfirmationController.onSubmit(mode: Mode = CheckMode)
+GET        /registration-successful                                 controllers.RegistrationConfirmationController.onPageLoad()

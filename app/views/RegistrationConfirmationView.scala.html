@@ -16,23 +16,16 @@
 
 @import config.AppConfig
 @import models.pageviews.RegistrationConfirmationViewModel
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukWarningText
 
 @this(
     layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukPanel: GovukPanel,
-    govukWarning: GovukWarningText,
-    govukRadios: GovukRadios,
-    govukButton: GovukButton
+    govukPanel: GovukPanel
 )
 
 @(viewModel: RegistrationConfirmationViewModel)(appConfig: AppConfig)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(viewModel.form, messages("registrationConfirmation.title")), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("registrationConfirmation.title")), showBackLink = false) {
 
-@if(appConfig.isPrivateBeta) {
     @govukPanel(Panel(
         title = messages("registrationConfirmation.panel.heading"),
         content = messages("registrationConfirmation.panel.p1", viewModel.dprsId)
@@ -45,84 +38,16 @@
         @messages("registrationConfirmation.p1.1", viewModel.subscribedDateTime)
     </p>
 
-    @if(viewModel.emailSent){
-        <p class="govuk-body">@messages("registrationConfirmation.p2.1", viewModel.primaryEmail)</p>
-    } else {
-        @govukWarning(WarningText(
-            iconFallbackText = Some("Warning"),
-            content = messages("registrationConfirmation.privateBeta.warning")
-        ))
+    <p class="govuk-body">@messages("registrationConfirmation.p2", viewModel.primaryEmail)</p>
 
-        <p class="govuk-body">@messages("registrationConfirmation.p2.0")</p>
-    }
-
-    <h2 class="govuk-heading-m">@messages("registrationConfirmation.privateBeta.h2")</h2>
+    <h2 class="govuk-heading-m">@messages("registrationConfirmation.h2")</h2>
 
     <p class="govuk-body">
-        @messages("registrationConfirmation.privateBeta.p1")
-        <a class="govuk-link" href= @appConfig.manageFrontendUrl>@messages("registrationConfirmation.privateBeta.link.text")</a>.
+        @messages("registrationConfirmation.p3")
+        <a class="govuk-link" href= @{appConfig.addPlatformOperatorUrl}>@if(viewModel.isThirdParty){@messages("registrationConfirmation.thirdParty.p3.link.text")} else {@messages("registrationConfirmation.operatorOfDP.p3.link.text")}</a>.
     </p>
 
     <p class="govuk-body">
         <a class="govuk-link" href="#" data-module="hmrc-print-link">@messages("registrationConfirmation.print.link.text")</a>
     </p>
-} else {
-    @formHelper(action = routes.RegistrationConfirmationController.onSubmit(viewModel.mode), Symbol("autoComplete") -> "off") {
-        @if(viewModel.form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(viewModel.form))
-        }
-
-        @govukPanel(Panel(
-            title = messages("registrationConfirmation.panel.heading"),
-            content = messages("registrationConfirmation.panel.p1", viewModel.dprsId)
-        ))
-
-        <p class="govuk-body">
-            @{viewModel.businessName
-                .map(messages("registrationConfirmation.organisation.p1.0", _))
-                .getOrElse(messages("registrationConfirmation.person.p1.0"))}
-            @messages("registrationConfirmation.p1.1", viewModel.subscribedDateTime)
-        </p>
-
-        @if(viewModel.emailSent){
-            <p class="govuk-body">@messages("registrationConfirmation.p2.1", viewModel.primaryEmail)</p>
-        } else {
-            @govukWarning(WarningText(
-                iconFallbackText = Some("Warning"),
-                content = messages("registrationConfirmation.privateBeta.warning")
-            ))
-
-            <p class="govuk-body">@messages("registrationConfirmation.p2.0")</p>
-        }
-
-        <h2 class="govuk-heading-m">@messages("registrationConfirmation.h2.1")</h2>
-
-        <p class="govuk-body">
-            @if(viewModel.isThirdParty) {
-                @messages("registrationConfirmation.thirdParty.p3")
-            } else {
-                @messages("registrationConfirmation.organisation.p3")
-            }
-        </p>
-
-        <h2 class="govuk-heading-m">@messages("registrationConfirmation.h2.2")</h2>
-
-        <p class="govuk-body">@messages("registrationConfirmation.p4")</p>
-
-        @govukRadios(
-            RadiosViewModel.yesNo(
-                field = viewModel.form("value"),
-                legend = LegendViewModel(messages("registrationConfirmation.heading")).withCssClass("govuk-visually-hidden")
-            )
-        )
-
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
-
-        <p class="govuk-body">
-            <a class="govuk-link" href="#" data-module="hmrc-print-link">@messages("registrationConfirmation.link.text")</a>
-        </p>
-    }
-}
 }

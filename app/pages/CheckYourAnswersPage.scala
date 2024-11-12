@@ -20,7 +20,7 @@ import controllers.routes
 import models.BusinessType.{Individual, SoleTrader}
 import models.registration.responses as registrationResponses
 import models.subscription.responses as subscriptionResponses
-import models.{NormalMode, SubscriptionDetails, UserAnswers}
+import models.{SubscriptionDetails, UserAnswers}
 import play.api.mvc.Call
 
 case object CheckYourAnswersPage extends Page {
@@ -39,7 +39,7 @@ case object CheckYourAnswersPage extends Page {
             alreadySubscribedRoute(answers)
 
           case _ =>
-            routes.RegistrationConfirmationController.onPageLoad(NormalMode)
+            routes.RegistrationConfirmationController.onPageLoad()
         }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
     }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 
