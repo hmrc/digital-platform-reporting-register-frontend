@@ -17,7 +17,7 @@
 package controllers
 
 import connectors.RegistrationConnector
-import controllers.actions.{DataRetrievalAction, IdentifierActionProvider}
+import controllers.actions.{DataRetrievalAction, IdentifierActionProvider2}
 import models.registration.requests.OrganisationWithUtr
 import models.registration.responses.RegistrationResponse
 import models.{NormalMode, RegistrationType, UserAnswers, Utr}
@@ -31,7 +31,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationTypeContinueController @Inject()(sessionRepository: SessionRepository,
-                                                   identify: IdentifierActionProvider,
+                                                   identify: IdentifierActionProvider2,
                                                    getData: DataRetrievalAction,
                                                    registrationConnector: RegistrationConnector)
                                                   (implicit mcc: MessagesControllerComponents,

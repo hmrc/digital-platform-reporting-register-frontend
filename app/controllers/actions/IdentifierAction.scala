@@ -39,7 +39,8 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
                                     userAllowListService: UserAllowListService,
                                     appConfig: AppConfig,
                                     val parser: BodyParsers.Default,
-                                    withDprsEnrollmentCheck: Boolean = false)
+                                    withDprsEnrollmentCheck: Boolean = false,
+                                    useStandardLogoutContinueUrl: Boolean = false)
                                    (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions {
 
   // scalastyle:off
@@ -79,7 +80,17 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
 
       case _ => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     } recover {
-      case _: NoActiveSession => Redirect(appConfig.loginUrl, Map("continue" -> Seq(appConfig.loginContinueUrl)))
+      case _: NoActiveSession => Redirect(
+        appConfig.loginUrl,
+        if (useStandardLogoutContinueUrl) {
+          println("******************* 1 ***********************")
+          Map("continue" -> Seq(appConfig.loginContinueUrl2))
+        }
+        else {
+          println("******************* 2 ***********************")
+          Map("continue" -> Seq(appConfig.loginContinueUrl))
+        }
+      )
       case _: AuthorisationException => Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
@@ -116,5 +127,27 @@ class AuthenticatedIdentifierActionProvider @Inject()(authConnector: AuthConnect
     userAllowListService = userAllowListService,
     appConfig = appConfig,
     parser = parser
+  )
+}
+
+
+trait IdentifierActionProvider2 {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true, useStandardLogoutContinueUrl: Boolean = true): IdentifierAction
+}
+class AuthenticatedIdentifierActionProvider2 @Inject()(authConnector: AuthConnector,
+                                                      userAllowListService: UserAllowListService,
+                                                      appConfig: AppConfig,
+                                                      parser: BodyParsers.Default)
+                                                     (implicit val executionContext: ExecutionContext)
+  extends IdentifierActionProvider2 {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true, useStandardLogoutContinueUrl: Boolean = true) = new AuthenticatedIdentifierAction(
+    withDprsEnrollmentCheck = withDprsEnrollmentCheck,
+    authConnector = authConnector,
+    userAllowListService = userAllowListService,
+    appConfig = appConfig,
+    parser = parser,
+    useStandardLogoutContinueUrl = useStandardLogoutContinueUrl
   )
 }
