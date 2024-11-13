@@ -27,7 +27,7 @@ import javax.inject.Inject
 class IndexController @Inject()(identify: IdentifierActionProvider)
                                (implicit mcc: MessagesControllerComponents) extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify() { implicit request =>
+  def onPageLoad(): Action[AnyContent] = Action { implicit request =>
     Redirect(routes.RegistrationTypeController.onPageLoad(NormalMode))
   }
 }

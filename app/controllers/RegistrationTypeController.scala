@@ -21,7 +21,7 @@ import controllers.actions.*
 import forms.RegistrationTypeFormProvider
 import models.registration.requests.OrganisationWithUtr
 import models.registration.responses.RegistrationResponse
-import models.{Mode, UserAnswers, Utr}
+import models.{Mode, User, UserAnswers, Utr}
 import pages.RegistrationTypePage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -41,33 +41,53 @@ class RegistrationTypeController @Inject()(sessionRepository: SessionRepository,
                                           (implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify() andThen getData) { implicit request =>
-    val answers = request.userAnswers
-      .getOrElse(UserAnswers(request.user))
-      .get(RegistrationTypePage)
+  def onPageLoad(mode: Mode): Action[AnyContent] = Action.async { implicit request =>
 
-    val preparedForm = answers match {
-      case None => formProvider()
-      case Some(value) => formProvider().fill(value)
-    }
+    hc.sessionId
+      .map(_.value)
+      .map { sessionID =>
+        sessionRepository.get(User(sessionID)).map { OptionalUserAnswers =>
+          val userAnswers  = OptionalUserAnswers.getOrElse(UserAnswers(User(sessionID))).get(RegistrationTypePage)
+          val preparedForm = userAnswers.map(formProvider().fill).getOrElse(formProvider())
+          Ok(view(preparedForm, mode))
+        }
+      }
+      .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
 
-    Ok(view(preparedForm, mode))
+
+//    val answers = request.userAnswers
+//      .getOrElse(UserAnswers(request.user))
+//      .get(RegistrationTypePage)
+//
+//    val preparedForm = answers match {
+//      case None => formProvider()
+//      case Some(value) => formProvider().fill(value)
+//    }
+//
+//    Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify() andThen getData).async { implicit request =>
-    formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-      value => {
-        val baseAnswers = request.userAnswers.getOrElse(UserAnswers(request.user))
+  def onSubmit(mode: Mode): Action[AnyContent] = Action.async { implicit request =>
 
-        for {
-          matchResult <- matchIfNecessary(baseAnswers)
-          answers = baseAnswers.copy(registrationResponse = matchResult)
-          updatedAnswers <- Future.fromTry(answers.set(RegistrationTypePage, value))
-          _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(RegistrationTypePage.nextPage(mode, updatedAnswers))
-      }
-    )
+    hc.sessionId
+      .map(_.value)
+      .map { sessionID =>
+        sessionRepository.get(User(sessionID)).flatMap { optionalUserAnswer =>
+          val userAnswer = optionalUserAnswer.getOrElse(UserAnswers(User(sessionID)))
+          formProvider().bindFromRequest().fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+            value => {
+              for {
+                matchResult <- matchIfNecessary(userAnswer)
+                answers = userAnswer.copy(registrationResponse = matchResult)
+                updatedAnswers <- Future.fromTry(answers.set(RegistrationTypePage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(RegistrationTypePage.nextPage(mode, updatedAnswers))
+            }
+          )
+        }
+      }.getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
+
   }
 
   private def matchIfNecessary(answers: UserAnswers)

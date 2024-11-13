@@ -47,6 +47,11 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
+    val sessionId = hc.sessionId match {
+      case Some(id) => id.value
+      case None => throw new RuntimeException("Unexpected error, No session id found")
+    }
+
     authorised().retrieve(
       Retrievals.affinityGroup and
         Retrievals.credentialRole and
@@ -67,13 +72,13 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
 
       case Some(Individual) ~ _ ~ Some(internalId) ~ maybeNino ~ enrolments ~ Some(groupIdentifier) ~ Some(credentials) =>
         userAllowListService.isUserAllowed(enrolments).flatMap {
-          case true => block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), maybeNino.map(Nino.apply)), request))
+          case true => block(IdentifierRequest(models.User(sessionId, Some(credentials.providerId), Some(groupIdentifier), maybeNino.map(Nino.apply)), request))
           case false => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
         }
         
       case Some(Organisation) ~ _ ~ Some(internalId) ~ _ ~ enrolments ~ Some(groupIdentifier) ~ Some(credentials) =>
         userAllowListService.isUserAllowed(enrolments).flatMap {
-          case true => block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), getCtUtrEnrolment(enrolments)), request))
+          case true => block(IdentifierRequest(models.User(sessionId, Some(credentials.providerId), Some(groupIdentifier), getCtUtrEnrolment(enrolments)), request))
           case false => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
         }
 
