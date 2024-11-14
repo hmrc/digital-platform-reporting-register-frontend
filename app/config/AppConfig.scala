@@ -65,8 +65,6 @@ class AppConfig @Inject()(configuration: Configuration) {
 
   val dataEncryptionEnabled: Boolean = configuration.get[Boolean]("features.use-encryption")
 
-  val isPrivateBeta: Boolean = configuration.getOptional("features.private-beta").getOrElse(false)
-
   val languageTranslationEnabled: Boolean = configuration.get[Boolean]("features.welsh-translation")
 
   def languageMap: Map[String, Lang] = Map(

@@ -22,16 +22,13 @@ import builders.SubscribedResponseBuilder.aSubscribedResponse
 import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
 import builders.SubscriptionRequestBuilder.aSubscriptionRequest
 import builders.UserAnswersBuilder.aUserAnswers
-import forms.RegistrationConfirmationFormProvider
-import models.{BusinessType, NormalMode, RegistrationType, SubscriptionDetails}
+import models.{BusinessType, RegistrationType, SubscriptionDetails}
 import pages.RegistrationConfirmationPage
 
 import java.time.Instant
 
 class RegistrationConfirmationViewModelSpec extends SpecBase {
 
-  private val anyMode = NormalMode
-  private val formProvider = new RegistrationConfirmationFormProvider()
   private val subscribedResponse = aSubscribedResponse.copy(dprsId = "some-dprs-id", Instant.parse("2024-03-17T09:30:47Z"))
   private val subscriptionRequest = aSubscriptionRequest.copy(primaryContact = anOrganisationContact.copy(email = "primary.email@example.com"))
   private val subscriptionDetails = aSubscriptionDetails.copy(
@@ -44,60 +41,26 @@ class RegistrationConfirmationViewModelSpec extends SpecBase {
   private val underTest = RegistrationConfirmationViewModel
 
   ".apply(...)" - {
-    "must return ViewModel with pre-filled form when RegistrationConfirmationPage answer available" in {
-      val form = formProvider()
+    "must return ViewModel" in {
       val anyBoolean = true
 
       val userAnswers = aUserAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
         .set(RegistrationConfirmationPage, anyBoolean).get
 
-      underTest.apply(anyMode, userAnswers, form) mustBe
+      underTest.apply(userAnswers) mustBe
         Some(RegistrationConfirmationViewModel(
-          mode = anyMode,
-          form = form.fill(anyBoolean),
           dprsId = "some-dprs-id",
           subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
           primaryEmail = "primary.email@example.com",
           isThirdParty = true,
-          businessName = Some("some-business-name"),
-          emailSent = subscriptionDetails.emailSent
+          businessName = Some("some-business-name")
         ))
     }
 
-    "must return ViewModel without pre-filled form when RegistrationConfirmationPage answer not available" in {
-      val form = formProvider()
-      val userAnswers = aUserAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
-        .remove(RegistrationConfirmationPage).get
+    "must return None when Subscription details do not exist" in {
+      val userAnswers = aUserAnswers.copy(subscriptionDetails = None)
 
-      underTest.apply(anyMode, userAnswers, form) mustBe
-        Some(RegistrationConfirmationViewModel(
-          mode = anyMode,
-          form = form,
-          dprsId = "some-dprs-id",
-          subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
-          primaryEmail = "primary.email@example.com",
-          isThirdParty = true,
-          businessName = Some("some-business-name"),
-          emailSent = subscriptionDetails.emailSent
-        ))
-    }
-
-    "must return ViewModel with pre-filled form with errors, when the form has errors" in {
-      val formWithErrors = formProvider().bind(Map(RegistrationConfirmationPage.toString -> "unknown-value"))
-      val userAnswers = aUserAnswers.copy(subscriptionDetails = Some(subscriptionDetails))
-        .remove(RegistrationConfirmationPage).get
-
-      underTest.apply(anyMode, userAnswers, formWithErrors) mustBe
-        Some(RegistrationConfirmationViewModel(
-          mode = anyMode,
-          form = formWithErrors,
-          dprsId = "some-dprs-id",
-          subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
-          primaryEmail = "primary.email@example.com",
-          isThirdParty = true,
-          businessName = Some("some-business-name"),
-          emailSent = subscriptionDetails.emailSent
-        ))
+      underTest.apply(userAnswers) mustBe None
     }
   }
 }
