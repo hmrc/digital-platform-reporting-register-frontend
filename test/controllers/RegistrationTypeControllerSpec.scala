@@ -57,7 +57,7 @@ class RegistrationTypeControllerSpec extends ControllerSpecBase with MockitoSuga
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.RegistrationTypeContinueController.platformOperator().url
+          redirectLocation(result).value mustEqual routes.BusinessTypeController.platformOperator().url
         }
       }
       "and third party is selected" in {
@@ -70,7 +70,7 @@ class RegistrationTypeControllerSpec extends ControllerSpecBase with MockitoSuga
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.RegistrationTypeContinueController.thirdParty().url
+          redirectLocation(result).value mustEqual routes.BusinessTypeController.thirdParty().url
         }
       }
 

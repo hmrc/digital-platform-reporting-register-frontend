@@ -38,8 +38,8 @@ class RegistrationTypeController @Inject()(formProvider: RegistrationTypeFormPro
     formProvider().bindFromRequest().fold(
       formWithErrors => BadRequest(view(formWithErrors, mode)),
       {
-        case RegistrationType.PlatformOperator => Redirect(routes.RegistrationTypeContinueController.platformOperator())
-        case RegistrationType.ThirdParty => Redirect(routes.RegistrationTypeContinueController.thirdParty())
+        case RegistrationType.PlatformOperator => Redirect(routes.BusinessTypeController.platformOperator())
+        case RegistrationType.ThirdParty => Redirect(routes.BusinessTypeController.thirdParty())
       }
     )
   }

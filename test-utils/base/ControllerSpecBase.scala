@@ -44,6 +44,8 @@ trait ControllerSpecBase extends SpecBase
     new GuiceApplicationBuilder().overrides(
       bind[DataRequiredAction].to[DataRequiredActionImpl],
       identifierActionProviderBind,
+      bind[IdentifierPlatformOperatorActionProvider].to[FakeIdentifierPlatformOperatorActionProvider],
+      bind[IdentifierThirdPartyActionProvider].to[FakeIdentifierThirdPartyActionProvider],
       bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
     )
   }

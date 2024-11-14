@@ -36,7 +36,8 @@ class AppConfig @Inject()(configuration: Configuration) {
 
   val loginUrl: String = configuration.get[String]("urls.login")
   val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
-  val loginContinueUrl2: String = configuration.get[String]("urls.loginContinue2")
+  val loginContinuePlatformOperatorUrl: String = configuration.get[String]("urls.loginContinuePlatformOperator")
+  val loginContinueThirdPartyUrl: String = configuration.get[String]("urls.loginContinueThirdParty")
   val signOutUrl: String = configuration.get[String]("urls.signOut")
 
   val taxEnrolmentsBaseUrl: String = configuration.get[Service](TaxEnrolmentsUrlKey).baseUrl

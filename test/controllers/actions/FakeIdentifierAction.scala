@@ -18,7 +18,8 @@ package controllers.actions
 
 import builders.UserBuilder.aUser
 import config.AppConfig
-import models.TaxIdentifier
+import models.LoginContinue.{PlatformOperator, ThirdParty}
+import models.{LoginContinue, TaxIdentifier}
 import models.requests.IdentifierRequest
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
@@ -78,6 +79,36 @@ class FakeIdentifierActionProviderWithDprsEnrollment @Inject()(appConfig: AppCon
     bodyParsers = bodyParser,
     taxIdentifierProvider = taxIdentifierProvider,
     hasDprsEnrollment = true,
+    withDprsEnrollmentCheck = withDprsEnrollmentCheck
+  )
+}
+
+class FakeIdentifierPlatformOperatorActionProvider @Inject()(appConfig: AppConfig,
+                                             bodyParser: PlayBodyParsers,
+                                             taxIdentifierProvider: FakeTaxIdentifierProvider)
+                                            (implicit val executionContext: ExecutionContext)
+  extends IdentifierPlatformOperatorActionProvider {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true, loginContinue: LoginContinue = PlatformOperator) = new FakeIdentifierAction(
+    appConfig = appConfig,
+    bodyParsers = bodyParser,
+    taxIdentifierProvider = taxIdentifierProvider,
+    hasDprsEnrollment = false,
+    withDprsEnrollmentCheck = withDprsEnrollmentCheck
+  )
+}
+
+class FakeIdentifierThirdPartyActionProvider @Inject()(appConfig: AppConfig,
+                                                             bodyParser: PlayBodyParsers,
+                                                             taxIdentifierProvider: FakeTaxIdentifierProvider)
+                                                            (implicit val executionContext: ExecutionContext)
+  extends IdentifierThirdPartyActionProvider {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true, loginContinue: LoginContinue = ThirdParty) = new FakeIdentifierAction(
+    appConfig = appConfig,
+    bodyParsers = bodyParser,
+    taxIdentifierProvider = taxIdentifierProvider,
+    hasDprsEnrollment = false,
     withDprsEnrollmentCheck = withDprsEnrollmentCheck
   )
 }
