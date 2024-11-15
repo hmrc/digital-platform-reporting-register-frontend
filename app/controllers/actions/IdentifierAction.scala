@@ -18,8 +18,9 @@ package controllers.actions
 
 import config.AppConfig
 import controllers.routes
+import models.LoginContinue.{Standard, PlatformOperator, ThirdParty}
 import models.requests.IdentifierRequest
-import models.{Nino, Utr}
+import models.{LoginContinue, Nino, Utr}
 import play.api.mvc.*
 import play.api.mvc.Results.*
 import services.UserAllowListService
@@ -39,7 +40,8 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
                                     userAllowListService: UserAllowListService,
                                     appConfig: AppConfig,
                                     val parser: BodyParsers.Default,
-                                    withDprsEnrollmentCheck: Boolean = false)
+                                    withDprsEnrollmentCheck: Boolean = false,
+                                    loginContinue: LoginContinue = Standard)
                                    (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions {
 
   // scalastyle:off
@@ -79,7 +81,14 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
 
       case _ => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     } recover {
-      case _: NoActiveSession => Redirect(appConfig.loginUrl, Map("continue" -> Seq(appConfig.loginContinueUrl)))
+      case _: NoActiveSession => Redirect(
+        appConfig.loginUrl,
+        loginContinue match {
+          case PlatformOperator => Map("continue" -> Seq(appConfig.loginContinuePlatformOperatorUrl))
+          case ThirdParty => Map("continue" -> Seq(appConfig.loginContinueThirdPartyUrl))
+          case _ => Map("continue" -> Seq(appConfig.loginContinueUrl))
+        }
+      )
       case _: AuthorisationException => Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
@@ -116,5 +125,48 @@ class AuthenticatedIdentifierActionProvider @Inject()(authConnector: AuthConnect
     userAllowListService = userAllowListService,
     appConfig = appConfig,
     parser = parser
+  )
+}
+
+
+trait IdentifierPlatformOperatorActionProvider {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true, loginContinue: LoginContinue = PlatformOperator): IdentifierAction
+}
+class AuthenticatedIdentifierPlatformOperatorActionProvider @Inject()(authConnector: AuthConnector,
+                                                      userAllowListService: UserAllowListService,
+                                                      appConfig: AppConfig,
+                                                      parser: BodyParsers.Default)
+                                                     (implicit val executionContext: ExecutionContext)
+  extends IdentifierPlatformOperatorActionProvider {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true, loginContinue: LoginContinue = PlatformOperator) = new AuthenticatedIdentifierAction(
+    withDprsEnrollmentCheck = withDprsEnrollmentCheck,
+    authConnector = authConnector,
+    userAllowListService = userAllowListService,
+    appConfig = appConfig,
+    parser = parser,
+    loginContinue = loginContinue
+  )
+}
+
+trait IdentifierThirdPartyActionProvider {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true, loginContinue: LoginContinue = ThirdParty): IdentifierAction
+}
+class AuthenticatedIdentifierThirdPartyActionProvider @Inject()(authConnector: AuthConnector,
+                                                                      userAllowListService: UserAllowListService,
+                                                                      appConfig: AppConfig,
+                                                                      parser: BodyParsers.Default)
+                                                                     (implicit val executionContext: ExecutionContext)
+  extends IdentifierThirdPartyActionProvider {
+
+  def apply(withDprsEnrollmentCheck: Boolean = true, loginContinue: LoginContinue = ThirdParty) = new AuthenticatedIdentifierAction(
+    withDprsEnrollmentCheck = withDprsEnrollmentCheck,
+    authConnector = authConnector,
+    userAllowListService = userAllowListService,
+    appConfig = appConfig,
+    parser = parser,
+    loginContinue = loginContinue
   )
 }

@@ -35,6 +35,9 @@ POST       /business-type                   controllers.BusinessTypeController.o
 GET        /change-reporting-user-type      controllers.BusinessTypeController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-reporting-user-type      controllers.BusinessTypeController.onSubmit(mode: Mode = CheckMode)
 
+GET        /business-type/platform-operator     controllers.BusinessTypeController.platformOperator()
+GET        /business-type/third-party           controllers.BusinessTypeController.thirdParty()
+
 GET        /registered-business-name                        controllers.BusinessNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /registered-business-name                        controllers.BusinessNameController.onSubmit(mode: Mode = NormalMode)
 GET        /change-registered-business-name                 controllers.BusinessNameController.onPageLoad(mode: Mode = CheckMode)

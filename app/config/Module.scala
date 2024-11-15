@@ -31,6 +31,8 @@ class Module extends play.api.inject.Module {
       bind[DataRetrievalAction].to[DataRetrievalActionImpl].eagerly(),
       bind[DataRequiredAction].to[DataRequiredActionImpl].eagerly(),
       bind[IdentifierActionProvider].to[AuthenticatedIdentifierActionProvider],
+      bind[IdentifierPlatformOperatorActionProvider].to[AuthenticatedIdentifierPlatformOperatorActionProvider],
+      bind[IdentifierThirdPartyActionProvider].to[AuthenticatedIdentifierThirdPartyActionProvider],
       bind[Clock].toInstance(Clock.systemUTC()),
       bind[Encrypter & Decrypter].toProvider[CryptoProvider]
     )

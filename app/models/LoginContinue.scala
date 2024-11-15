@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package controllers
+package models
 
-import models.NormalMode
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+sealed trait LoginContinue
 
-import javax.inject.Inject
+object LoginContinue extends Enumerable.Implicits {
 
-class IndexController @Inject()()
-                               (implicit mcc: MessagesControllerComponents) extends FrontendController(mcc) with I18nSupport {
+  case object Standard extends WithName("standard") with LoginContinue
+  case object PlatformOperator extends WithName("platformOperator") with LoginContinue
+  case object ThirdParty extends WithName("thirdParty") with LoginContinue
 
-  def onPageLoad(): Action[AnyContent] = Action {
-    Redirect(routes.RegistrationTypeController.onPageLoad(NormalMode))
-  }
+  val values: Seq[LoginContinue] = Seq(
+    Standard, PlatformOperator, ThirdParty
+  )
+
+  implicit val enumerable: Enumerable[LoginContinue] =
+    Enumerable(values.map(v => v.toString -> v) *)
 }
