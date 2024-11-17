@@ -18,6 +18,8 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import forms.common.Validation
+import models.BusinessType
+import models.RegistrationType.PlatformOperator
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import play.api.data.FormError
@@ -86,6 +88,32 @@ class ClaimEnrolmentFormProviderSpec extends StringFieldBehaviours {
       fieldName,
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
+  
+  ".businessType" - {
+    val fieldName = "businessType"
+    val requiredKey = "claimEnrolment.error.businessType.required"
+    val validValues = BusinessType.valuesForRegistrationType(PlatformOperator).map(_.toString)
+    val invalidGen = arbitrary[String].suchThat(_.nonEmpty).suchThat(x => !validValues.contains(x))
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      Gen.oneOf(validValues)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      invalidGen,
+      FormError(fieldName, "error.invalid")
     )
 
     behave like mandatoryField(

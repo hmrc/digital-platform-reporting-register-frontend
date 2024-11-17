@@ -20,6 +20,8 @@ import forms.common.Validation
 
 import javax.inject.Inject
 import forms.mappings.Mappings
+import models.BusinessType
+import models.RegistrationType.PlatformOperator
 import play.api.data.Form
 import play.api.data.Forms.*
 import models.ClaimEnrolmentDetails
@@ -35,7 +37,9 @@ class ClaimEnrolmentFormProvider @Inject() extends Mappings {
         .verifying(firstError(
           maxLength(105, "claimEnrolment.error.businessName.length"),
           regexp(Validation.textInputPattern.toString, "claimEnrolment.error.businessName.format")
-        ))
-    )(ClaimEnrolmentDetails.apply)(x => Some((x.utr, x.businessName)))
+        )),
+      "businessType" -> enumerable[BusinessType]("claimEnrolment.error.businessType.required")
+        .verifying("claimEnrolment.error.businessType.required", BusinessType.valuesForRegistrationType(PlatformOperator).contains)
+    )(ClaimEnrolmentDetails.apply)(x => Some((x.utr, x.businessName, x.businessType)))
   )
 }

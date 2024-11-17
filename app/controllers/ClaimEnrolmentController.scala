@@ -16,10 +16,16 @@
 
 package controllers
 
+import config.{AppConfig, SubscriptionIdentifiersProvider}
+import connectors.RegistrationConnector
 import controllers.actions.*
 import forms.ClaimEnrolmentFormProvider
+import models.eacd.{EnrolmentDetails, Identifier}
+import models.registration.requests.{OrganisationDetails, OrganisationWithUtr}
+import models.registration.responses.MatchResponseWithId
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.EnrolmentService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.ClaimEnrolmentView
 
@@ -28,7 +34,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ClaimEnrolmentController @Inject()(identify: IdentifierActionProvider,
                                          formProvider: ClaimEnrolmentFormProvider,
-                                         view: ClaimEnrolmentView
+                                         view: ClaimEnrolmentView,
+                                         subscriptionIdentifiersProvider: SubscriptionIdentifiersProvider,
+                                         registrationConnector: RegistrationConnector,
+                                         enrolmentService: EnrolmentService,
+                                         appConfig: AppConfig
                                         )(implicit mcc: MessagesControllerComponents, ec: ExecutionContext)
   extends FrontendController(mcc) with I18nSupport {
 
@@ -37,9 +47,37 @@ class ClaimEnrolmentController @Inject()(identify: IdentifierActionProvider,
   }
 
   def onSubmit(): Action[AnyContent] = identify().async { implicit request =>
-    formProvider().bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-      value => Future.successful(Redirect(routes.IndexController.onPageLoad())) // TODO: Add logic :P
-    )
+    subscriptionIdentifiersProvider.subscriptionIdentifiers.map { subscriptionIdentifiers =>
+      formProvider().bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+        value => {
+          val registrationRequest = OrganisationWithUtr(
+            utr     = value.utr,
+            details = Some(OrganisationDetails(value.businessName, value.businessType))
+          )
+
+          registrationConnector.register(registrationRequest).flatMap {
+            case matchResponse: MatchResponseWithId =>
+              if (matchResponse.safeId == subscriptionIdentifiers.safeId) {
+                val enrolmentDetails = for {
+                  providerId <- request.user.providerId
+                  groupId <- request.user.groupId
+                } yield EnrolmentDetails(providerId, "UTR", value.utr, groupId, Identifier("DPRSID", subscriptionIdentifiers.dprsId))
+                
+                enrolmentDetails.map { details =>
+                  enrolmentService.enrol(details).map(_ => Redirect(appConfig.manageFrontendUrl))
+                }.getOrElse(redirectOnFail)
+              } else {
+                redirectOnFail
+              }
+              
+            case _ => redirectOnFail
+          }
+        }
+      )
+    }.getOrElse(redirectOnFail)
   }
+  
+  private lazy val redirectOnFail: Future[Result] =
+    Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
 }

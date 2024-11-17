@@ -18,7 +18,7 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class ClaimEnrolmentDetails(utr: String, businessName: String)
+final case class ClaimEnrolmentDetails(utr: String, businessName: String, businessType: BusinessType)
 
 object ClaimEnrolmentDetails {
   
