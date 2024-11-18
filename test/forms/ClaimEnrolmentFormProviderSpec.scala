@@ -39,7 +39,7 @@ class ClaimEnrolmentFormProviderSpec extends StringFieldBehaviours {
     )
     
     val invalidGen = Gen.oneOf(
-      arbitrary[String].suchThat(_.forall(_.isDigit) == false),
+      arbitrary[String].suchThat(_.trim.nonEmpty).suchThat(_.forall(_.isDigit) == false),
       Gen.numStr.suchThat(x => x.length != 10 && x.length != 13)
     )
     
@@ -101,7 +101,7 @@ class ClaimEnrolmentFormProviderSpec extends StringFieldBehaviours {
     val fieldName = "businessType"
     val requiredKey = "claimEnrolment.error.businessType.required"
     val validValues = BusinessType.valuesForRegistrationType(PlatformOperator).map(_.toString)
-    val invalidGen = arbitrary[String].suchThat(_.nonEmpty).suchThat(x => !validValues.contains(x))
+    val invalidGen = arbitrary[String].suchThat(_.trim.nonEmpty).suchThat(x => !validValues.contains(x))
 
     behave like fieldThatBindsValidData(
       form,
