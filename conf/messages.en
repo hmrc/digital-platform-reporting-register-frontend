@@ -516,3 +516,17 @@ individualIdentityNotConfirmed.p3 = Check if you have entered your first name an
 individualIdentityNotConfirmed.h2.3 = Contact HMRC to help us find you
 individualIdentityNotConfirmed.p4 = If you have checked and entered your NINO and name again and we still cannot find your business, you can
 individualIdentityNotConfirmed.p4.link.text = contact HMRC
+
+claimEnrolment.title = Enter your business details
+claimEnrolment.heading = Enter your business details
+claimEnrolment.utr = Unique Taxpayer Reference (UTR)
+claimEnrolment.utr.hint = Your UTR can be 10 or 13 digits long.
+claimEnrolment.error.utr.required = Enter your Unique Taxpayer Reference
+claimEnrolment.error.utr.format = Enter your Unique Taxpayer Reference in the correct format
+claimEnrolment.businessName = Business name
+claimEnrolment.error.businessName.required = Enter your business name
+claimEnrolment.error.businessName.length = Business name must be 105 characters or less
+claimEnrolment.error.businessName.format = Business name must only include letters, numbers, hyphens, spaces, commas, full stops, ampersands, underscores and apostrophes
+claimEnrolment.businessType = What type of business are you?
+claimEnrolment.businessType.hint = Select one option.
+claimEnrolment.error.businessType.required = Select what type of business you are
