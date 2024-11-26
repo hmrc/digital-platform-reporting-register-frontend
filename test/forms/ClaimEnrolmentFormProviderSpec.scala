@@ -40,7 +40,7 @@ class ClaimEnrolmentFormProviderSpec extends StringFieldBehaviours {
     
     val invalidGen = Gen.oneOf(
       arbitrary[String].suchThat(_.trim.nonEmpty).suchThat(_.forall(_.isDigit) == false),
-      Gen.numStr.suchThat(x => x.length != 10 && x.length != 13)
+      Gen.numStr.suchThat(x => x.nonEmpty && x.length != 10 && x.length != 13)
     )
     
     behave like fieldThatBindsValidData(
