@@ -370,7 +370,6 @@ primaryContactPhoneNumber.change.hidden = the telephone number for {0}
 
 secondaryContactEmailAddress.title = What is the email address for the second person or team we should contact?
 secondaryContactEmailAddress.heading = What is the email address for {0}?
-secondaryContactEmailAddress.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
 secondaryContactEmailAddress.checkYourAnswersLabel = Email address
 secondaryContactEmailAddress.error.required = Enter the email address for {0}
 secondaryContactEmailAddress.error.length = Email must be 132 characters or less
