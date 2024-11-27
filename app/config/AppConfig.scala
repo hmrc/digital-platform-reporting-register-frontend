@@ -76,4 +76,5 @@ class AppConfig @Inject()(configuration: Configuration) {
 
   val utrAllowListFeature = "UTR"
   val vrnAllowListFeature = "VRN"
+  val fatcaAllowListFeature = "FATCAID"
 }
