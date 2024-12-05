@@ -465,8 +465,8 @@ businessDetailsDoNotMatch.p3 = Check if you have entered your full business name
 businessDetailsDoNotMatch.p4 = If your business is registered with Companies House, you can also
 businessDetailsDoNotMatch.p4.link.text = search the register for your company name
 businessDetailsDoNotMatch.h2.3 = Contact HMRC to help us find your business
-businessDetailsDoNotMatch.p5.1 = If you have checked and entered your UTR and name again and we still cannot find your business, you can
-businessDetailsDoNotMatch.p5.2 = contact HMRC
+businessDetailsDoNotMatch.p5 = If you have checked and entered your UTR and business name again and we still cannot find your business, you can
+businessDetailsDoNotMatch.p5.link.text = contact HMRC
 
 businessDetailsMatchOther.title = You’re unable to use this service with these sign in details
 businessDetailsMatchOther.heading = You’re unable to use this service with these sign in details
@@ -510,7 +510,7 @@ individualIdentityNotConfirmed.p2.link.text = find your National Insurance numbe
 individualIdentityNotConfirmed.h2.2 = Try entering your name again
 individualIdentityNotConfirmed.p3 = Check if you have entered your first name and last name correctly.
 individualIdentityNotConfirmed.h2.3 = Contact HMRC to help us find you
-individualIdentityNotConfirmed.p4 = If you have checked and entered your National Insurance number and name again and we still cannot find your business, you can
+individualIdentityNotConfirmed.p4 = If you have checked and entered your National Insurance number and name again and we still cannot find you, you can
 individualIdentityNotConfirmed.p4.link.text = contact HMRC
 
 claimEnrolment.title = Enter your business details
