@@ -18,7 +18,8 @@
 
 @this(
     layout: templates.Layout,
-    newTabLink: HmrcNewTabLinkHelper
+    newTabLink: HmrcNewTabLinkHelper,
+    govukButton: GovukButton
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -46,16 +47,10 @@
 
     <p class="govuk-body">@messages("businessDetailsDoNotMatch.p3")</p>
 
-    <p class="govuk-body">@messages("businessDetailsDoNotMatch.p4")</p>
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages("businessDetailsDoNotMatch.li.1")</li>
-        <li>@messages("businessDetailsDoNotMatch.li.2")</li>
-    </ul>
-
     <p class="govuk-body">
-        @messages("businessDetailsDoNotMatch.p5")
+        @messages("businessDetailsDoNotMatch.p4")
         @newTabLink(NewTabLinkHelper(
-            text = messages("businessDetailsDoNotMatch.p5.link.text"),
+            text = messages("businessDetailsDoNotMatch.p4.link.text"),
             href = Some("https://find-and-update.company-information.service.gov.uk/")
         )).
     </p>
@@ -63,10 +58,15 @@
     <h2 class="govuk-heading-m">@messages("businessDetailsDoNotMatch.h2.3")</h2>
 
     <p class="govuk-body">
-        @messages("businessDetailsDoNotMatch.p6.1")
+        @messages("businessDetailsDoNotMatch.p5")
         @newTabLink(NewTabLinkHelper(
-            text = messages("businessDetailsDoNotMatch.p6.2"),
+            text = messages("businessDetailsDoNotMatch.p5.link.text"),
             href = Some("https://www.gov.uk/government/organisations/hm-revenue-customs/contact/corporation-tax-enquiries")
         )).
     </p>
+
+    @govukButton(
+        ButtonViewModel(messages("site.tryAgain"))
+            .asLink(routes.BusinessTypeController.onPageLoad(NormalMode).url)
+    )
 }

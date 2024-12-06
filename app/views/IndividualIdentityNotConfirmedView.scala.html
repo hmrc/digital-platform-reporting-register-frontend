@@ -54,4 +54,9 @@
             href = Some("https://www.gov.uk/government/organisations/hm-revenue-customs/contact/income-tax-enquiries-for-individuals-pensioners-and-employees")
         )).
     </p>
+
+    @govukButton(
+        ButtonViewModel(messages("site.tryAgain"))
+            .asLink(routes.BusinessTypeController.onPageLoad(NormalMode).url)
+    )
 }

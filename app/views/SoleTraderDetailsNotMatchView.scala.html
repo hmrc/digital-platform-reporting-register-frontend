@@ -17,7 +17,8 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
 @this(layout: templates.Layout,
-    newTabLink: HmrcNewTabLinkHelper
+    newTabLink: HmrcNewTabLinkHelper,
+    govukButton: GovukButton
     )
 @()(implicit request: Request[_], messages: Messages)
 
@@ -50,4 +51,10 @@
             href = Some("https://www.gov.uk/government/organisations/hm-revenue-customs/contact/income-tax-enquiries-for-individuals-pensioners-and-employees")
         )).
     </p>
+
+    @govukButton(
+        ButtonViewModel(messages("site.tryAgain"))
+            .asLink(routes.BusinessTypeController.onPageLoad(NormalMode).url)
+    )
+
 }
