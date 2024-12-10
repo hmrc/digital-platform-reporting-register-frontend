@@ -41,6 +41,7 @@
                 label = LabelViewModel(messages("secondaryContactEmailAddress.heading", viewModel.contactName)).asPageHeading()
             )
             .withWidth(Full)
+            .withHint(HintViewModel(content = messages("secondaryContactEmailAddress.hint")))
         )
 
         @govukButton(
