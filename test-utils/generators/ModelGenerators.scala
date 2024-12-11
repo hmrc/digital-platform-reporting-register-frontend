@@ -22,6 +22,8 @@ import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {
 
+  private val countriesList = new DefaultCountriesList()
+
   implicit lazy val arbitraryNino: Gen[String] =
     for {
       firstChar <- Gen.oneOf('A', 'C', 'E', 'H', 'J', 'L', 'M', 'O', 'P', 'R', 'S', 'W', 'X', 'Y').map(_.toString)
@@ -48,7 +50,7 @@ trait ModelGenerators {
         city <- arbitrary[String]
         region <- arbitrary[Option[String]]
         postalCode <- arbitrary[String]
-        country <- Gen.oneOf(Country.nonUkInternationalCountries)
+        country <- Gen.oneOf(countriesList.nonUkInternationalCountries)
       } yield BusinessAddress(addressLine1, addressLine2, city, region, postalCode, country)
     }
 
@@ -60,7 +62,7 @@ trait ModelGenerators {
         town <- arbitrary[String]
         county <- arbitrary[String]
         postCode <- arbitrary[String]
-        country <- Gen.oneOf(Country.ukCountries)
+        country <- Gen.oneOf(countriesList.ukCountries)
       } yield UkAddress(line1, Some(line2), town, Some(county), postCode, country)
     }
 
@@ -72,7 +74,7 @@ trait ModelGenerators {
         city <- arbitrary[String]
         region <- arbitrary[Option[String]]
         postal <- arbitrary[String]
-        country <- Gen.oneOf(Country.internationalCountries)
+        country <- Gen.oneOf(countriesList.internationalCountries)
       } yield InternationalAddress(line1, line2, city, region, postal, country)
     }
 

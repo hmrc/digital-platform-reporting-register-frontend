@@ -14,7 +14,8 @@
  * limitations under the License.
  *@
 
-@import models.Country._
+@import models.CountriesList
+@import views.ViewUtils.countrySelectItems
 @import models.pageviews.BusinessAddressViewModel
 @import viewmodels.InputWidth._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
@@ -26,7 +27,8 @@
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
     govukButton: GovukButton,
-    govukSelect : GovukSelect
+    govukSelect : GovukSelect,
+    countriesList: CountriesList
 )
 
 @(viewModel: BusinessAddressViewModel)(implicit request: Request[_], messages: Messages)
@@ -84,7 +86,7 @@
         @govukSelect(
             SelectViewModel(
                 field = viewModel.form("country"),
-                items = selectItems(nonUkInternationalCountries),
+                items = countrySelectItems(countriesList.nonUkInternationalCountries),
                 label = LabelViewModel(messages("businessAddress.country"))
             )
             .withCssClass("govuk-input")

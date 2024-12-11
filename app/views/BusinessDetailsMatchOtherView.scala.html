@@ -14,11 +14,13 @@
  * limitations under the License.
  *@
 
+@import models.CountriesList
 @import models.pageviews.BusinessDetailsMatchOtherViewModel
 @import views.ViewUtils
 
 @this(
-        layout: templates.Layout
+        layout: templates.Layout,
+        countriesList: CountriesList
 )
 
 @(viewModel: BusinessDetailsMatchOtherViewModel)(implicit request: Request[_], messages: Messages)
@@ -31,7 +33,7 @@
 
     <p class="govuk-body">@{viewModel.businessName}</p>
 
-    <p class="govuk-body">@Html(ViewUtils.formatAddress(viewModel.address))</p>
+    <p class="govuk-body">@Html(ViewUtils.formatAddress(viewModel.address, countriesList))</p>
 
     <p class="govuk-body">
         @messages("businessDetailsMatchOther.p2")

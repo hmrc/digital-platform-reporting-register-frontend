@@ -21,7 +21,7 @@ import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import forms.BusinessAddressFormProvider
 import generators.Generators
 import models.pageviews.BusinessAddressViewModel
-import models.{BusinessAddress, NormalMode}
+import models.{BusinessAddress, DefaultCountriesList, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -38,7 +38,7 @@ class BusinessAddressControllerSpec extends ControllerSpecBase with MockitoSugar
 
   private lazy val businessAddressRoute = routes.BusinessAddressController.onPageLoad(NormalMode).url
 
-  private val form = new BusinessAddressFormProvider()()
+  private val form = new BusinessAddressFormProvider(new DefaultCountriesList)()
 
   "BusinessAddress Controller" - {
     "must return OK and the correct view for a GET" in {

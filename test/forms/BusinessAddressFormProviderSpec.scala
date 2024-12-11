@@ -18,13 +18,14 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import forms.common.Validation
-import models.Country
+import models.DefaultCountriesList
 import org.scalacheck.Gen
 import play.api.data.FormError
 
 class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
 
-  private val form = new BusinessAddressFormProvider()()
+  private val countriesList = new DefaultCountriesList()
+  private val form = new BusinessAddressFormProvider(countriesList)()
 
   ".addressLine1" - {
     val fieldName = "addressLine1"
@@ -45,7 +46,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
       unsafeTextInputsWithMaxLength(maxLength),
       FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
-    
+
     behave like fieldWithMaxLength(
       form,
       fieldName,
@@ -174,7 +175,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
-    
+
     behave like mandatoryField(
       form,
       fieldName,
@@ -189,7 +190,7 @@ class BusinessAddressFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      Gen.oneOf(Country.nonUkInternationalCountries.map(_.code))
+      Gen.oneOf(countriesList.nonUkInternationalCountries.map(_.code))
     )
 
     behave like mandatoryField(

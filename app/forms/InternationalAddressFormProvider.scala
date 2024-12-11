@@ -17,17 +17,17 @@
 package forms
 
 import forms.common.Validation
-
-import javax.inject.Inject
 import forms.mappings.Mappings
+import models.{CountriesList, Country, InternationalAddress}
 import play.api.data.Form
 import play.api.data.Forms.*
-import models.{Country, InternationalAddress}
 
-class InternationalAddressFormProvider @Inject() extends Mappings {
+import javax.inject.Inject
 
-   def apply(): Form[InternationalAddress] = Form(
-     mapping(
+class InternationalAddressFormProvider @Inject()(countriesList: CountriesList) extends Mappings {
+
+  def apply(): Form[InternationalAddress] = Form(
+    mapping(
       "line1" -> text("internationalAddress.error.line1.required")
         .verifying(firstError(
           maxLength(35, "internationalAddress.error.line1.length"),
@@ -54,8 +54,8 @@ class InternationalAddressFormProvider @Inject() extends Mappings {
           regexp(Validation.textInputPattern.toString, "internationalAddress.error.postal.format")
         )),
       "country" -> text("internationalAddress.error.country.required")
-         .verifying("internationalAddress.error.country.required", value => Country.internationalCountries.exists(_.code == value))
-         .transform[Country](value => Country.internationalCountries.find(_.code == value).get, _.code)
+        .verifying("internationalAddress.error.country.required", value => countriesList.internationalCountries.exists(_.code == value))
+        .transform[Country](value => countriesList.internationalCountries.find(_.code == value).get, _.code)
     )(InternationalAddress.apply)(x => Some((x.line1, x.line2, x.city, x.region, x.postal, x.country)))
-   )
- }
+  )
+}

@@ -20,13 +20,14 @@ import base.SpecBase
 import builders.UserAnswersBuilder.aUserAnswers
 import forms.BusinessAddressFormProvider
 import generators.Generators
-import models.NormalMode
+import models.{DefaultCountriesList, NormalMode}
 import pages.BusinessAddressPage
 
 class BusinessAddressViewModelSpec extends SpecBase with Generators {
 
   private val anyMode = NormalMode
-  private val formProvider = new BusinessAddressFormProvider()
+  private val countriesList = new DefaultCountriesList()
+  private val formProvider = new BusinessAddressFormProvider(countriesList)
 
   private val underTest = BusinessAddressViewModel
 
