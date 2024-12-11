@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package config
 
-import play.api.i18n.Messages
-import play.api.libs.json.{Json, OFormat}
-import viewmodels.govuk.select.*
+import models.{CountriesList, DefaultCountriesList, ExtendedCountriesList}
 
-final case class Country(code: String, name: String) {
-  def message(implicit messages: Messages): String = messages(s"country.$code")
-}
+import javax.inject.{Inject, Provider}
 
-object Country {
-  implicit val format: OFormat[Country] = Json.format[Country]
+class CountriesListProvider @Inject()(appConfig: AppConfig) extends Provider[CountriesList] {
+
+  override def get(): CountriesList = if (appConfig.extendedCountriesListEnabled) {
+    new ExtendedCountriesList
+  } else {
+    new DefaultCountriesList
+  }
 }

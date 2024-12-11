@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import models.CountriesList
 @import views.ViewUtils
 @import models.registration.Address
 
@@ -22,7 +23,8 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    countriesList: CountriesList
 )
 
 @(form: Form[_], businessName: String, address: Address, mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -39,7 +41,7 @@
 
         <p class="govuk-body">@businessName</p>
 
-        <p class="govuk-body">@Html(ViewUtils.formatAddress(address))</p>
+        <p class="govuk-body">@Html(ViewUtils.formatAddress(address, countriesList))</p>
 
         @govukRadios(
             RadiosViewModel.yesNo(

@@ -21,7 +21,7 @@ import builders.ContactDetailsBuilder.aContactDetails
 import builders.UserBuilder.aUser
 import cats.data.*
 import models.registration.Address
-import models.{Country, IndividualName, InternationalAddress, UkAddress, UserAnswers}
+import models.{DefaultCountriesList, IndividualName, InternationalAddress, UkAddress, UserAnswers}
 import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages.*
 
@@ -34,10 +34,11 @@ class IndividualWithoutIdSpec extends SpecBase
 
   "individual without Id" - {
 
+    val countriesList = new DefaultCountriesList()
     val aName = IndividualName("first", "last")
     val aDateOfBirth = LocalDate.of(2000, 1, 2)
-    val aUkCountry = Country.ukCountries.head
-    val anInternationalCountry = Country.internationalCountries.head
+    val aUkCountry = countriesList.ukCountries.head
+    val anInternationalCountry = countriesList.internationalCountries.head
     val aUkAddress = UkAddress("line 1", Some("line 2"), "town", Some("county"), "postcode", aUkCountry)
     val anInternationalAddress = InternationalAddress("line 1", Some("line 2"), "city", Some("region"), "postcode", anInternationalCountry)
 

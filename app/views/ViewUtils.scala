@@ -17,10 +17,12 @@
 package views
 
 import models.registration.Address
-import models.{Country, InternationalAddress, UkAddress}
+import models.{CountriesList, Country, InternationalAddress, UkAddress}
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
+import viewmodels.govuk.all.SelectItemViewModel
 
 object ViewUtils {
 
@@ -37,13 +39,13 @@ object ViewUtils {
     if (form.hasErrors || form.hasGlobalErrors) messages("error.title.prefix") else ""
   }
 
-  def formatUkAddress(ukAddress: UkAddress): String =
-    formatAddress(Address.fromUkAddress(ukAddress))
+  def formatUkAddress(ukAddress: UkAddress, countriesList: CountriesList): String =
+    formatAddress(Address.fromUkAddress(ukAddress), countriesList)
 
-  def formatInternationalAddress(internationalAddress: InternationalAddress): String =
-    formatAddress(Address.fromInternationalAddress(internationalAddress))
+  def formatInternationalAddress(internationalAddress: InternationalAddress, countriesList: CountriesList): String =
+    formatAddress(Address.fromInternationalAddress(internationalAddress), countriesList)
 
-  def formatAddress(address: Address): String = {
+  def formatAddress(address: Address, countriesList: CountriesList): String = {
     val code = address.countryCode
     val lines = Seq(
       formatLine(address.addressLine1.trim),
@@ -51,11 +53,19 @@ object ViewUtils {
       formatLine(address.addressLine3),
       formatLine(address.addressLine4),
       formatLine(address.postalCode),
-      formatLine(Country.allCountries.find(_.code == code).map(_.name).getOrElse(code))
+      formatLine(countriesList.allCountries.find(_.code == code).map(_.name).getOrElse(code))
     )
 
     lines.flatten.map(HtmlFormat.escape).mkString("<br/>")
   }
+
+  def countrySelectItems(countries: Seq[Country]): Seq[SelectItem] = SelectItem(value = None, text = "") +:
+    countries.map { country =>
+      SelectItemViewModel(
+        value = country.code,
+        text = country.name
+      )
+    }
 
   private def formatLine(line: Option[String]): Option[String] =
     line.map(_.trim).filterNot(_.isEmpty)

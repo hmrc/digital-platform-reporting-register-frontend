@@ -18,13 +18,13 @@ package forms
 
 import forms.common.Validation
 import forms.mappings.Mappings
-import models.{BusinessAddress, Country}
+import models.{BusinessAddress, CountriesList, Country}
 import play.api.data.Form
 import play.api.data.Forms.*
 
 import javax.inject.Inject
 
-class BusinessAddressFormProvider @Inject() extends Mappings {
+class BusinessAddressFormProvider @Inject()(countriesList: CountriesList) extends Mappings {
 
   def apply(): Form[BusinessAddress] = Form(
     mapping(
@@ -54,8 +54,8 @@ class BusinessAddressFormProvider @Inject() extends Mappings {
           regexp(Validation.textInputPattern.toString, "businessAddress.error.postalCode.format")
         )),
       "country" -> text("businessAddress.error.country.required")
-        .verifying("businessAddress.error.country.required", value => Country.nonUkInternationalCountries.exists(_.code == value))
-        .transform[Country](value => Country.nonUkInternationalCountries.find(_.code == value).get, _.code)
+        .verifying("businessAddress.error.country.required", value => countriesList.nonUkInternationalCountries.exists(_.code == value))
+        .transform[Country](value => countriesList.nonUkInternationalCountries.find(_.code == value).get, _.code)
     )(BusinessAddress.apply)(x => Some((x.addressLine1, x.addressLine2, x.city, x.region, x.postalCode, x.country)))
   )
 }

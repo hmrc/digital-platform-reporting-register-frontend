@@ -19,7 +19,7 @@ package controllers
 import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.InternationalAddressFormProvider
-import models.{Country, InternationalAddress, NormalMode}
+import models.{DefaultCountriesList, InternationalAddress, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -34,8 +34,9 @@ import scala.concurrent.Future
 
 class InternationalAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
 
-  private val form = new InternationalAddressFormProvider()()
-  private val country = Country.internationalCountries.head
+  private val countriesList = new DefaultCountriesList()
+  private val form = new InternationalAddressFormProvider(countriesList)()
+  private val country = countriesList.internationalCountries.head
   private val address = InternationalAddress("Testing Lane", None, "New York", None, "Test PostCode", country)
   private val userAnswers = anEmptyAnswer.set(InternationalAddressPage, address).success.value
 

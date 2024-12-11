@@ -18,13 +18,14 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import forms.common.Validation
-import play.api.data.FormError
+import models.DefaultCountriesList
 import org.scalacheck.Gen
-import models.Country
+import play.api.data.FormError
 
 class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
 
-  val form = new InternationalAddressFormProvider()()
+  private val countriesList = new DefaultCountriesList()
+  private val form = new InternationalAddressFormProvider(countriesList)()
 
   ".line1" - {
 
@@ -195,7 +196,7 @@ class InternationalAddressFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      Gen.oneOf(Country.internationalCountries.map(_.code))
+      Gen.oneOf(countriesList.internationalCountries.map(_.code))
     )
 
     behave like mandatoryField(
