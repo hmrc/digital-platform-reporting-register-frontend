@@ -17,15 +17,15 @@
 package pages
 
 import base.SpecBase
+import builders.CountryBuilder.aCountry
 import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
-import models.{CheckMode, Country, InternationalAddress, NormalMode}
+import models.{CheckMode, InternationalAddress, NormalMode}
 import org.scalatest.{OptionValues, TryValues}
 
 class InternationalAddressPageSpec extends SpecBase with TryValues with OptionValues {
 
-  private val country = Country.internationalCountries.head
-  private val address = InternationalAddress("line 1", None, "city", None, "Postcode", country)
+  private val address = InternationalAddress("line 1", None, "city", None, "Postcode", aCountry)
 
   ".nextPage" - {
     "in Normal Mode" - {

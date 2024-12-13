@@ -18,9 +18,11 @@ package views
 
 import base.SpecBase
 import models.registration.Address
-import models.{Country, InternationalAddress, UkAddress}
+import models.{DefaultCountriesList, InternationalAddress, UkAddress}
 
 class ViewUtilsSpec extends SpecBase {
+
+  private val countriesList = new DefaultCountriesList()
 
   "must format an address properly" - {
 
@@ -28,7 +30,7 @@ class ViewUtilsSpec extends SpecBase {
     val line2 = ""
     val city = "Alabama"
     val postal = "AL1"
-    val country = Country.ukCountries.head
+    val country = countriesList.ukCountries.head
 
     val expectedResult = Seq(
       line1,
@@ -47,7 +49,7 @@ class ViewUtilsSpec extends SpecBase {
         country.code
       )
 
-      ViewUtils.formatAddress(address) mustEqual expectedResult
+      ViewUtils.formatAddress(address, countriesList) mustEqual expectedResult
     }
 
     "for a UK address" in {
@@ -57,10 +59,10 @@ class ViewUtilsSpec extends SpecBase {
         city,
         None,
         postal,
-        Country.ukCountries.head
+        countriesList.ukCountries.head
       )
 
-      ViewUtils.formatUkAddress(address) mustEqual expectedResult
+      ViewUtils.formatUkAddress(address, countriesList) mustEqual expectedResult
     }
 
     "for an international address" in {
@@ -73,7 +75,7 @@ class ViewUtilsSpec extends SpecBase {
         country
       )
 
-      ViewUtils.formatInternationalAddress(address) mustEqual expectedResult
+      ViewUtils.formatInternationalAddress(address, countriesList) mustEqual expectedResult
     }
   }
 }

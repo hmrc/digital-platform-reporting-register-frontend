@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package models
+package builders
 
-import play.api.i18n.Messages
-import play.api.libs.json.{Json, OFormat}
-import viewmodels.govuk.select.*
+import models.Country
 
-final case class Country(code: String, name: String) {
-  def message(implicit messages: Messages): String = messages(s"country.$code")
-}
+object CountryBuilder {
 
-object Country {
-  implicit val format: OFormat[Country] = Json.format[Country]
+  val aCountry: Country = Country(
+    code = "default-code",
+    name = "default-name"
+  )
 }
