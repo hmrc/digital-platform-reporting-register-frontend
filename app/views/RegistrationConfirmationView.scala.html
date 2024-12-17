@@ -35,10 +35,10 @@
         @{viewModel.businessName
             .map(messages("registrationConfirmation.organisation.p1.0", _))
             .getOrElse(messages("registrationConfirmation.person.p1.0"))}
-        @messages("registrationConfirmation.p1.1", viewModel.subscribedDateTime)
+        @messages("registrationConfirmation.p1.1", viewModel.subscribedDateTime, viewModel.primaryEmail)
     </p>
 
-    <p class="govuk-body">@messages("registrationConfirmation.p2", viewModel.primaryEmail)</p>
+    <p class="govuk-body">@messages("registrationConfirmation.p2")</p>
 
     <h2 class="govuk-heading-m">@messages("registrationConfirmation.h2")</h2>
 
