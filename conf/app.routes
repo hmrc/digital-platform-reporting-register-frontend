@@ -209,6 +209,3 @@ GET        /confirmed-identity                                      controllers.
 GET        /individual-identity-not-confirmed                       controllers.IndividualIdentityNotConfirmedController.onPageLoad()
 
 GET        /registration-successful                                 controllers.RegistrationConfirmationController.onPageLoad()
-
-GET        /claim-enrolment                                         controllers.ClaimEnrolmentController.onPageLoad()
-POST       /claim-enrolment                                         controllers.ClaimEnrolmentController.onSubmit()
