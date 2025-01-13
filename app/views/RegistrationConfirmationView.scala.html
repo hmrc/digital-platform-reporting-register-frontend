@@ -19,7 +19,8 @@
 
 @this(
     layout: templates.Layout,
-    govukPanel: GovukPanel
+    govukPanel: GovukPanel,
+    govukWarning: GovukWarningText
 )
 
 @(viewModel: RegistrationConfirmationViewModel)(appConfig: AppConfig)(implicit request: Request[_], messages: Messages)
@@ -35,10 +36,21 @@
         @{viewModel.businessName
             .map(messages("registrationConfirmation.organisation.p1.0", _))
             .getOrElse(messages("registrationConfirmation.person.p1.0"))}
-        @messages("registrationConfirmation.p1.1", viewModel.subscribedDateTime, viewModel.primaryEmail)
+        @messages("registrationConfirmation.p1.1", viewModel.subscribedDateTime)
+        @if(viewModel.emailSent) { @messages("registrationConfirmation.p1.2", viewModel.primaryEmail) }
     </p>
 
     <p class="govuk-body">@messages("registrationConfirmation.p2")</p>
+    @if(!viewModel.emailSent) {
+        @govukWarning(WarningText(
+            iconFallbackText = Some("Warning"),
+            content = messages("registrationConfirmation.emailNotSent.warning")
+        ))
+
+        <p class="govuk-body">
+            <a class="govuk-link" href="#" data-module="hmrc-print-link">@messages("registrationConfirmation.print.link.text")</a>
+        </p>
+    }
 
     <h2 class="govuk-heading-m">@messages("registrationConfirmation.h2")</h2>
 
@@ -46,8 +58,9 @@
         @messages("registrationConfirmation.p3")
         <a class="govuk-link" href= @{appConfig.addPlatformOperatorUrl}>@if(viewModel.isThirdParty){@messages("registrationConfirmation.thirdParty.p3.link.text")} else {@messages("registrationConfirmation.operatorOfDP.p3.link.text")}</a>.
     </p>
-
-    <p class="govuk-body">
-        <a class="govuk-link" href="#" data-module="hmrc-print-link">@messages("registrationConfirmation.print.link.text")</a>
-    </p>
+    @if(viewModel.emailSent) {
+        <p class="govuk-body">
+            <a class="govuk-link" href="#" data-module="hmrc-print-link">@messages("registrationConfirmation.print.link.text")</a>
+        </p>
+    }
 }
