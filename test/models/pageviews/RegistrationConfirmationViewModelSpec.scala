@@ -35,7 +35,8 @@ class RegistrationConfirmationViewModelSpec extends SpecBase {
     subscriptionResponse = subscribedResponse,
     subscriptionRequest = subscriptionRequest,
     registrationType = RegistrationType.ThirdParty,
-    businessName = Some("some-business-name")
+    businessName = Some("some-business-name"),
+    emailSent = true
   )
 
   private val underTest = RegistrationConfirmationViewModel
@@ -53,7 +54,8 @@ class RegistrationConfirmationViewModelSpec extends SpecBase {
           subscribedDateTime = "17 March 2024 at 9:30am (GMT)",
           primaryEmail = "primary.email@example.com",
           isThirdParty = true,
-          businessName = Some("some-business-name")
+          businessName = subscriptionDetails.businessName,
+          emailSent = subscriptionDetails.emailSent
         ))
     }
 
