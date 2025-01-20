@@ -19,7 +19,7 @@ package connectors
 import config.AppConfig
 import models.eacd.requests.{GroupEnrolment, UpsertKnownFacts}
 import org.apache.pekko.Done
-import play.api.http.Status.{CONFLICT, CREATED, NO_CONTENT}
+import play.api.http.Status.{CREATED, NO_CONTENT}
 import play.api.libs.json.Json
 import play.api.libs.ws.writeableOf_JsValue
 import services.UuidService
@@ -60,7 +60,7 @@ class TaxEnrolmentConnector @Inject()(appConfig: AppConfig,
       .execute[HttpResponse]
       .flatMap { response =>
         response.status match {
-          case CREATED | CONFLICT => Future.successful(Done)
+          case CREATED => Future.successful(Done)
         }
       }
 }
