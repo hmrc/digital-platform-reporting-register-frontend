@@ -16,25 +16,27 @@
 
 package config
 
-import com.typesafe.config.Config
 import play.api.{ConfigLoader, Configuration}
 
 import javax.inject.{Inject, Singleton}
+import scala.jdk.CollectionConverters.*
 
 @Singleton
 class SubscriptionIdentifiersProvider @Inject()(configuration: Configuration) {
 
-  given configLoader: ConfigLoader[SubscriptionIdentifiers] = new ConfigLoader[SubscriptionIdentifiers] {
-    override def load(config: Config, path: String): SubscriptionIdentifiers =
-      SubscriptionIdentifiers(
-        safeId = config.getConfig(path).getString("safeId"),
-        dprsId = config.getConfig(path).getString("dprsId")
-      )
+  val subscriptionIdentifiers: Option[Seq[SubscriptionIdentifiers]] = {
+    configuration.getOptional[Configuration]("subscriptionIdentifiers").map { identifiersConfig =>
+      identifiersConfig.subKeys.toSeq.sorted.flatMap { key =>
+        identifiersConfig.getOptional[Configuration](key).flatMap { subConfig =>
+          for {
+            safeId <- subConfig.getOptional[String]("safeId")
+            dprsId <- subConfig.getOptional[String]("dprsId")
+          } yield SubscriptionIdentifiers(safeId, dprsId)
+        }
+      }
+    }
   }
-  
-  val subscriptionIdentifiers: Option[SubscriptionIdentifiers] =
-    configuration.getOptional[SubscriptionIdentifiers]("subscriptionIdentifiers")
-      
+
 }
 
 final case class SubscriptionIdentifiers(safeId: String, dprsId: String)

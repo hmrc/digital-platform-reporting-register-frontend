@@ -16,40 +16,37 @@
 
 package config
 
+import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.OptionValues
 import play.api.inject.guice.GuiceApplicationBuilder
 
 class SubscriptionIdentifiersProviderSpec extends AnyFreeSpec with Matchers with OptionValues {
-  
+
   "subscriptionIdentifiers" - {
-
     "must be empty when there are no details in config" in {
-
-      val app =
-        new GuiceApplicationBuilder()
-          .build()
-
+      val app = new GuiceApplicationBuilder().build()
       val provider = app.injector.instanceOf[SubscriptionIdentifiersProvider]
-      
+
       provider.subscriptionIdentifiers must not be defined
     }
   }
 
   "must return Subscription Identifiers when the encrypted values are present in config" in {
-
-    val safeId = "XYZ789"
-    val dprsId = "ABC123"
-    
-    val app =
-      new GuiceApplicationBuilder()
-        .configure("subscriptionIdentifiers.safeId" -> safeId)
-        .configure("subscriptionIdentifiers.dprsId" -> dprsId)
-        .build()
-
+    val app = new GuiceApplicationBuilder()
+      .configure("subscriptionIdentifiers.0.safeId" -> "safeId-0")
+      .configure("subscriptionIdentifiers.0.dprsId" -> "dprsId-0")
+      .configure("subscriptionIdentifiers.1.safeId" -> "safeId-1")
+      .configure("subscriptionIdentifiers.1.dprsId" -> "dprsId-1")
+      .configure("subscriptionIdentifiers.2.safeId" -> "safeId-2")
+      .configure("subscriptionIdentifiers.2.dprsId" -> "dprsId-2")
+      .build()
     val provider = app.injector.instanceOf[SubscriptionIdentifiersProvider]
-    
-    provider.subscriptionIdentifiers.value mustEqual SubscriptionIdentifiers(safeId, dprsId)
+
+    provider.subscriptionIdentifiers.value mustEqual Seq(
+      SubscriptionIdentifiers("safeId-0", "dprsId-0"),
+      SubscriptionIdentifiers("safeId-1", "dprsId-1"),
+      SubscriptionIdentifiers("safeId-2", "dprsId-2")
+    )
   }
 }

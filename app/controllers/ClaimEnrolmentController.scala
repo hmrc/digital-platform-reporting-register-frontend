@@ -52,32 +52,29 @@ class ClaimEnrolmentController @Inject()(identify: IdentifierActionProvider,
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
         value => {
           val registrationRequest = OrganisationWithUtr(
-            utr     = value.utr,
+            utr = value.utr,
             details = Some(OrganisationDetails(value.businessName, value.businessType))
           )
 
           registrationConnector.register(registrationRequest).flatMap {
             case matchResponse: MatchResponseWithId =>
-              if (matchResponse.safeId == subscriptionIdentifiers.safeId) {
+              subscriptionIdentifiers.find(_.safeId == matchResponse.safeId).map { foundItem =>
                 val enrolmentDetails = for {
                   providerId <- request.user.providerId
                   groupId <- request.user.groupId
-                } yield EnrolmentDetails(providerId, "UTR", value.utr, groupId, Identifier("DPRSID", subscriptionIdentifiers.dprsId))
-                
+                } yield EnrolmentDetails(providerId, "UTR", value.utr, groupId, Identifier("DPRSID", foundItem.dprsId))
+
                 enrolmentDetails.map { details =>
                   enrolmentService.enrol(details).map(_ => Redirect(appConfig.manageFrontendUrl))
                 }.getOrElse(redirectOnFail)
-              } else {
-                redirectOnFail
-              }
-              
+              }.getOrElse(redirectOnFail)
             case _ => redirectOnFail
           }
         }
       )
     }.getOrElse(redirectOnFail)
   }
-  
+
   private lazy val redirectOnFail: Future[Result] =
     Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
 }

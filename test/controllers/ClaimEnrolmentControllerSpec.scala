@@ -17,18 +17,18 @@
 package controllers
 
 import base.ControllerSpecBase
+import builders.AddressBuilder.anyAddress
 import config.AppConfig
 import connectors.RegistrationConnector
 import forms.ClaimEnrolmentFormProvider
-import models.eacd.{EnrolmentDetails, Identifier}
 import models.BusinessType.LimitedCompany
-import models.registration.Address
+import models.eacd.{EnrolmentDetails, Identifier}
 import models.registration.requests.{OrganisationDetails, OrganisationWithUtr}
 import models.registration.responses.{MatchResponseWithId, NoMatchResponse}
 import org.apache.pekko.Done
-import org.scalacheck.Gen
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, reset, verify, when}
+import org.scalacheck.Gen
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
@@ -48,9 +48,6 @@ class ClaimEnrolmentControllerSpec extends ControllerSpecBase with MockitoSugar 
 
   private val utr = Gen.listOfN(10, Gen.numChar).map(_.mkString).sample.value
   private val businessName = "businessName"
-  private val safeId = "safeId"
-  private val dprsId = "dprsId"
-  
   private val mockRegistrationConnector = mock[RegistrationConnector]
   private val mockEnrolmentService = mock[EnrolmentService]
 
@@ -60,18 +57,13 @@ class ClaimEnrolmentControllerSpec extends ControllerSpecBase with MockitoSugar 
   }
 
   "ClaimEnrolment Controller" - {
-
     "for a GET" - {
-      
       "must return OK and the correct view" in {
-
         val application = applicationBuilder(userAnswers = None).build()
 
         running(application) {
           val request = FakeRequest(GET, claimEnrolmentRoute)
-
           val view = application.injector.instanceOf[ClaimEnrolmentView]
-
           val result = route(application, request).value
 
           status(result) mustEqual OK
@@ -79,20 +71,15 @@ class ClaimEnrolmentControllerSpec extends ControllerSpecBase with MockitoSugar 
         }
       }
     }
-    
+
     "for a POST" - {
-
       "when there are no subscription identifiers in config" - {
-        
         "must redirect to journey recovery" in {
-
           val application = applicationBuilder(userAnswers = None).build()
 
           running(application) {
-            val request =
-              FakeRequest(POST, claimEnrolmentRoute)
-                .withFormUrlEncodedBody(("utr", utr), ("businessName", businessName))
-            
+            val request = FakeRequest(POST, claimEnrolmentRoute)
+              .withFormUrlEncodedBody(("utr", utr), ("businessName", businessName))
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
@@ -100,79 +87,74 @@ class ClaimEnrolmentControllerSpec extends ControllerSpecBase with MockitoSugar 
           }
         }
       }
-      
-      "when there are subscription identifiers in config" - {
-        
-        "and the user enters details that match the safe id" - {
-          
-          "must create an enrolment and redirect to the manage frontend" in {
 
-            val matchResponse = MatchResponseWithId(safeId, Address("line1", None, None, None, None, "GB"), None)
-            
-            when(mockRegistrationConnector.register(any())(any())) thenReturn Future.successful(matchResponse)
-            when(mockEnrolmentService.enrol(any())(any())) thenReturn Future.successful(Done)
-            
-            val application =
-              applicationBuilder(userAnswers = None)
-                .configure("subscriptionIdentifiers.safeId" -> safeId)
-                .configure("subscriptionIdentifiers.dprsId" -> dprsId)
-                .overrides(
-                  bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-                  bind[EnrolmentService].toInstance(mockEnrolmentService)
-                )
-                .build()
+      "when there are subscription identifiers in config" - {
+        "and the user enters details that match the safe id" - {
+          "must create an enrolment and redirect to the manage frontend" in {
+            val matchResponse = MatchResponseWithId("safeId-1", anyAddress, None)
+
+            when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(matchResponse))
+            when(mockEnrolmentService.enrol(any())(any())).thenReturn(Future.successful(Done))
+
+            val application = applicationBuilder(userAnswers = None)
+              .configure("subscriptionIdentifiers.0.safeId" -> "safeId-0")
+              .configure("subscriptionIdentifiers.0.dprsId" -> "dprsId-0")
+              .configure("subscriptionIdentifiers.1.safeId" -> "safeId-1")
+              .configure("subscriptionIdentifiers.1.dprsId" -> "dprsId-1")
+              .overrides(
+                bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+                bind[EnrolmentService].toInstance(mockEnrolmentService)
+              ).build()
 
             running(application) {
-              val request =
-                FakeRequest(POST, claimEnrolmentRoute)
-                  .withFormUrlEncodedBody(
-                    ("utr", utr),
-                    ("businessName", businessName),
-                    ("businessType", LimitedCompany.toString)
-                  )
+              val request = FakeRequest(POST, claimEnrolmentRoute)
+                .withFormUrlEncodedBody(
+                  ("utr", utr),
+                  ("businessName", businessName),
+                  ("businessType", LimitedCompany.toString)
+                )
 
               val appConfig = application.injector.instanceOf[AppConfig]
               val expectedRegisterRequest = OrganisationWithUtr(utr, Some(OrganisationDetails(businessName, LimitedCompany)))
-              val expectedEnrolmentDetails = EnrolmentDetails("default-provider-id", "UTR", utr, "default-group-id", Identifier("DPRSID", dprsId))
-              
+              val expectedEnrolmentDetails = EnrolmentDetails("default-provider-id", "UTR", utr, "default-group-id", Identifier("DPRSID", "dprsId-1"))
+
               val result = route(application, request).value
-              
+
               status(result) mustEqual SEE_OTHER
               redirectLocation(result).value mustEqual appConfig.manageFrontendUrl
-              
+
               verify(mockRegistrationConnector).register(eqTo(expectedRegisterRequest))(any())
               verify(mockEnrolmentService).enrol(eqTo(expectedEnrolmentDetails))(any())
             }
           }
-          
+
           "must fail when creating the enrolment fails" in {
+            val matchResponse = MatchResponseWithId("safeId-1", anyAddress, None)
 
-            val matchResponse = MatchResponseWithId(safeId, Address("line1", None, None, None, None, "GB"), None)
-
-            when(mockRegistrationConnector.register(any())(any())) thenReturn Future.successful(matchResponse)
-            when(mockEnrolmentService.enrol(any())(any())) thenReturn Future.failed(RuntimeException("foo"))
+            when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(matchResponse))
+            when(mockEnrolmentService.enrol(any())(any())).thenReturn(Future.failed(RuntimeException("foo")))
 
             val application =
               applicationBuilder(userAnswers = None)
-                .configure("subscriptionIdentifiers.safeId" -> safeId)
-                .configure("subscriptionIdentifiers.dprsId" -> dprsId)
+                .configure("subscriptionIdentifiers.0.safeId" -> "safeId-0")
+                .configure("subscriptionIdentifiers.0.dprsId" -> "dprsId-0")
+                .configure("subscriptionIdentifiers.1.safeId" -> "safeId-1")
+                .configure("subscriptionIdentifiers.1.dprsId" -> "dprsId-1")
                 .overrides(
                   bind[RegistrationConnector].toInstance(mockRegistrationConnector),
                   bind[EnrolmentService].toInstance(mockEnrolmentService)
-                )
-                .build()
+                ).build()
 
             running(application) {
-              val request =
-                FakeRequest(POST, claimEnrolmentRoute)
-                  .withFormUrlEncodedBody(
-                    ("utr", utr),
-                    ("businessName", businessName),
-                    ("businessType", LimitedCompany.toString)
-                  )
+              val request = FakeRequest(POST, claimEnrolmentRoute)
+                .withFormUrlEncodedBody(
+                  ("utr", utr),
+                  ("businessName", businessName),
+                  ("businessType", LimitedCompany.toString)
+                )
 
               val expectedRegisterRequest = OrganisationWithUtr(utr, Some(OrganisationDetails(businessName, LimitedCompany)))
-              val expectedEnrolmentDetails = EnrolmentDetails("default-provider-id", "UTR", utr, "default-group-id", Identifier("DPRSID", dprsId))
+              val expectedEnrolmentDetails = EnrolmentDetails("default-provider-id", "UTR", utr, "default-group-id", Identifier("DPRSID", "dprsId-1"))
 
               route(application, request).value.failed.futureValue
 
@@ -183,36 +165,33 @@ class ClaimEnrolmentControllerSpec extends ControllerSpecBase with MockitoSugar 
         }
 
         "and the user enters details that match a different safe id" - {
-
           "must redirect to journey recovery" in {
+            val matchResponse = MatchResponseWithId("a different safeId", anyAddress, None)
 
-            val matchResponse = MatchResponseWithId("a different safeId", Address("line1", None, None, None, None, "GB"), None)
+            when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(matchResponse))
 
-            when(mockRegistrationConnector.register(any())(any())) thenReturn Future.successful(matchResponse)
-
-            val application =
-              applicationBuilder(userAnswers = None)
-                .configure("subscriptionIdentifiers.safeId" -> safeId)
-                .configure("subscriptionIdentifiers.dprsId" -> dprsId)
-                .overrides(
-                  bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-                  bind[EnrolmentService].toInstance(mockEnrolmentService)
-                )
-                .build()
+            val application = applicationBuilder(userAnswers = None)
+              .configure("subscriptionIdentifiers.0.safeId" -> "safeId-0")
+              .configure("subscriptionIdentifiers.0.dprsId" -> "dprsId-0")
+              .configure("subscriptionIdentifiers.1.safeId" -> "safeId-1")
+              .configure("subscriptionIdentifiers.1.dprsId" -> "dprsId-1")
+              .overrides(
+                bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+                bind[EnrolmentService].toInstance(mockEnrolmentService)
+              ).build()
 
             running(application) {
-              val request =
-                FakeRequest(POST, claimEnrolmentRoute)
-                  .withFormUrlEncodedBody(
-                    ("utr", utr),
-                    ("businessName", businessName),
-                    ("businessType", LimitedCompany.toString)
-                  )
+              val request = FakeRequest(POST, claimEnrolmentRoute)
+                .withFormUrlEncodedBody(
+                  ("utr", utr),
+                  ("businessName", businessName),
+                  ("businessType", LimitedCompany.toString)
+                )
 
               val expectedRegisterRequest = OrganisationWithUtr(utr, Some(OrganisationDetails(businessName, LimitedCompany)))
-              
+
               val result = route(application, request).value
-              
+
               status(result) mustEqual SEE_OTHER
               redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
@@ -223,31 +202,28 @@ class ClaimEnrolmentControllerSpec extends ControllerSpecBase with MockitoSugar 
         }
 
         "and the user enters details that do not match" - {
-
           "must redirect to journey recovery" in {
-            
             val matchResponse = NoMatchResponse()
 
-            when(mockRegistrationConnector.register(any())(any())) thenReturn Future.successful(matchResponse)
+            when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(matchResponse))
 
-            val application =
-              applicationBuilder(userAnswers = None)
-                .configure("subscriptionIdentifiers.safeId" -> safeId)
-                .configure("subscriptionIdentifiers.dprsId" -> dprsId)
-                .overrides(
-                  bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-                  bind[EnrolmentService].toInstance(mockEnrolmentService)
-                )
-                .build()
+            val application = applicationBuilder(userAnswers = None)
+              .configure("subscriptionIdentifiers.0.safeId" -> "safeId-0")
+              .configure("subscriptionIdentifiers.0.dprsId" -> "dprsId-0")
+              .configure("subscriptionIdentifiers.1.safeId" -> "safeId-1")
+              .configure("subscriptionIdentifiers.1.dprsId" -> "dprsId-1")
+              .overrides(
+                bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+                bind[EnrolmentService].toInstance(mockEnrolmentService)
+              ).build()
 
             running(application) {
-              val request =
-                FakeRequest(POST, claimEnrolmentRoute)
-                  .withFormUrlEncodedBody(
-                    ("utr", utr),
-                    ("businessName", businessName),
-                    ("businessType", LimitedCompany.toString)
-                  )
+              val request = FakeRequest(POST, claimEnrolmentRoute)
+                .withFormUrlEncodedBody(
+                  ("utr", utr),
+                  ("businessName", businessName),
+                  ("businessType", LimitedCompany.toString)
+                )
 
               val expectedRegisterRequest = OrganisationWithUtr(utr, Some(OrganisationDetails(businessName, LimitedCompany)))
 
@@ -261,58 +237,51 @@ class ClaimEnrolmentControllerSpec extends ControllerSpecBase with MockitoSugar 
             }
           }
         }
-        
-        "must fail when trying to match fails" in {
-          
-          when(mockRegistrationConnector.register(any())(any())) thenReturn Future.failed(RuntimeException("foo"))
 
-          val application =
-            applicationBuilder(userAnswers = None)
-              .configure("subscriptionIdentifiers.safeId" -> safeId)
-              .configure("subscriptionIdentifiers.dprsId" -> dprsId)
-              .overrides(
-                bind[RegistrationConnector].toInstance(mockRegistrationConnector),
-                bind[EnrolmentService].toInstance(mockEnrolmentService)
-              )
-              .build()
+        "must fail when trying to match fails" in {
+          when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.failed(RuntimeException("foo")))
+
+          val application = applicationBuilder(userAnswers = None)
+            .configure("subscriptionIdentifiers.0.safeId" -> "safeId-0")
+            .configure("subscriptionIdentifiers.0.dprsId" -> "dprsId-0")
+            .configure("subscriptionIdentifiers.1.safeId" -> "safeId-1")
+            .configure("subscriptionIdentifiers.1.dprsId" -> "dprsId-1")
+            .overrides(
+              bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+              bind[EnrolmentService].toInstance(mockEnrolmentService)
+            ).build()
 
           running(application) {
-            val request =
-              FakeRequest(POST, claimEnrolmentRoute)
-                .withFormUrlEncodedBody(
-                  ("utr", utr),
-                  ("businessName", businessName),
-                  ("businessType", LimitedCompany.toString)
-                )
+            val request = FakeRequest(POST, claimEnrolmentRoute)
+              .withFormUrlEncodedBody(
+                ("utr", utr),
+                ("businessName", businessName),
+                ("businessType", LimitedCompany.toString)
+              )
 
             val expectedRegisterRequest = OrganisationWithUtr(utr, Some(OrganisationDetails(businessName, LimitedCompany)))
 
             route(application, request).value.failed.futureValue
-            
+
             verify(mockRegistrationConnector).register(eqTo(expectedRegisterRequest))(any())
             verify(mockEnrolmentService, never()).enrol(any())(any())
           }
         }
-        
+
         "and the user submits invalid data" - {
-
           "must return a Bad Request and errors" in {
-
-            val application =
-              applicationBuilder(userAnswers = None)
-                .configure("subscriptionIdentifiers.safeId" -> safeId)
-                .configure("subscriptionIdentifiers.dprsId" -> dprsId)
-                .build()
+            val application = applicationBuilder(userAnswers = None)
+              .configure("subscriptionIdentifiers.0.safeId" -> "safeId-0")
+              .configure("subscriptionIdentifiers.0.dprsId" -> "dprsId-0")
+              .configure("subscriptionIdentifiers.1.safeId" -> "safeId-1")
+              .configure("subscriptionIdentifiers.1.dprsId" -> "dprsId-1")
+              .build()
 
             running(application) {
-              val request =
-                FakeRequest(POST, claimEnrolmentRoute)
-                  .withFormUrlEncodedBody(("value", "invalid value"))
-
+              val request = FakeRequest(POST, claimEnrolmentRoute)
+                .withFormUrlEncodedBody(("value", "invalid value"))
               val boundForm = form.bind(Map("value" -> "invalid value"))
-
               val view = application.injector.instanceOf[ClaimEnrolmentView]
-
               val result = route(application, request).value
 
               status(result) mustEqual BAD_REQUEST
