@@ -55,16 +55,20 @@ class IndividualEmailAddressFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(fieldName, requiredKey)
     )
 
-    "not allow invalid email addreses" in {
+    "not allow invalid email addreses" - {
+      val badEmailAddresses = List(
+        "fooexample.com",
+        "@example.com",
+        "foo@example",
+        "foo,example@example.com"
+      )
 
-      val noAt = "fooexample.com"
-      val noUserName = "@example.com"
-      val noDomain = "foo@example"
-      val commaName = "foo,example@example.com"
-      val invalidData = Gen.oneOf(noAt, noUserName, noDomain, commaName).sample.value
-
-      val result = underTest.bind(Map("value" -> invalidData)).apply(fieldName)
-      result.errors mustEqual Seq(FormError(fieldName, formatKey, Seq(Validation.emailPattern.toString)))
+      badEmailAddresses.foreach(badEmail => {
+        s"${badEmail}" in {
+          val result = underTest.bind(Map("value" -> badEmail)).apply(fieldName)
+          result.errors mustEqual Seq(FormError(fieldName, formatKey, Seq(Validation.emailPattern.toString)))
+        }
+      })
     }
   }
 }

@@ -40,12 +40,12 @@ class TaxEnrolmentConnectorSpec extends ConnectorSpecBase {
       underTest.allocateEnrolmentToGroup(aGroupEnrolment).futureValue
     }
 
-    "must succeed when the server returns CONFLICT(409)" in {
+    "must fail when the server returns CONFLICT(409)" in {
       wireMockServer
         .stubFor(post(urlMatching(s"/tax-enrolments/groups/${aGroupEnrolment.groupId}/enrolments/${aGroupEnrolment.enrolmentKey}"))
           .willReturn(aResponse.withStatus(409)))
 
-      underTest.allocateEnrolmentToGroup(aGroupEnrolment).futureValue
+      underTest.allocateEnrolmentToGroup(aGroupEnrolment).failed.futureValue
     }
 
     "must return a failed future when the server returns an error" in {
