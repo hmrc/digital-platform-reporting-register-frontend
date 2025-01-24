@@ -157,7 +157,7 @@ trait Generators extends ModelGenerators {
     Gen.oneOf('Ŋ' to 'ő'),
     Gen.oneOf('Ŕ' to 'ſ'),
     Gen.const('ÿ'),
-    Gen.const('!'),
+    Gen.const('!')
   )
 
   def unsafeTextInputs: Gen[Char] = Gen.oneOf(
