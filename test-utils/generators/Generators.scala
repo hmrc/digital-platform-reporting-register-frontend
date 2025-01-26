@@ -156,7 +156,8 @@ trait Generators extends ModelGenerators {
     Gen.oneOf('Ł' to 'ň'),
     Gen.oneOf('Ŋ' to 'ő'),
     Gen.oneOf('Ŕ' to 'ſ'),
-    Gen.const('ÿ')
+    Gen.const('ÿ'),
+    Gen.const('!')
   )
 
   def unsafeTextInputs: Gen[Char] = Gen.oneOf(
@@ -164,7 +165,6 @@ trait Generators extends ModelGenerators {
     Gen.const('>'),
     Gen.const('='),
     Gen.const('|'),
-    Gen.const('!'),
     Gen.const('"'),
     Gen.const('$')
   )
