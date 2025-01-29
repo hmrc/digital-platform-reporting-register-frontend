@@ -91,6 +91,7 @@
             )
             .withCssClass("govuk-input")
             .asAccessibleAutocomplete(Some(AccessibleAutocomplete(defaultValue = Some(""), showAllValues = true, autoSelect = true)))
+            .withAttribute("aria-controls", "country_listbox")
         )
 
         @govukButton(

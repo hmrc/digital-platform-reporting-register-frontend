@@ -22,7 +22,7 @@ import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
-import viewmodels.govuk.all.SelectItemViewModel
+import viewmodels.govuk.all.{FluentSelectItem, SelectItemViewModel}
 
 object ViewUtils {
 
@@ -64,7 +64,7 @@ object ViewUtils {
       SelectItemViewModel(
         value = country.code,
         text = country.name
-      )
+      ).withAttribute("aria-describedby", country.name)
     }
 
   private def formatLine(line: Option[String]): Option[String] =
