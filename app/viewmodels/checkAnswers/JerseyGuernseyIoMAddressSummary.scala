@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.routes
 import models.{CheckMode, UserAnswers}
-import pages.AddressInUkPage
+import pages.JerseyGuernseyIoMAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -26,22 +26,27 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object AddressInUkSummary {
+import scala.language.postfixOps
+
+object JerseyGuernseyIoMAddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.get(AddressInUkPage).map { answer =>
-      val value = ValueViewModel(
-        HtmlContent(
-          HtmlFormat.escape(messages(s"addressInUk.$answer"))
-        )
-      )
+    answers.get(JerseyGuernseyIoMAddressPage).map { answer =>
+      val value = Seq(
+        Some(HtmlFormat.escape(answer.line1)),
+        answer.line2.map(HtmlFormat.escape),
+        Some(HtmlFormat.escape(answer.town)),
+        answer.county.map(HtmlFormat.escape),
+        Some(HtmlFormat.escape(answer.postCode)),
+        Some(HtmlFormat.escape(answer.country.name))
+      ).flatten.map(_.toString).mkString("<br/>")
 
       SummaryListRowViewModel(
-        key = "addressInUk.checkYourAnswersLabel",
-        value = value,
+        key = "jerseyGuernseyIoMAddress.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(value)),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.AddressInUkController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("addressInUk.change.hidden"))
+          ActionItemViewModel("site.change", routes.JerseyGuernseyIoMAddressController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("jerseyGuernseyIoMAddress.change.hidden"))
         )
       )
     }

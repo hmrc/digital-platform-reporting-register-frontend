@@ -39,7 +39,8 @@ object CheckYourAnswersIndividualViewModel {
         DateOfBirthSummary.row(answers),
         AddressInUkSummary.row(answers),
         InternationalAddressSummary.row(answers),
-        UkAddressSummary.row(answers)
+        UkAddressSummary.row(answers),
+        JerseyGuernseyIoMAddressSummary.row(answers)
       ).flatten))
 
     CheckYourAnswersIndividualViewModel(contactDetails, yourDetails)

@@ -20,6 +20,7 @@ import cats.data.*
 import cats.implicits.*
 import models.UserAnswers
 import models.registration.Address
+import models.registration.RegisteredAddressCountry.{International, JerseyGuernseyIsleOfMan, Uk}
 import pages.*
 import play.api.libs.json.{Json, OWrites}
 import queries.Query
@@ -56,8 +57,9 @@ object IndividualWithoutId {
 
   private def getAddress(answers: UserAnswers): EitherNec[Query, Address] =
     answers.getEither(AddressInUkPage).flatMap {
-      case true => answers.getEither(UkAddressPage).map(Address.fromUkAddress)
-      case false => answers.getEither(InternationalAddressPage).map(Address.fromInternationalAddress)
+      case Uk => answers.getEither(UkAddressPage).map(Address.fromUkAddress)
+      case International => answers.getEither(InternationalAddressPage).map(Address.fromInternationalAddress)
+      case JerseyGuernseyIsleOfMan => answers.getEither(JerseyGuernseyIoMAddressPage).map(Address.fromJerseyGuernseyIoMAddress)
     }
 
   private def getPhoneNumber(answers: UserAnswers): EitherNec[Query, Option[String]] =

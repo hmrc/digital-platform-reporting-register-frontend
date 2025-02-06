@@ -20,6 +20,7 @@ import base.SpecBase
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import builders.UserBuilder.aUser
 import models.BusinessType.{LimitedCompany, SoleTrader}
+import models.registration.RegisteredAddressCountry
 import models.subscription.*
 import models.{BusinessType, IndividualName, SoleTraderName, Utr}
 import org.scalatest.{EitherValues, OptionValues, TryValues}
@@ -109,15 +110,23 @@ class SubscriptionRequestSpec extends SpecBase
         val answers = aUserAnswers
           .set(BusinessTypePage, BusinessType.Individual).success.value
           .set(HasNinoPage, false).success.value
-          .set(AddressInUkPage, true).success.value
+          .set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
         underTest.getGbUser(answers) mustBe Right(true)
       }
 
-      "must return false when no nino and address is not in UK" in {
+      "must return true when has no nino and address is in JerseyGuernseyIoM" in {
         val answers = aUserAnswers
           .set(BusinessTypePage, BusinessType.Individual).success.value
           .set(HasNinoPage, false).success.value
-          .set(AddressInUkPage, false).success.value
+          .set(AddressInUkPage, RegisteredAddressCountry.JerseyGuernseyIsleOfMan).success.value
+        underTest.getGbUser(answers) mustBe Right(true)
+      }
+
+      "must return false when no nino and address is International" in {
+        val answers = aUserAnswers
+          .set(BusinessTypePage, BusinessType.Individual).success.value
+          .set(HasNinoPage, false).success.value
+          .set(AddressInUkPage, RegisteredAddressCountry.International).success.value
         underTest.getGbUser(answers) mustBe Right(false)
       }
 

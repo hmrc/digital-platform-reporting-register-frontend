@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,21 @@ package forms
 
 import forms.behaviours.StringFieldBehaviours
 import forms.common.Validation
-import models.Country
+import models.DefaultCountriesList
 import org.scalacheck.Gen
 import play.api.data.FormError
 
-class UkAddressFormProviderSpec extends StringFieldBehaviours {
+class JerseyGuernseyIoMAddressFormProviderSpec extends StringFieldBehaviours {
 
-  private val form = new UkAddressFormProvider()()
+  private val countriesList = new DefaultCountriesList()
+  private val form = new JerseyGuernseyIoMAddressFormProvider(countriesList)()
 
   ".line1" - {
 
     val fieldName = "line1"
-    val requiredKey = "ukAddress.error.line1.required"
-    val lengthKey = "ukAddress.error.line1.length"
-    val formatKey = "ukAddress.error.line1.format"
+    val requiredKey = "jerseyGuernseyIoMAddress.error.line1.required"
+    val lengthKey = "jerseyGuernseyIoMAddress.error.line1.length"
+    val formatKey = "jerseyGuernseyIoMAddress.error.line1.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -64,8 +65,8 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
   ".line2" - {
 
     val fieldName = "line2"
-    val lengthKey = "ukAddress.error.line2.length"
-    val formatKey = "ukAddress.error.line2.format"
+    val lengthKey = "jerseyGuernseyIoMAddress.error.line2.length"
+    val formatKey = "jerseyGuernseyIoMAddress.error.line2.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -92,9 +93,9 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
   ".town" - {
 
     val fieldName = "town"
-    val requiredKey = "ukAddress.error.town.required"
-    val lengthKey = "ukAddress.error.town.length"
-    val formatKey = "ukAddress.error.town.format"
+    val requiredKey = "jerseyGuernseyIoMAddress.error.town.required"
+    val lengthKey = "jerseyGuernseyIoMAddress.error.town.length"
+    val formatKey = "jerseyGuernseyIoMAddress.error.town.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -127,8 +128,8 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
   ".county" - {
 
     val fieldName = "county"
-    val lengthKey = "ukAddress.error.county.length"
-    val formatKey = "ukAddress.error.county.format"
+    val lengthKey = "jerseyGuernseyIoMAddress.error.county.length"
+    val formatKey = "jerseyGuernseyIoMAddress.error.county.format"
     val maxLength = 35
 
     behave like fieldThatBindsValidData(
@@ -155,8 +156,8 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
   ".postCode" - {
 
     val fieldName = "postCode"
-    val requiredKey = "ukAddress.error.postCode.required"
-    val formatKey = "ukAddress.error.postCode.format"
+    val requiredKey = "jerseyGuernseyIoMAddress.error.postCode.required"
+    val formatKey = "jerseyGuernseyIoMAddress.error.postCode.format"
     val maxLength = 8
 
     behave like fieldThatBindsValidData(
@@ -181,12 +182,12 @@ class UkAddressFormProviderSpec extends StringFieldBehaviours {
 
   ".country" - {
     val fieldName = "country"
-    val requiredKey = "ukAddress.error.country.required"
+    val requiredKey = "jerseyGuernseyIoMAddress.error.country.required"
 
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      Gen.oneOf(Seq(Country.UnitedKingdom.code))
+      Gen.oneOf(countriesList.crownDependantCountries.map(_.code))
     )
 
     behave like mandatoryField(

@@ -19,6 +19,7 @@ package models.eacd.requests
 import base.SpecBase
 import builders.BusinessAddressBuilder.aBusinessAddress
 import builders.InternationalAddressBuilder.anInternationalAddress
+import builders.JerseyGuernseyIoMAddressBuilder.aJerseyGuernseyIsleOfManAddress
 import builders.UkAddressBuilder.aUkAddress
 import builders.UserAnswersBuilder.aUserAnswers
 import builders.UserBuilder.aUser
@@ -96,6 +97,18 @@ class EnrolmentKnownFactsSpec extends SpecBase with TryValues {
         providerId = userAnswers.user.providerId.get,
         verifierKey = "Postcode",
         verifierValue = aUkAddress.postCode,
+        groupId = userAnswers.user.groupId.get
+      )
+    }
+
+    "must return correct EnrolmentKnownFacts when no Nino or Utr, and user answers has JerseyGuernseyIoMAddress" in {
+      val userAnswers = aUserAnswers.copy(user = aUser.copy(taxIdentifier = None))
+        .set(JerseyGuernseyIoMAddressPage, aJerseyGuernseyIsleOfManAddress).success.value
+
+      EnrolmentKnownFacts.apply(userAnswers).get mustBe EnrolmentKnownFacts(
+        providerId = userAnswers.user.providerId.get,
+        verifierKey = "Postcode",
+        verifierValue = aJerseyGuernseyIsleOfManAddress.postCode,
         groupId = userAnswers.user.groupId.get
       )
     }

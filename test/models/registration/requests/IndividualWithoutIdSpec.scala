@@ -18,10 +18,11 @@ package models.registration.requests
 
 import base.SpecBase
 import builders.ContactDetailsBuilder.aContactDetails
+import builders.JerseyGuernseyIoMAddressBuilder.aJerseyGuernseyIsleOfManAddress
 import builders.UserBuilder.aUser
 import cats.data.*
-import models.registration.Address
-import models.{DefaultCountriesList, IndividualName, InternationalAddress, UkAddress, UserAnswers}
+import models.registration.{Address, RegisteredAddressCountry}
+import models.{Country, DefaultCountriesList, IndividualName, InternationalAddress, UkAddress, UserAnswers}
 import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages.*
 
@@ -37,7 +38,7 @@ class IndividualWithoutIdSpec extends SpecBase
     val countriesList = new DefaultCountriesList()
     val aName = IndividualName("first", "last")
     val aDateOfBirth = LocalDate.of(2000, 1, 2)
-    val aUkCountry = countriesList.ukCountries.head
+    val aUkCountry = Country.UnitedKingdom
     val anInternationalCountry = countriesList.internationalCountries.head
     val aUkAddress = UkAddress("line 1", Some("line 2"), "town", Some("county"), "postcode", aUkCountry)
     val anInternationalAddress = InternationalAddress("line 1", Some("line 2"), "city", Some("region"), "postcode", anInternationalCountry)
@@ -46,7 +47,7 @@ class IndividualWithoutIdSpec extends SpecBase
       val answers = UserAnswers(aUser)
         .set(IndividualNamePage, aName).success.value
         .set(DateOfBirthPage, aDateOfBirth).success.value
-        .set(AddressInUkPage, true).success.value
+        .set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
         .set(UkAddressPage, aUkAddress).success.value
         .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
         .set(CanPhoneIndividualPage, false).success.value
@@ -61,13 +62,27 @@ class IndividualWithoutIdSpec extends SpecBase
       val answers = UserAnswers(aUser)
         .set(IndividualNamePage, aName).success.value
         .set(DateOfBirthPage, aDateOfBirth).success.value
-        .set(AddressInUkPage, false).success.value
+        .set(AddressInUkPage, RegisteredAddressCountry.International).success.value
         .set(InternationalAddressPage, anInternationalAddress).success.value
         .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
         .set(CanPhoneIndividualPage, false).success.value
 
       val result = IndividualWithoutId.build(answers)
       val expectedAddress = Address("line 1", Some("line 2"), Some("city"), Some("region"), Some("postcode"), anInternationalCountry.code)
+      result.value mustEqual IndividualWithoutId("first", "last", aDateOfBirth, expectedAddress, aContactDetails)
+    }
+
+    "must build from user answers when questions have been answered with a JerseyGuernseyIoM address" in {
+      val answers = UserAnswers(aUser)
+        .set(IndividualNamePage, aName).success.value
+        .set(DateOfBirthPage, aDateOfBirth).success.value
+        .set(AddressInUkPage, RegisteredAddressCountry.JerseyGuernseyIsleOfMan).success.value
+        .set(JerseyGuernseyIoMAddressPage, aJerseyGuernseyIsleOfManAddress).success.value
+        .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
+        .set(CanPhoneIndividualPage, false).success.value
+
+      val result = IndividualWithoutId.build(answers)
+      val expectedAddress = Address("Address line 1", Some("Address line 2"), Some("default-city"), Some("default-region"), Some("default-postal-code"), "GG")
       result.value mustEqual IndividualWithoutId("first", "last", aDateOfBirth, expectedAddress, aContactDetails)
     }
 
@@ -88,7 +103,7 @@ class IndividualWithoutIdSpec extends SpecBase
       val answers = UserAnswers(aUser)
         .set(IndividualNamePage, aName).success.value
         .set(DateOfBirthPage, aDateOfBirth).success.value
-        .set(AddressInUkPage, true).success.value
+        .set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
 
       val result = IndividualWithoutId.build(answers)
       result.left.value.toChain.toList must contain theSameElementsAs Seq(
@@ -102,11 +117,25 @@ class IndividualWithoutIdSpec extends SpecBase
       val answers = UserAnswers(aUser)
         .set(IndividualNamePage, aName).success.value
         .set(DateOfBirthPage, aDateOfBirth).success.value
-        .set(AddressInUkPage, false).success.value
+        .set(AddressInUkPage, RegisteredAddressCountry.International).success.value
 
       val result = IndividualWithoutId.build(answers)
       result.left.value.toChain.toList must contain theSameElementsAs Seq(
         InternationalAddressPage,
+        IndividualEmailAddressPage,
+        CanPhoneIndividualPage
+      )
+    }
+
+    "must fail to build from user answers and report all errors when JerseyGuernseyIoM address is missing" in {
+      val answers = UserAnswers(aUser)
+        .set(IndividualNamePage, aName).success.value
+        .set(DateOfBirthPage, aDateOfBirth).success.value
+        .set(AddressInUkPage, RegisteredAddressCountry.JerseyGuernseyIsleOfMan).success.value
+
+      val result = IndividualWithoutId.build(answers)
+      result.left.value.toChain.toList must contain theSameElementsAs Seq(
+        JerseyGuernseyIoMAddressPage,
         IndividualEmailAddressPage,
         CanPhoneIndividualPage
       )

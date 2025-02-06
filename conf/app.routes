@@ -93,6 +93,11 @@ POST       /individual-international-address            controllers.Internationa
 GET        /change-individual-international-address     controllers.InternationalAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-individual-international-address     controllers.InternationalAddressController.onSubmit(mode: Mode = CheckMode)
 
+GET        /individual-crown-dependencies-address               controllers.JerseyGuernseyIoMAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /individual-crown-dependencies-address               controllers.JerseyGuernseyIoMAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /individual-change-crown-dependencies-address        controllers.JerseyGuernseyIoMAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /individual-change-crown-dependencies-address        controllers.JerseyGuernseyIoMAddressController.onSubmit(mode: Mode = CheckMode)
+
 GET        /individual-uk-address                  controllers.UkAddressController.onPageLoad(mode: Mode = NormalMode)
 POST       /individual-uk-address                  controllers.UkAddressController.onSubmit(mode: Mode = NormalMode)
 GET        /change-individual-uk-address           controllers.UkAddressController.onPageLoad(mode: Mode = CheckMode)

@@ -31,6 +31,7 @@ object EnrolmentKnownFacts {
     lazy val userAnswersUtr = userAnswers.get(UtrPage)
     lazy val userAnswersPostcode: Option[String] = userAnswers.get(BusinessAddressPage).map(_.postalCode)
       .orElse(userAnswers.get(UkAddressPage).map(_.postCode))
+      .orElse(userAnswers.get(JerseyGuernseyIoMAddressPage).map(_.postCode))
       .orElse(userAnswers.get(InternationalAddressPage).map(_.postal))
 
     val verifierPair = userAnswers.user.taxIdentifier match {

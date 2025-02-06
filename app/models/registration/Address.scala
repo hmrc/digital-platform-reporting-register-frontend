@@ -16,7 +16,7 @@
 
 package models.registration
 
-import models.{BusinessAddress, InternationalAddress, UkAddress}
+import models.{BusinessAddress, InternationalAddress, JerseyGuernseyIoMAddress, UkAddress}
 import play.api.libs.json.{Json, OFormat}
 
 final case class Address(addressLine1: String,
@@ -40,6 +40,15 @@ object Address {
   )
 
   def fromUkAddress(address: UkAddress): Address = Address(
+    addressLine1 = address.line1,
+    addressLine2 = address.line2,
+    addressLine3 = Some(address.town),
+    addressLine4 = address.county,
+    postalCode = Some(address.postCode),
+    countryCode = address.country.code
+  )
+
+  def fromJerseyGuernseyIoMAddress(address: JerseyGuernseyIoMAddress): Address = Address(
     addressLine1 = address.line1,
     addressLine2 = address.line2,
     addressLine3 = Some(address.town),

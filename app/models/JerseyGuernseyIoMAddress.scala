@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package forms
+package models
 
-import forms.behaviours.BooleanFieldBehaviours
-import play.api.data.FormError
+import play.api.libs.json.*
 
-class AddressInUkFormProviderSpec extends BooleanFieldBehaviours {
+case class JerseyGuernseyIoMAddress(line1: String,
+                                    line2: Option[String],
+                                    town: String,
+                                    county: Option[String],
+                                    postCode: String,
+                                    country: Country)
 
-  val requiredKey = "addressInUk.error.required"
+object JerseyGuernseyIoMAddress {
 
-  val form = new AddressInUkFormProvider()()
-
-  ".value" - {
-
-    val fieldName = "value"
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
-  }
+  implicit val format: OFormat[JerseyGuernseyIoMAddress] = Json.format
 }

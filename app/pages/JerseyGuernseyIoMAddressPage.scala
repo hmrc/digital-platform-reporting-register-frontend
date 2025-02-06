@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import forms.behaviours.BooleanFieldBehaviours
-import play.api.data.FormError
+import controllers.routes
+import models.{JerseyGuernseyIoMAddress, NormalMode, UserAnswers}
+import play.api.libs.json.JsPath
+import play.api.mvc.Call
 
-class AddressInUkFormProviderSpec extends BooleanFieldBehaviours {
+case object JerseyGuernseyIoMAddressPage extends QuestionPage[JerseyGuernseyIoMAddress] {
 
-  val requiredKey = "addressInUk.error.required"
+  override def path: JsPath = JsPath \ toString
 
-  val form = new AddressInUkFormProvider()()
+  override def toString: String = "jerseyGuernseyIoMAddress"
 
-  ".value" - {
-
-    val fieldName = "value"
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
-  }
+  override protected def nextPageNormalMode(answers: UserAnswers): Call =
+    routes.IndividualEmailAddressController.onPageLoad(NormalMode)
 }

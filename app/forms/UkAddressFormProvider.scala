@@ -17,13 +17,14 @@
 package forms
 
 import forms.common.{UkPostCode, Validation}
-import models.{CountriesList, Country, UkAddress}
+import models.Country.UnitedKingdom
+import models.{Country, UkAddress}
 import play.api.data.Form
 import play.api.data.Forms.*
 
 import javax.inject.Inject
 
-class UkAddressFormProvider @Inject()(countriesList: CountriesList) extends UkPostCode {
+class UkAddressFormProvider @Inject() extends UkPostCode {
 
   def apply(): Form[UkAddress] = Form(
     mapping(
@@ -49,8 +50,7 @@ class UkAddressFormProvider @Inject()(countriesList: CountriesList) extends UkPo
         ))),
       "postCode" -> ukPostCode("ukAddress.error.postCode.required", "ukAddress.error.postCode.format"),
       "country" -> text("ukAddress.error.country.required")
-        .verifying("ukAddress.error.country.required", value => countriesList.ukCountries.exists(_.code == value))
-        .transform[Country](value => countriesList.ukCountries.find(_.code == value).get, _.code)
+        .transform[Country](_ => UnitedKingdom, _.code)
     )(UkAddress.apply)(x => Some((x.line1, x.line2, x.town, x.county, x.postCode, x.country)))
   )
 }
