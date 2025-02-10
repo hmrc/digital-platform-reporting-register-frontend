@@ -21,6 +21,7 @@ import builders.AddressBuilder
 import builders.AddressBuilder.anyAddress
 import builders.BusinessAddressBuilder.aBusinessAddress
 import builders.ContactDetailsBuilder.aContactDetails
+import builders.JerseyGuernseyIoMAddressBuilder.aJerseyGuernseyIsleOfManAddress
 import builders.SubscribedResponseBuilder.aSubscribedResponse
 import builders.SubscriptionDetailsBuilder.aSubscriptionDetails
 import builders.UkAddressBuilder.aUkAddress
@@ -31,9 +32,9 @@ import models.audit.{AuditEventModel, FailureResponseData}
 import models.eacd.{EnrolmentDetails, EnrolmentKnownFacts}
 import models.email.requests.SendEmailRequest
 import models.pageviews.{CheckYourAnswersIndividualViewModel, CheckYourAnswersOrganisationViewModel}
-import models.registration.Address
 import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
 import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId}
+import models.registration.{Address, RegisteredAddressCountry}
 import models.subscription.requests.SubscriptionRequest
 import models.subscription.responses.SubscriptionResponse
 import models.subscription.{IndividualContact, OrganisationContact}
@@ -397,14 +398,14 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
                 .set(RegisteredInUkPage, false).success.value
                 .set(IndividualNamePage, IndividualName("first", "last")).success.value
                 .set(DateOfBirthPage, aDateOfBirth).success.value
-                .set(AddressInUkPage, true).success.value
-                .set(UkAddressPage, aUkAddress).success.value
+                .set(AddressInUkPage, RegisteredAddressCountry.JerseyGuernseyIsleOfMan).success.value
+                .set(JerseyGuernseyIoMAddressPage, aJerseyGuernseyIsleOfManAddress).success.value
                 .set(IndividualEmailAddressPage, "some.email@example.com").success.value
                 .set(CanPhoneIndividualPage, false).success.value
                 .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
 
               val contactDetails = aContactDetails.copy(emailAddress = "some.email@example.com")
-              val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress), contactDetails)
+              val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromJerseyGuernseyIoMAddress(aJerseyGuernseyIsleOfManAddress), contactDetails)
               val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "some.email@example.com", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
               val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, registrationType = RegistrationType.ThirdParty, businessType = Some(BusinessType.SoleTrader), businessName = None, emailSent = true)
@@ -454,7 +455,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
                 .set(RegisteredInUkPage, false).success.value
                 .set(IndividualNamePage, IndividualName("first", "last")).success.value
                 .set(DateOfBirthPage, aDateOfBirth).success.value
-                .set(AddressInUkPage, true).success.value
+                .set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
                 .set(UkAddressPage, aUkAddress).success.value
                 .set(IndividualEmailAddressPage, "some.email@example.com").success.value
                 .set(CanPhoneIndividualPage, false).success.value
@@ -512,7 +513,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               .set(RegisteredInUkPage, false).success.value
               .set(IndividualNamePage, IndividualName("first", "last")).success.value
               .set(DateOfBirthPage, aDateOfBirth).success.value
-              .set(AddressInUkPage, true).success.value
+              .set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
               .set(UkAddressPage, aUkAddress).success.value
               .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
               .set(CanPhoneIndividualPage, false).success.value
@@ -553,7 +554,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               .set(RegisteredInUkPage, false).success.value
               .set(IndividualNamePage, IndividualName("first", "last")).success.value
               .set(DateOfBirthPage, aDateOfBirth).success.value
-              .set(AddressInUkPage, true).success.value
+              .set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
               .set(UkAddressPage, aUkAddress).success.value
               .set(IndividualEmailAddressPage, "some.email@example.com").success.value
               .set(CanPhoneIndividualPage, false).success.value
@@ -608,7 +609,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               .set(RegisteredInUkPage, false).success.value
               .set(IndividualNamePage, IndividualName("first", "last")).success.value
               .set(DateOfBirthPage, aDateOfBirth).success.value
-              .set(AddressInUkPage, true).success.value
+              .set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
               .set(UkAddressPage, aUkAddress).success.value
               .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
               .set(CanPhoneIndividualPage, false).success.value

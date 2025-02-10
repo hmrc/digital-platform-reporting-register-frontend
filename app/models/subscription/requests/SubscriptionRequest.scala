@@ -19,6 +19,7 @@ package models.subscription.requests
 import cats.data.*
 import cats.implicits.*
 import models.BusinessType.SoleTrader
+import models.registration.RegisteredAddressCountry.International
 import models.subscription.*
 import models.{BusinessType, SoleTraderName, UserAnswers, Utr}
 import pages.*
@@ -47,12 +48,15 @@ object SubscriptionRequest {
     case _ => answers.getEither(BusinessTypePage).flatMap {
       case BusinessType.Individual => answers.getEither(HasNinoPage).flatMap {
         case true => Right(true)
-        case false => answers.getEither(AddressInUkPage)
+        case false => answers.getEither(AddressInUkPage).flatMap {
+          case International => Right(false)
+          case _ => Right(true)
+        }
       }
       case _ => answers.getEither(RegisteredInUkPage)
     }
   }
-
+  
   private[requests] def getTradingName(answers: UserAnswers): EitherNec[Query, Option[String]] =
     Right(answers.get(BusinessEnterTradingNamePage))
 

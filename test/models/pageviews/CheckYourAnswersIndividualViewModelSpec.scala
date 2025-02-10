@@ -20,6 +20,7 @@ import base.SpecBase
 import builders.InternationalAddressBuilder.anInternationalAddress
 import builders.UserAnswersBuilder.*
 import models.IndividualName
+import models.registration.RegisteredAddressCountry
 import org.scalatest.{OptionValues, TryValues}
 import pages.*
 import play.api.i18n.Messages
@@ -55,7 +56,7 @@ class CheckYourAnswersIndividualViewModelSpec extends SpecBase with OptionValues
         .set(IndividualPhoneNumberPage, "phone").success.value
         .set(IndividualNamePage, IndividualName("Homer", "Simpson")).success.value
         .set(DateOfBirthPage, LocalDate.of(2000, 1, 1)).success.value
-        .set(AddressInUkPage, true).success.value
+        .set(AddressInUkPage, RegisteredAddressCountry.International).success.value
         .set(InternationalAddressPage, anInternationalAddress).success.value
       val viewModel = CheckYourAnswersIndividualViewModel.apply(answers)
 

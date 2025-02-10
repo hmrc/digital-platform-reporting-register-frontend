@@ -16,15 +16,16 @@
 
 package forms
 
-import javax.inject.Inject
-
 import forms.mappings.Mappings
+import models.registration.RegisteredAddressCountry
 import play.api.data.Form
+
+import javax.inject.Inject
 
 class AddressInUkFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+  def apply(): Form[RegisteredAddressCountry] =
     Form(
-      "value" -> boolean("addressInUk.error.required")
+      "value" -> enumerable[RegisteredAddressCountry]("addressInUk.error.required")
     )
 }

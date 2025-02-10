@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package forms
+package builders
 
-import forms.behaviours.BooleanFieldBehaviours
-import play.api.data.FormError
+import models.{Country, JerseyGuernseyIoMAddress}
 
-class AddressInUkFormProviderSpec extends BooleanFieldBehaviours {
+object JerseyGuernseyIoMAddressBuilder {
 
-  val requiredKey = "addressInUk.error.required"
-
-  val form = new AddressInUkFormProvider()()
-
-  ".value" - {
-
-    val fieldName = "value"
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
-  }
+  val aJerseyGuernseyIsleOfManAddress: JerseyGuernseyIoMAddress = JerseyGuernseyIoMAddress(
+    line1 = "Address line 1",
+    line2 = Some("Address line 2"),
+    town = "default-city",
+    county = Some("default-region"),
+    postCode = "default-postal-code",
+    country = Country("GG", "Guernsey")
+  )
 }

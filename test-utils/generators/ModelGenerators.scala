@@ -62,7 +62,7 @@ trait ModelGenerators {
         town <- arbitrary[String]
         county <- arbitrary[String]
         postCode <- arbitrary[String]
-        country <- Gen.oneOf(countriesList.ukCountries)
+        country <- Gen.oneOf(Seq(Country.UnitedKingdom))
       } yield UkAddress(line1, Some(line2), town, Some(county), postCode, country)
     }
 

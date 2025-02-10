@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,47 +18,42 @@ package controllers
 
 import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
-import forms.UkAddressFormProvider
-import models.{Country, DefaultCountriesList, NormalMode, UkAddress}
+import forms.JerseyGuernseyIoMAddressFormProvider
+import models.{Country, DefaultCountriesList, JerseyGuernseyIoMAddress, NormalMode, UkAddress}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.UkAddressPage
+import pages.{JerseyGuernseyIoMAddressPage, UkAddressPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import views.html.UkAddressView
+import views.html.JerseyGuernseyIoMAddressView
 
 import scala.concurrent.Future
 
-class UkAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
+
+class JerseyGuernseyIoMAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
 
   private val countriesList = new DefaultCountriesList()
-  private val formProvider = new UkAddressFormProvider()
-  private val form = formProvider()
-  private val country = Country.UnitedKingdom
-  private lazy val ukAddressRoute = routes.UkAddressController.onPageLoad(NormalMode).url
-  private val validUkAddress = UkAddress(
-    "line 1",
-    None,
-    "town",
-    Some("county"),
-    "AA1 1AA",
-    country
-  )
-  private val userAnswers = anEmptyAnswer.set(UkAddressPage, validUkAddress).success.value
+  private val form = new JerseyGuernseyIoMAddressFormProvider(countriesList)()
 
-  private def getParam(key: String, value: Option[String]) =
-    Seq(value.map(key -> _))
+  private lazy val jerseyGuernseyIoMAddressRoute = routes.JerseyGuernseyIoMAddressController.onPageLoad(NormalMode).url
 
-  "UkAddress Controller" - {
+  private val validAnswer = JerseyGuernseyIoMAddress("line 1", None, "town", None, "AA1 1AA", Country("GG", "Guernsey"))
+  private val userAnswers = anEmptyAnswer.set(JerseyGuernseyIoMAddressPage, validAnswer).success.value
+
+  "JerseyGuernseyIoMAddress Controller" - {
+
     "must return OK and the correct view for a GET" in {
+
       val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
-        val request = FakeRequest(GET, ukAddressRoute)
-        val view = application.injector.instanceOf[UkAddressView]
+        val request = FakeRequest(GET, jerseyGuernseyIoMAddressRoute)
+
+        val view = application.injector.instanceOf[JerseyGuernseyIoMAddressView]
+
         val result = route(application, request).value
 
         status(result) mustEqual OK
@@ -67,19 +62,37 @@ class UkAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
+
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, ukAddressRoute)
-        val view = application.injector.instanceOf[UkAddressView]
+        val request = FakeRequest(GET, jerseyGuernseyIoMAddressRoute)
+        val view = application.injector.instanceOf[JerseyGuernseyIoMAddressView]
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(validUkAddress), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must populate the view correctly on a GET when the question has previously been answered but answer saved under UkAddress " in {
+
+      val updatedUserAnswers = anEmptyAnswer
+        .set(UkAddressPage, UkAddress("line 1", None, "town", None, "AA1 1AA", Country("GG", "Guernsey"))).success.value
+      val application = applicationBuilder(userAnswers = Some(updatedUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, jerseyGuernseyIoMAddressRoute)
+        val view = application.injector.instanceOf[JerseyGuernseyIoMAddressView]
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode)(request, messages(application)).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
+
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
@@ -90,29 +103,27 @@ class UkAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
           .build()
 
       running(application) {
-        val params = getParam("line1", Some(validUkAddress.line1)) ++
-          getParam("line2", validUkAddress.line2) ++
-          getParam("town", Some(validUkAddress.town)) ++
-          getParam("county", validUkAddress.county) ++
-          getParam("postCode", Some(validUkAddress.postCode)) ++
-          getParam("country", Some(validUkAddress.country.code))
-        val request = FakeRequest(POST, ukAddressRoute)
-          .withFormUrlEncodedBody(params.flatten *)
+        val request =
+          FakeRequest(POST, jerseyGuernseyIoMAddressRoute)
+            .withFormUrlEncodedBody(("line1", "line 1"), ("town", "town"), ("postCode", "AA1 1AA"), ("country", "GG"))
+
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual UkAddressPage.nextPage(NormalMode, anEmptyAnswer).url
+        redirectLocation(result).value mustEqual JerseyGuernseyIoMAddressPage.nextPage(NormalMode, anEmptyAnswer).url
       }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
+
       val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
-        val request = FakeRequest(POST, ukAddressRoute)
-          .withFormUrlEncodedBody(("value", "invalid value"))
+        val request =
+          FakeRequest(POST, jerseyGuernseyIoMAddressRoute)
+            .withFormUrlEncodedBody(("value", "invalid value"))
         val boundForm = form.bind(Map("value" -> "invalid value"))
-        val view = application.injector.instanceOf[UkAddressView]
+        val view = application.injector.instanceOf[JerseyGuernseyIoMAddressView]
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
@@ -121,10 +132,11 @@ class UkAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, ukAddressRoute)
+        val request = FakeRequest(GET, jerseyGuernseyIoMAddressRoute)
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -133,11 +145,13 @@ class UkAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
 
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
+
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(POST, ukAddressRoute)
-          .withFormUrlEncodedBody(("line1", "value 1"), ("town", "value 2"), ("postCode", "AA1 1AA"))
+        val request =
+          FakeRequest(POST, jerseyGuernseyIoMAddressRoute)
+            .withFormUrlEncodedBody(("ine1", "value 1"), ("line2", "value 2"))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

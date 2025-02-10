@@ -20,6 +20,7 @@ import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.AddressInUkFormProvider
 import models.NormalMode
+import models.registration.RegisteredAddressCountry
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -53,7 +54,7 @@ class AddressInUkControllerSpec extends ControllerSpecBase with MockitoSugar {
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
-      val userAnswers = anEmptyAnswer.set(AddressInUkPage, true).success.value
+      val userAnswers = anEmptyAnswer.set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
@@ -62,7 +63,7 @@ class AddressInUkControllerSpec extends ControllerSpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(RegisteredAddressCountry.Uk), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -77,9 +78,9 @@ class AddressInUkControllerSpec extends ControllerSpecBase with MockitoSugar {
 
       running(application) {
         val request = FakeRequest(POST, addressInUkRoute)
-          .withFormUrlEncodedBody(("value", "true"))
+          .withFormUrlEncodedBody(("value", "international"))
         val result = route(application, request).value
-        val updatedAnswers = anEmptyAnswer.set(AddressInUkPage, true).success.value
+        val updatedAnswers = anEmptyAnswer.set(AddressInUkPage, RegisteredAddressCountry.International).success.value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual AddressInUkPage.nextPage(NormalMode, updatedAnswers).url

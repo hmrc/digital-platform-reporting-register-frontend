@@ -19,6 +19,7 @@ package models.registration
 import base.SpecBase
 import builders.BusinessAddressBuilder.aBusinessAddress
 import builders.InternationalAddressBuilder.anInternationalAddress
+import builders.JerseyGuernseyIoMAddressBuilder.aJerseyGuernseyIsleOfManAddress
 import builders.UkAddressBuilder.aUkAddress
 
 class AddressSpec extends SpecBase {
@@ -47,6 +48,19 @@ class AddressSpec extends SpecBase {
         addressLine4 = aUkAddress.county,
         postalCode = Some(aUkAddress.postCode),
         countryCode = aUkAddress.country.code
+      )
+    }
+  }
+
+  ".fromJerseyGuernseyIoMAddress" - {
+    "must map a JerseyGuernseyIoM address to Address" in {
+      underTest.fromJerseyGuernseyIoMAddress(aJerseyGuernseyIsleOfManAddress) mustBe Address(
+        addressLine1 = aJerseyGuernseyIsleOfManAddress.line1,
+        addressLine2 = aJerseyGuernseyIsleOfManAddress.line2,
+        addressLine3 = Some(aJerseyGuernseyIsleOfManAddress.town),
+        addressLine4 = aJerseyGuernseyIsleOfManAddress.county,
+        postalCode = Some(aJerseyGuernseyIsleOfManAddress.postCode),
+        countryCode = aJerseyGuernseyIsleOfManAddress.country.code
       )
     }
   }

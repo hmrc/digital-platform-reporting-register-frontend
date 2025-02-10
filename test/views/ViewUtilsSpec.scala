@@ -18,7 +18,7 @@ package views
 
 import base.SpecBase
 import models.registration.Address
-import models.{DefaultCountriesList, InternationalAddress, UkAddress}
+import models.{Country, DefaultCountriesList, InternationalAddress, UkAddress}
 
 class ViewUtilsSpec extends SpecBase {
 
@@ -30,7 +30,7 @@ class ViewUtilsSpec extends SpecBase {
     val line2 = ""
     val city = "Alabama"
     val postal = "AL1"
-    val country = countriesList.ukCountries.head
+    val country = Country.UnitedKingdom
 
     val expectedResult = Seq(
       line1,
@@ -59,7 +59,7 @@ class ViewUtilsSpec extends SpecBase {
         city,
         None,
         postal,
-        countriesList.ukCountries.head
+        Country.UnitedKingdom
       )
 
       ViewUtils.formatUkAddress(address, countriesList) mustEqual expectedResult
