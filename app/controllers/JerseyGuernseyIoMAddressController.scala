@@ -18,7 +18,6 @@ package controllers
 
 import controllers.actions.*
 import forms.JerseyGuernseyIoMAddressFormProvider
-import jakarta.inject.Inject
 import models.{CountriesList, JerseyGuernseyIoMAddress, Mode, UkAddress}
 import pages.{JerseyGuernseyIoMAddressPage, UkAddressPage}
 import play.api.i18n.I18nSupport
@@ -27,6 +26,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import views.html.JerseyGuernseyIoMAddressView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class JerseyGuernseyIoMAddressController @Inject()(sessionRepository: SessionRepository,
