@@ -16,7 +16,12 @@
 
 package models.registration.requests
 
+import cats.data.{EitherNec, NonEmptyChain}
+import models.BusinessType.{Individual, SoleTrader}
+import models.{BusinessType, UserAnswers}
+import pages.BusinessTypePage
 import play.api.libs.json.{JsObject, Json, OFormat, OWrites}
+import queries.Query
 
 trait RegistrationRequest
 
@@ -32,6 +37,15 @@ object RegistrationRequest {
         case x: IndividualWithoutId => Json.toJsObject(x)(IndividualWithoutId.writes)
         case x: OrganisationWithoutId => Json.toJsObject(x)(OrganisationWithoutId.writes)
       }
+  }
+
+  def build(userAnswers: UserAnswers): EitherNec[Query, RegistrationRequest] = userAnswers.getEither(BusinessTypePage).flatMap {
+    case SoleTrader | Individual => IndividualWithoutId.build(userAnswers)
+    case _ => OrganisationWithoutId.build(userAnswers)
+  }
+
+  final case class BuildRegistrationRequestFailure(errors: NonEmptyChain[Query]) extends Throwable {
+    override def getMessage: String = s"Unable to build a registration request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}"
   }
 }
 

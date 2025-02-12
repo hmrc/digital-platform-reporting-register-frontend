@@ -560,3 +560,7 @@ claimEnrolment.error.businessName.format = Business name must only include lette
 claimEnrolment.businessType = What type of business are you?
 claimEnrolment.businessType.hint = Select one option.
 claimEnrolment.error.businessType.required = Select what type of business you are
+
+missingInformation.title = Some information is missing
+missingInformation.heading = Some information is missing
+missingInformation.guidance = You must provide this information to proceed.

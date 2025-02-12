@@ -19,7 +19,7 @@ package controllers
 import base.ControllerSpecBase
 import builders.UserAnswersBuilder.anEmptyAnswer
 import forms.UkAddressFormProvider
-import models.{Country, DefaultCountriesList, NormalMode, UkAddress}
+import models.{Country, NormalMode, UkAddress}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -34,7 +34,6 @@ import scala.concurrent.Future
 
 class UkAddressControllerSpec extends ControllerSpecBase with MockitoSugar {
 
-  private val countriesList = new DefaultCountriesList()
   private val formProvider = new UkAddressFormProvider()
   private val form = formProvider()
   private val country = Country.UnitedKingdom

@@ -56,7 +56,7 @@ object SubscriptionRequest {
       case _ => answers.getEither(RegisteredInUkPage)
     }
   }
-  
+
   private[requests] def getTradingName(answers: UserAnswers): EitherNec[Query, Option[String]] =
     Right(answers.get(BusinessEnterTradingNamePage))
 
@@ -123,4 +123,8 @@ object SubscriptionRequest {
       case true => answers.getEither(SecondaryContactPhoneNumberPage).map(Some(_))
       case false => Right(None)
     }
+
+  final case class BuildSubscriptionRequestFailure(errors: NonEmptyChain[Query]) extends Throwable {
+    override def getMessage: String = s"Unable to build a subscription request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}"
+  }
 }

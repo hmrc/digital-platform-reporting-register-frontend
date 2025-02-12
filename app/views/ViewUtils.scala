@@ -40,10 +40,10 @@ object ViewUtils {
   }
 
   def formatUkAddress(ukAddress: UkAddress, countriesList: CountriesList): String =
-    formatAddress(Address.fromUkAddress(ukAddress), countriesList)
+    formatAddress(Address(ukAddress), countriesList)
 
   def formatInternationalAddress(internationalAddress: InternationalAddress, countriesList: CountriesList): String =
-    formatAddress(Address.fromInternationalAddress(internationalAddress), countriesList)
+    formatAddress(Address(internationalAddress), countriesList)
 
   def formatAddress(address: Address, countriesList: CountriesList): String = {
     val code = address.countryCode

@@ -18,13 +18,24 @@ package models.registration.requests
 
 import base.SpecBase
 import builders.AddressBuilder.anAddress
+import builders.BusinessAddressBuilder.aBusinessAddress
 import builders.ContactDetailsBuilder.aContactDetails
-import models.BusinessType
+import builders.UkAddressBuilder.aUkAddress
+import builders.UserAnswersBuilder.anEmptyAnswer
+import models.registration.{Address, RegisteredAddressCountry}
+import models.{BusinessType, IndividualName}
+import org.scalatest.{EitherValues, OptionValues, TryValues}
+import pages.*
 import play.api.libs.json.Json
 
 import java.time.LocalDate
 
-class RegistrationRequestSpec extends SpecBase {
+class RegistrationRequestSpec extends SpecBase
+  with TryValues
+  with OptionValues
+  with EitherValues {
+
+  private val underTest = RegistrationRequest
 
   "a registration request" - {
     "must write an individual with NINO request" in {
@@ -111,6 +122,111 @@ class RegistrationRequestSpec extends SpecBase {
           "emailAddress" -> "some.email@example.com"
         )
       )
+    }
+  }
+
+  "build(...)" - {
+    "must create IndividualWithoutId when data available and SoleTrader" in {
+      val userAnswers = anEmptyAnswer
+        .set(BusinessTypePage, BusinessType.SoleTrader).success.value
+        .set(IndividualNamePage, IndividualName("some-first-name", "some-last-name")).success.value
+        .set(DateOfBirthPage, LocalDate.parse("2000-01-01")).success.value
+        .set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
+        .set(UkAddressPage, aUkAddress).success.value
+        .set(IndividualEmailAddressPage, "some.email@example.com").success.value
+        .set(CanPhoneIndividualPage, false).success.value
+
+      underTest.build(userAnswers).value mustBe IndividualWithoutId(
+        firstName = "some-first-name",
+        lastName = "some-last-name",
+        dateOfBirth = LocalDate.parse("2000-01-01"),
+        address = Address(aUkAddress),
+        contactDetails = ContactDetails("some.email@example.com", None)
+      )
+    }
+
+    "must create IndividualWithoutId when data available and Individual" in {
+      val userAnswers = anEmptyAnswer
+        .set(BusinessTypePage, BusinessType.Individual).success.value
+        .set(IndividualNamePage, IndividualName("some-first-name", "some-last-name")).success.value
+        .set(DateOfBirthPage, LocalDate.parse("2000-01-01")).success.value
+        .set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
+        .set(UkAddressPage, aUkAddress).success.value
+        .set(IndividualEmailAddressPage, "some.email@example.com").success.value
+        .set(CanPhoneIndividualPage, false).success.value
+
+      underTest.build(userAnswers).value mustBe IndividualWithoutId(
+        firstName = "some-first-name",
+        lastName = "some-last-name",
+        dateOfBirth = LocalDate.parse("2000-01-01"),
+        address = Address(aUkAddress),
+        contactDetails = ContactDetails("some.email@example.com", None)
+      )
+    }
+
+    "must create OrganisationWithoutId when data available and not Individual and not SoleTrader" in {
+      val userAnswers = anEmptyAnswer
+        .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+        .set(BusinessNameNoUtrPage, "some-business-name").success.value
+        .set(BusinessAddressPage, aBusinessAddress).success.value
+        .set(PrimaryContactNamePage, "some-contact-name").success.value
+        .set(PrimaryContactEmailAddressPage, "some.email@example.com").success.value
+        .set(CanPhonePrimaryContactPage, false).success.value
+
+      underTest.build(userAnswers).value mustBe OrganisationWithoutId(
+        name = "some-business-name",
+        address = Address(aBusinessAddress),
+        contactDetails = ContactDetails("some.email@example.com", None)
+      )
+    }
+
+    "should return errors when" - {
+      "BusinessTypePage not provided" in {
+        val userAnswers = anEmptyAnswer
+          .remove(BusinessTypePage).success.value
+
+        val result = underTest.build(userAnswers)
+        result.left.value.toChain.toList must contain theSameElementsAs Seq(BusinessTypePage)
+      }
+
+      "IndividualWithoutId cannot be created from given user answers" in {
+        val userAnswers = anEmptyAnswer
+          .set(BusinessTypePage, BusinessType.Individual).success.value
+          .remove(IndividualNamePage).success.value
+          .remove(DateOfBirthPage).success.value
+          .remove(AddressInUkPage).success.value
+          .remove(UkAddressPage).success.value
+          .remove(IndividualEmailAddressPage).success.value
+          .remove(CanPhoneIndividualPage).success.value
+
+        val result = underTest.build(userAnswers)
+        result.left.value.toChain.toList must contain theSameElementsAs Seq(
+          IndividualNamePage,
+          DateOfBirthPage,
+          AddressInUkPage,
+          IndividualEmailAddressPage,
+          CanPhoneIndividualPage
+        )
+      }
+
+      "OrganisationWithoutId cannot be created from given user answers" in {
+        val userAnswers = anEmptyAnswer
+          .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+          .remove(BusinessNameNoUtrPage).success.value
+          .remove(BusinessAddressPage).success.value
+          .remove(PrimaryContactNamePage).success.value
+          .remove(PrimaryContactEmailAddressPage).success.value
+          .remove(CanPhonePrimaryContactPage).success.value
+
+        val result = underTest.build(userAnswers)
+        result.left.value.toChain.toList must contain theSameElementsAs Seq(
+          BusinessNameNoUtrPage,
+          BusinessAddressPage,
+          PrimaryContactNamePage,
+          PrimaryContactEmailAddressPage,
+          CanPhonePrimaryContactPage
+        )
+      }
     }
   }
 }
