@@ -39,31 +39,31 @@ object Address {
     countryCode = businessAddress.country.code,
   )
 
-  def fromUkAddress(address: UkAddress): Address = Address(
-    addressLine1 = address.line1,
-    addressLine2 = address.line2,
-    addressLine3 = Some(address.town),
-    addressLine4 = address.county,
-    postalCode = Some(address.postCode),
-    countryCode = address.country.code
+  def apply(ukAddress: UkAddress): Address = Address(
+    addressLine1 = ukAddress.line1,
+    addressLine2 = ukAddress.line2,
+    addressLine3 = Some(ukAddress.town),
+    addressLine4 = ukAddress.county,
+    postalCode = Some(ukAddress.postCode),
+    countryCode = ukAddress.country.code
   )
 
-  def fromJerseyGuernseyIoMAddress(address: JerseyGuernseyIoMAddress): Address = Address(
-    addressLine1 = address.line1,
-    addressLine2 = address.line2,
-    addressLine3 = Some(address.town),
-    addressLine4 = address.county,
-    postalCode = Some(address.postCode),
-    countryCode = address.country.code
+  def apply(jerseyGuernseyIoMAddress: JerseyGuernseyIoMAddress): Address = Address(
+    addressLine1 = jerseyGuernseyIoMAddress.line1,
+    addressLine2 = jerseyGuernseyIoMAddress.line2,
+    addressLine3 = Some(jerseyGuernseyIoMAddress.town),
+    addressLine4 = jerseyGuernseyIoMAddress.county,
+    postalCode = Some(jerseyGuernseyIoMAddress.postCode),
+    countryCode = jerseyGuernseyIoMAddress.country.code
   )
 
-  def fromInternationalAddress(address: InternationalAddress): Address = Address(
-    addressLine1 = address.line1,
-    addressLine2 = address.line2,
-    addressLine3 = Some(address.city),
-    addressLine4 = address.region,
-    postalCode = Some(address.postal),
-    countryCode = address.country.code
+  def apply(internationalAddress: InternationalAddress): Address = Address(
+    addressLine1 = internationalAddress.line1,
+    addressLine2 = internationalAddress.line2,
+    addressLine3 = Some(internationalAddress.city),
+    addressLine4 = internationalAddress.region,
+    postalCode = Some(internationalAddress.postal),
+    countryCode = internationalAddress.country.code
   )
 }
 

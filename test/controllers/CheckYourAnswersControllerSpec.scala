@@ -328,6 +328,41 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
             verify(mockSessionRepository, never).set(any())
           }
         }
+
+        "and SubscriptionRequest could not be created" in {
+          val registrationResponse = MatchResponseWithId("safeId", anyAddress, None)
+          val answers = anEmptyAnswer
+            .copy(registrationResponse = Some(registrationResponse))
+            .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
+            .set(BusinessTypePage, BusinessType.SoleTrader).success.value
+            .set(RegisteredInUkPage, true).success.value
+            .set(CanPhoneIndividualPage, false).success.value
+            .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
+            .set(UkAddressPage, aUkAddress).success.value
+
+          val application = applicationBuilder(userAnswers = Some(answers)).overrides(
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[EmailConnector].toInstance(mockEmailConnector),
+            bind[EnrolmentService].toInstance(mockEnrolmentService),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          ).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.MissingInformationController.onPageLoad().url
+            verify(mockRegistrationConnector, never()).register(any())(any())
+            verify(mockSubscriptionConnector, never()).subscribe(any)(any())
+            verify(mockEmailConnector, never).send(any)(any())
+            verify(mockEnrolmentService, never).enrol(any)(any())
+            verify(mockAuditService, never).sendAudit(any)(any())
+            verify(mockSessionRepository, never).set(any)
+          }
+        }
       }
 
       "when we already have an already subscribed registration response" - {
@@ -405,7 +440,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
                 .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
 
               val contactDetails = aContactDetails.copy(emailAddress = "some.email@example.com")
-              val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromJerseyGuernseyIoMAddress(aJerseyGuernseyIsleOfManAddress), contactDetails)
+              val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address(aJerseyGuernseyIsleOfManAddress), contactDetails)
               val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "some.email@example.com", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
               val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, registrationType = RegistrationType.ThirdParty, businessType = Some(BusinessType.SoleTrader), businessName = None, emailSent = true)
@@ -462,7 +497,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
                 .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
 
               val contactDetails = aContactDetails.copy(emailAddress = "some.email@example.com")
-              val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress), contactDetails)
+              val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address(aUkAddress), contactDetails)
               val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "some.email@example.com", None)
               val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
               val subscriptionDetails = aSubscriptionDetails.copy(subscriptionRequest = expectedSubscriptionRequest, registrationType = RegistrationType.ThirdParty, businessType = Some(BusinessType.SoleTrader), businessName = None, emailSent = false)
@@ -518,7 +553,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
               .set(CanPhoneIndividualPage, false).success.value
 
-            val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress), aContactDetails)
+            val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address(aUkAddress), aContactDetails)
             val expectedFinalAnswers = answers.copy(registrationResponse = Some(registrationResponse))
 
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
@@ -561,7 +596,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               .set(SoleTraderNamePage, SoleTraderName("first", "last")).success.value
 
             val contactDetails = aContactDetails.copy(emailAddress = "some.email@example.com")
-            val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress), contactDetails)
+            val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address(aUkAddress), contactDetails)
             val expectedContact = IndividualContact(models.subscription.Individual("first", "last"), "some.email@example.com", None)
             val expectedSubscriptionRequest = SubscriptionRequest("safeId", false, None, expectedContact, None)
             val subscribedResponse = models.subscription.responses.AlreadySubscribedResponse()
@@ -614,7 +649,7 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               .set(IndividualEmailAddressPage, aContactDetails.emailAddress).success.value
               .set(CanPhoneIndividualPage, false).success.value
 
-            val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address.fromUkAddress(aUkAddress), aContactDetails)
+            val expectedRegistrationRequest = IndividualWithoutId("first", "last", aDateOfBirth, Address(aUkAddress), aContactDetails)
 
             when(mockRegistrationConnector.register(any())(any())).thenReturn(Future.successful(registrationResponse))
 
@@ -896,6 +931,40 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
               verify(mockAuditService, never()).sendAudit(any())(any())
               verify(mockSessionRepository, never()).set(any())
             }
+          }
+        }
+
+        "and RegistrationRequest cannot be created" in {
+          val answers = anEmptyAnswer
+            .set(RegistrationTypePage, RegistrationType.PlatformOperator).success.value
+            .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+            .set(RegisteredInUkPage, false).success.value
+
+          when(mockEmailConnector.send(any())(any())).thenReturn(Future.successful(true))
+          when(mockEnrolmentService.enrol(any())(any())).thenReturn(Future.successful(Done))
+          when(mockAuditService.sendAudit(any())(any())).thenReturn(Future.successful(AuditResult.Success))
+          when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+          val application = applicationBuilder(userAnswers = Some(answers)).overrides(
+            bind[RegistrationConnector].toInstance(mockRegistrationConnector),
+            bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+            bind[EmailConnector].toInstance(mockEmailConnector),
+            bind[EnrolmentService].toInstance(mockEnrolmentService),
+            bind[AuditService].toInstance(mockAuditService),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          ).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.MissingInformationController.onPageLoad().url
+            verify(mockRegistrationConnector, never).register(any)(any())
+            verify(mockSubscriptionConnector, never).subscribe(any)(any())
+            verify(mockEmailConnector, never()).send(any())(any())
+            verify(mockEnrolmentService, never()).enrol(any())(any())
+            verify(mockAuditService, never).sendAudit(any)(any())
           }
         }
       }

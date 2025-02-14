@@ -217,3 +217,6 @@ GET        /registration-successful                                 controllers.
 
 GET        /claim-enrolment                                         controllers.ClaimEnrolmentController.onPageLoad()
 POST       /claim-enrolment                                         controllers.ClaimEnrolmentController.onSubmit()
+
+GET        /missing-information                                     controllers.MissingInformationController.onPageLoad()
+POST       /missing-information                                     controllers.MissingInformationController.onSubmit()

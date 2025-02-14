@@ -17,6 +17,6 @@
 package models
 
 case class User(id: String,
-                providerId: Option[String] = None, // TODO: Refactor to make it non optional
-                groupId: Option[String] = None, // TODO: Refactor to make it non optional
+                providerId: Option[String] = None,
+                groupId: Option[String] = None,
                 taxIdentifier: Option[TaxIdentifier] = None)

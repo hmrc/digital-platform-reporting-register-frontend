@@ -39,9 +39,9 @@ class AddressSpec extends SpecBase {
     }
   }
 
-  ".fromUkAddress" - {
+  ".apply(ukAddress: UkAddress)" - {
     "must map a UK address to Address" in {
-      underTest.fromUkAddress(aUkAddress) mustBe Address(
+      underTest.apply(aUkAddress) mustBe Address(
         addressLine1 = aUkAddress.line1,
         addressLine2 = aUkAddress.line2,
         addressLine3 = Some(aUkAddress.town),
@@ -52,9 +52,9 @@ class AddressSpec extends SpecBase {
     }
   }
 
-  ".fromJerseyGuernseyIoMAddress" - {
+  ".apply(jerseyGuernseyIoMAddress: JerseyGuernseyIoMAddress)" - {
     "must map a JerseyGuernseyIoM address to Address" in {
-      underTest.fromJerseyGuernseyIoMAddress(aJerseyGuernseyIsleOfManAddress) mustBe Address(
+      underTest.apply(aJerseyGuernseyIsleOfManAddress) mustBe Address(
         addressLine1 = aJerseyGuernseyIsleOfManAddress.line1,
         addressLine2 = aJerseyGuernseyIsleOfManAddress.line2,
         addressLine3 = Some(aJerseyGuernseyIsleOfManAddress.town),
@@ -65,9 +65,9 @@ class AddressSpec extends SpecBase {
     }
   }
 
-  ".fromInternationalAddress" - {
+  ".apply(internationalAddress: InternationalAddress)" - {
     "must map an international address to Address" in {
-      underTest.fromInternationalAddress(anInternationalAddress) mustBe Address(
+      underTest.apply(anInternationalAddress) mustBe Address(
         addressLine1 = anInternationalAddress.line1,
         addressLine2 = anInternationalAddress.line2,
         addressLine3 = Some(anInternationalAddress.city),

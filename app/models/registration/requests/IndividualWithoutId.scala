@@ -31,8 +31,7 @@ final case class IndividualWithoutId(firstName: String,
                                      lastName: String,
                                      dateOfBirth: LocalDate,
                                      address: Address,
-                                     contactDetails: ContactDetails
-                                    ) extends RegistrationRequest
+                                     contactDetails: ContactDetails) extends RegistrationRequest
 
 object IndividualWithoutId {
 
@@ -57,9 +56,9 @@ object IndividualWithoutId {
 
   private def getAddress(answers: UserAnswers): EitherNec[Query, Address] =
     answers.getEither(AddressInUkPage).flatMap {
-      case Uk => answers.getEither(UkAddressPage).map(Address.fromUkAddress)
-      case International => answers.getEither(InternationalAddressPage).map(Address.fromInternationalAddress)
-      case JerseyGuernseyIsleOfMan => answers.getEither(JerseyGuernseyIoMAddressPage).map(Address.fromJerseyGuernseyIoMAddress)
+      case Uk => answers.getEither(UkAddressPage).map(Address.apply)
+      case International => answers.getEither(InternationalAddressPage).map(Address.apply)
+      case JerseyGuernseyIsleOfMan => answers.getEither(JerseyGuernseyIoMAddressPage).map(Address.apply)
     }
 
   private def getPhoneNumber(answers: UserAnswers): EitherNec[Query, Option[String]] =
