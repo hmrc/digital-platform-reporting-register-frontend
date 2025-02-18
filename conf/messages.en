@@ -137,7 +137,7 @@ hasUtrSelfAssessment.error.required = Select yes if you have a Self Assessment U
 
 registeredInUk.title = Is your registered address in the UK?
 registeredInUk.heading = Is your registered address in the UK?
-registeredInUk.p1 = The UK consists of England, Wales, Scotland and Northern Ireland.
+registeredInUk.hint = The UK consists of England, Wales, Scotland and Northern Ireland.
 registeredInUk.error.required = Select yes if your registered address is in the UK
 
 soleTraderName.title = What is your name?
