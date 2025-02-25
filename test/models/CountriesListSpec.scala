@@ -17,7 +17,7 @@
 package models
 
 import base.SpecBase
-import models.Country.{Guernsey, Jersey, TheIsleOfMan, UnitedKingdom}
+import models.Country.{Guernsey, IsleOfMan, Jersey, UnitedKingdom}
 
 class CountriesListSpec extends SpecBase {
 
@@ -26,7 +26,7 @@ class CountriesListSpec extends SpecBase {
   "CountryList" - {
     "crownDependantCountries" - {
       "must contain only Guernsey, Jersey and The Isle of Man" in {
-        val expectedList = Seq(Guernsey, Jersey, TheIsleOfMan)
+        val expectedList = Seq(Guernsey, Jersey, IsleOfMan)
 
         underTest.crownDependantCountries must contain theSameElementsAs expectedList
       }
