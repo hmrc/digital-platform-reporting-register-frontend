@@ -18,6 +18,8 @@ package models.pageviews
 
 import base.SpecBase
 import builders.InternationalAddressBuilder.anInternationalAddress
+import builders.JerseyGuernseyIoMAddressBuilder.aJerseyGuernseyIsleOfManAddress
+import builders.UkAddressBuilder.aUkAddress
 import builders.UserAnswersBuilder.*
 import models.IndividualName
 import models.registration.RegisteredAddressCountry
@@ -49,7 +51,7 @@ class CheckYourAnswersIndividualViewModelSpec extends SpecBase with OptionValues
       viewModel.yourDetails mustBe None
     }
 
-    "must contain expected rows when registrationResponse is not present" in {
+    "must contain expected rows when registrationResponse is not present for International Address" in {
       val answers = aUserAnswers.copy(registrationResponse = None)
         .set(IndividualEmailAddressPage, "email").success.value
         .set(CanPhoneIndividualPage, true).success.value
@@ -58,6 +60,36 @@ class CheckYourAnswersIndividualViewModelSpec extends SpecBase with OptionValues
         .set(DateOfBirthPage, LocalDate.of(2000, 1, 1)).success.value
         .set(AddressInUkPage, RegisteredAddressCountry.International).success.value
         .set(InternationalAddressPage, anInternationalAddress).success.value
+      val viewModel = CheckYourAnswersIndividualViewModel.apply(answers)
+
+      viewModel.contactDetails.rows.size mustEqual 3
+      viewModel.yourDetails.get.rows.size mustEqual 4
+    }
+
+    "must contain expected rows when registrationResponse is not present for Uk Address" in {
+      val answers = aUserAnswers.copy(registrationResponse = None)
+        .set(IndividualEmailAddressPage, "email").success.value
+        .set(CanPhoneIndividualPage, true).success.value
+        .set(IndividualPhoneNumberPage, "phone").success.value
+        .set(IndividualNamePage, IndividualName("Homer", "Simpson")).success.value
+        .set(DateOfBirthPage, LocalDate.of(2000, 1, 1)).success.value
+        .set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
+        .set(UkAddressPage, aUkAddress).success.value
+      val viewModel = CheckYourAnswersIndividualViewModel.apply(answers)
+
+      viewModel.contactDetails.rows.size mustEqual 3
+      viewModel.yourDetails.get.rows.size mustEqual 4
+    }
+
+    "must contain expected rows when registrationResponse is not present for JGIoM Address" in {
+      val answers = aUserAnswers.copy(registrationResponse = None)
+        .set(IndividualEmailAddressPage, "email").success.value
+        .set(CanPhoneIndividualPage, true).success.value
+        .set(IndividualPhoneNumberPage, "phone").success.value
+        .set(IndividualNamePage, IndividualName("Homer", "Simpson")).success.value
+        .set(DateOfBirthPage, LocalDate.of(2000, 1, 1)).success.value
+        .set(AddressInUkPage, RegisteredAddressCountry.JerseyGuernseyIsleOfMan).success.value
+        .set(JerseyGuernseyIoMAddressPage, aJerseyGuernseyIsleOfManAddress).success.value
       val viewModel = CheckYourAnswersIndividualViewModel.apply(answers)
 
       viewModel.contactDetails.rows.size mustEqual 3

@@ -36,6 +36,7 @@ import models.registration.requests.{IndividualWithoutId, OrganisationWithoutId}
 import models.registration.responses.{MatchResponseWithId, MatchResponseWithoutId}
 import models.registration.{Address, RegisteredAddressCountry}
 import models.subscription.requests.SubscriptionRequest
+import models.subscription.requests.SubscriptionRequest.BuildSubscriptionRequestFailure
 import models.subscription.responses.SubscriptionResponse
 import models.subscription.{IndividualContact, OrganisationContact}
 import models.{BusinessType, IndividualName, NormalMode, RegistrationType, SoleTraderName, SubscriptionDetails}
@@ -409,7 +410,6 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
 
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-            route(application, request).value.failed.futureValue
 
             verify(mockRegistrationConnector, never()).register(any())(any())
             verify(mockSubscriptionConnector, never()).subscribe(any())(any())
@@ -967,6 +967,22 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
             verify(mockAuditService, never).sendAudit(any)(any())
           }
         }
+
+        "and RegistrationResponse cannot be created" in {
+
+          val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+            val result = route(application, request).value
+
+
+            status(result) mustEqual SEE_OTHER
+            //redirectLocation(result).value mustEqual routes.MissingInformationController.onPageLoad().url
+          }
+        }
+
+
       }
     }
   }

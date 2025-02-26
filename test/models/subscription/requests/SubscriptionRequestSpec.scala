@@ -22,6 +22,7 @@ import builders.UserBuilder.aUser
 import models.BusinessType.{LimitedCompany, SoleTrader}
 import models.registration.RegisteredAddressCountry
 import models.subscription.*
+import models.subscription.requests.SubscriptionRequest.BuildSubscriptionRequestFailure
 import models.{BusinessType, IndividualName, SoleTraderName, Utr}
 import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages.*

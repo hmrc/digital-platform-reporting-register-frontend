@@ -76,6 +76,7 @@ class UserAllowListConnectorSpec extends ConnectorSpecBase {
 
       val failure = result.asInstanceOf[UnexpectedResponseException]
       failure.status mustEqual 500
+      failure.getMessage mustEqual "Unexpected status: 500"
     }
   }
 }

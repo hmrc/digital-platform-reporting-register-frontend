@@ -23,7 +23,7 @@ import controllers.actions.FakeTaxIdentifierProvider
 import forms.BusinessTypeFormProvider
 import models.registration.requests.OrganisationWithUtr
 import models.registration.responses.NoMatchResponse
-import models.{BusinessType, NormalMode, RegistrationType, UserAnswers, Utr}
+import models.{BusinessType, Nino, NormalMode, RegistrationType, UserAnswers, Utr}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
@@ -169,6 +169,36 @@ class BusinessTypeControllerSpec extends ControllerSpecBase with MockitoSugar {
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual RegistrationTypePage.nextPage(NormalMode, anEmptyAnswer).url
           verify(mockConnector, never()).register(any())(any())
+        }
+      }
+
+      "must not make a registration call when the user has NINO and must redirect to the next page" in {
+        val mockSessionRepository = mock[SessionRepository]
+        val mockConnector = mock[RegistrationConnector]
+        val mockTaxIdentifierProvider = mock[FakeTaxIdentifierProvider]
+
+        when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+        when(mockConnector.register(any())(any())).thenReturn(Future.successful(NoMatchResponse()))
+        when(mockTaxIdentifierProvider.taxIdentifier).thenReturn(Some(Nino("123")))
+
+        val application = applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[RegistrationConnector].toInstance(mockConnector),
+            bind[FakeTaxIdentifierProvider].toInstance(mockTaxIdentifierProvider)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, businessTypeThirdPartyRoute)
+          val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual RegistrationTypePage.nextPage(NormalMode, anEmptyAnswer).url
+          verify(mockConnector, never()).register(any())(any())
+          verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+
         }
       }
 
