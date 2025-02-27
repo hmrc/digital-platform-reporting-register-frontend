@@ -19,6 +19,7 @@ package models.subscription.requests
 import base.SpecBase
 import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import builders.UserBuilder.aUser
+import cats.data.NonEmptyChain
 import models.BusinessType.{LimitedCompany, SoleTrader}
 import models.registration.RegisteredAddressCountry
 import models.subscription.*
@@ -26,6 +27,7 @@ import models.subscription.requests.SubscriptionRequest.BuildSubscriptionRequest
 import models.{BusinessType, IndividualName, SoleTraderName, Utr}
 import org.scalatest.{EitherValues, OptionValues, TryValues}
 import pages.*
+import queries.Query
 
 import scala.util.Right
 
@@ -538,6 +540,14 @@ class SubscriptionRequestSpec extends SpecBase
         CanPhonePrimaryContactPage,
         HasSecondaryContactPage
       )
+    }
+  }
+
+  "BuildSubscriptionRequestFailure" - {
+    "must contain correct message" in {
+      val errors = NonEmptyChain(AddressInUkPage, BusinessAddressPage)
+      val underTest = BuildSubscriptionRequestFailure(errors: NonEmptyChain[Query])
+      underTest.getMessage mustBe s"Unable to build a subscription request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}"
     }
   }
 }

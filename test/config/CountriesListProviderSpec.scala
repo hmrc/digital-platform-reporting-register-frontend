@@ -16,7 +16,7 @@
 
 package config
 
-import models.{Country, DefaultCountriesList, ExtendedCountriesList}
+import models.{DefaultCountriesList, ExtendedCountriesList}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.inject.guice.GuiceApplicationBuilder

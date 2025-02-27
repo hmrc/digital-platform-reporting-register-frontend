@@ -43,12 +43,7 @@ class SessionRepository @Inject()(mongoComponent: MongoComponent,
     mongoComponent = mongoComponent,
     domainFormat = if (appConfig.dataEncryptionEnabled) UserAnswers.encryptedFormat else UserAnswers.format,
     indexes = Seq(
-      IndexModel(
-        Indexes.ascending("lastUpdated"),
-        IndexOptions()
-          .name("lastUpdatedIdx")
-          .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
-      )
+      IndexModel(Indexes.ascending("lastUpdated"), IndexOptions().name("lastUpdatedIdx").expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS))
     )
   ) {
 
