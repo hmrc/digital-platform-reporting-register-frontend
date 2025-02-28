@@ -22,6 +22,8 @@ import builders.BusinessAddressBuilder.aBusinessAddress
 import builders.ContactDetailsBuilder.aContactDetails
 import builders.UkAddressBuilder.aUkAddress
 import builders.UserAnswersBuilder.anEmptyAnswer
+import cats.data.NonEmptyChain
+import models.registration.requests.RegistrationRequest.BuildRegistrationRequestFailure
 import models.registration.{Address, RegisteredAddressCountry}
 import models.{BusinessType, IndividualName}
 import org.scalatest.{EitherValues, OptionValues, TryValues}
@@ -227,6 +229,14 @@ class RegistrationRequestSpec extends SpecBase
           CanPhonePrimaryContactPage
         )
       }
+    }
+  }
+
+  "BuildRegistrationRequestFailure" - {
+    "must contain correct message" in {
+      val errors = NonEmptyChain(AddressInUkPage, BusinessAddressPage)
+      val underTest = BuildRegistrationRequestFailure(errors)
+      underTest.getMessage mustBe s"Unable to build a registration request, path(s) missing: ${errors.toChain.toList.map(_.path).mkString(", ")}"
     }
   }
 }

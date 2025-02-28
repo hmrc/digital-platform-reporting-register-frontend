@@ -28,11 +28,9 @@ object HasBusinessTradingNameSummary {
 
   def row(answers: UserAnswers)
          (implicit messages: Messages): Option[SummaryListRow] = answers.get(HasBusinessTradingNamePage).map { answer =>
-    val value = if (answer) "site.yes" else "site.no"
-
     SummaryListRowViewModel(
       key = "hasBusinessTradingName.checkYourAnswersLabel",
-      value = ValueViewModel(value),
+      value = ValueViewModel(if (answer) "site.yes" else "site.no"),
       actions = Seq(
         ActionItemViewModel("site.change", routes.HasBusinessTradingNameController.onPageLoad(CheckMode).url)
           .withVisuallyHiddenText(messages("hasBusinessTradingName.change.hidden"))

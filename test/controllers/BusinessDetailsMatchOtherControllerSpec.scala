@@ -19,7 +19,7 @@ package controllers
 
 import base.ControllerSpecBase
 import builders.AddressBuilder.anAddress
-import builders.UserAnswersBuilder.aUserAnswers
+import builders.UserAnswersBuilder.{aUserAnswers, anEmptyAnswer}
 import helpers.UserAnswerHelper
 import models.pageviews.BusinessDetailsMatchOtherViewModel
 import play.api.test.FakeRequest
@@ -45,7 +45,7 @@ class BusinessDetailsMatchOtherControllerSpec extends ControllerSpecBase with Us
     }
 
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.BusinessDetailsMatchOtherController.onPageLoad().url)

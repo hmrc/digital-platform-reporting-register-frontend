@@ -18,7 +18,7 @@ package controllers.actions
 
 import config.AppConfig
 import controllers.routes
-import models.LoginContinue.{Standard, PlatformOperator, ThirdParty}
+import models.LoginContinue.{PlatformOperator, Standard, ThirdParty}
 import models.requests.IdentifierRequest
 import models.{LoginContinue, Nino, Utr}
 import play.api.mvc.*
@@ -72,7 +72,7 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
           case true => block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), maybeNino.map(Nino.apply)), request))
           case false => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
         }
-        
+
       case Some(Organisation) ~ _ ~ Some(internalId) ~ _ ~ enrolments ~ Some(groupIdentifier) ~ Some(credentials) =>
         userAllowListService.isUserAllowed(enrolments).flatMap {
           case true => block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), getCtUtrEnrolment(enrolments)), request))
@@ -92,7 +92,7 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
       case _: AuthorisationException => Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
-  
+
   private def getCtUtrEnrolment(enrolments: Enrolments): Option[Utr] =
     enrolments.getEnrolment("IR-CT")
       .flatMap { enrolment =>
@@ -100,7 +100,7 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
           .find(_.key == "UTR")
           .map(identifier => Utr(identifier.value))
       }
-  
+
   private def hasDprsEnrolment(enrolments: Enrolments): Boolean =
     enrolments.getEnrolment("HMRC-DPRS")
       .flatMap(_.identifiers.find(_.key == "DPRSID"))
@@ -130,14 +130,14 @@ class AuthenticatedIdentifierActionProvider @Inject()(authConnector: AuthConnect
 
 
 trait IdentifierPlatformOperatorActionProvider {
-
   def apply(withDprsEnrollmentCheck: Boolean = true, loginContinue: LoginContinue = PlatformOperator): IdentifierAction
 }
+
 class AuthenticatedIdentifierPlatformOperatorActionProvider @Inject()(authConnector: AuthConnector,
-                                                      userAllowListService: UserAllowListService,
-                                                      appConfig: AppConfig,
-                                                      parser: BodyParsers.Default)
-                                                     (implicit val executionContext: ExecutionContext)
+                                                                      userAllowListService: UserAllowListService,
+                                                                      appConfig: AppConfig,
+                                                                      parser: BodyParsers.Default)
+                                                                     (implicit val executionContext: ExecutionContext)
   extends IdentifierPlatformOperatorActionProvider {
 
   def apply(withDprsEnrollmentCheck: Boolean = true, loginContinue: LoginContinue = PlatformOperator) = new AuthenticatedIdentifierAction(
@@ -154,11 +154,12 @@ trait IdentifierThirdPartyActionProvider {
 
   def apply(withDprsEnrollmentCheck: Boolean = true, loginContinue: LoginContinue = ThirdParty): IdentifierAction
 }
+
 class AuthenticatedIdentifierThirdPartyActionProvider @Inject()(authConnector: AuthConnector,
-                                                                      userAllowListService: UserAllowListService,
-                                                                      appConfig: AppConfig,
-                                                                      parser: BodyParsers.Default)
-                                                                     (implicit val executionContext: ExecutionContext)
+                                                                userAllowListService: UserAllowListService,
+                                                                appConfig: AppConfig,
+                                                                parser: BodyParsers.Default)
+                                                               (implicit val executionContext: ExecutionContext)
   extends IdentifierThirdPartyActionProvider {
 
   def apply(withDprsEnrollmentCheck: Boolean = true, loginContinue: LoginContinue = ThirdParty) = new AuthenticatedIdentifierAction(

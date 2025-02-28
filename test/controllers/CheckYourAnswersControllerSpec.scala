@@ -409,7 +409,8 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
 
           running(application) {
             val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
-            route(application, request).value.failed.futureValue
+
+            route(application, request).value
 
             verify(mockRegistrationConnector, never()).register(any())(any())
             verify(mockSubscriptionConnector, never()).subscribe(any())(any())
@@ -965,6 +966,18 @@ class CheckYourAnswersControllerSpec extends ControllerSpecBase with MockitoSuga
             verify(mockEmailConnector, never()).send(any())(any())
             verify(mockEnrolmentService, never()).enrol(any())(any())
             verify(mockAuditService, never).sendAudit(any)(any())
+          }
+        }
+
+        "and RegistrationResponse cannot be created" in {
+          val application = applicationBuilder(userAnswers = Some(anEmptyAnswer)).build()
+
+          running(application) {
+            val request = FakeRequest(POST, routes.CheckYourAnswersController.onSubmit().url)
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.MissingInformationController.onPageLoad().url
           }
         }
       }

@@ -164,5 +164,25 @@ class BusinessNameControllerSpec extends ControllerSpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
+    "must return message saying unable to build registration request, path missing: utr" in {
+      val baseAnswers =
+        anEmptyAnswer
+          .set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(baseAnswers))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, businessNameRoute)
+            .withFormUrlEncodedBody(("value", "name"))
+
+        val result = route(application, request).value.failed.futureValue.getMessage
+
+        result mustEqual "Unable to build registration request, path(s) missing: /utr"
+      }
+    }
   }
 }
