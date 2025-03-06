@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models
+@this(
+    layout: templates.Layout
+)
 
-import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
+@()(implicit request: Request[_], messages: Messages)
 
-case class User(id: String,
-                providerId: Option[String] = None,
-                groupId: Option[String] = None,
-                taxIdentifier: Option[TaxIdentifier] = None,
-                affinityGroup: Option[AffinityGroup] = None) {
+@layout(
+    pageTitle = titleNoForm(messages("cannotUseServiceIndividual.title")),
+    showBackLink = false
+) {
 
-  lazy val isIndividualAffinityGroup: Boolean = affinityGroup.contains(Individual)
-  lazy val isOrganisationAffinityGroup: Boolean = affinityGroup.contains(Organisation)
+    <h1 class="govuk-heading-xl">@messages("cannotUseServiceIndividual.heading")</h1>
+
+    <p class="govuk-body">@messages("cannotUseServiceIndividual.p.1")</p>
+
+    <p class="govuk-body">
+        <a class="govuk-link" href="https://www.tax.service.gov.uk/account">@messages("cannotUseServiceIndividual.p.2.link.text")</a>
+    </p>
 }

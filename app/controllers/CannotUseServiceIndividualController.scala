@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package models
+package controllers
 
-import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import views.html.CannotUseServiceIndividualView
 
-case class User(id: String,
-                providerId: Option[String] = None,
-                groupId: Option[String] = None,
-                taxIdentifier: Option[TaxIdentifier] = None,
-                affinityGroup: Option[AffinityGroup] = None) {
+import javax.inject.Inject
 
-  lazy val isIndividualAffinityGroup: Boolean = affinityGroup.contains(Individual)
-  lazy val isOrganisationAffinityGroup: Boolean = affinityGroup.contains(Organisation)
+class CannotUseServiceIndividualController @Inject()(view: CannotUseServiceIndividualView)
+                                                    (implicit mcc: MessagesControllerComponents) extends FrontendController(mcc) with I18nSupport {
+
+  def onPageLoad: Action[AnyContent] = Action { implicit request =>
+    Ok(view())
+  }
 }

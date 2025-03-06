@@ -25,6 +25,12 @@ GET        /agent-sign-in                   controllers.CannotUseServiceAgentCon
 
 GET        /non-admin-sign-in               controllers.CannotUseServiceAssistantController.onPageLoad()
 
+GET        /platform-incorrect-individual-sign-in       controllers.CannotUseServiceIndividualController.onPageLoad()
+
+GET        /third-party-incorrect-individual-sign-in    controllers.CannotUseServiceThirdPartyIndividualController.onPageLoad()
+
+GET        /third-party-incorrect-organisation-sign-in  controllers.CannotUseServiceThirdPartyOrganisationController.onPageLoad()
+
 GET        /user-type                       controllers.RegistrationTypeController.onPageLoad(mode: Mode = NormalMode)
 POST       /user-type                       controllers.RegistrationTypeController.onSubmit(mode: Mode = NormalMode)
 GET        /change-user-type                controllers.RegistrationTypeController.onPageLoad(mode: Mode = CheckMode)

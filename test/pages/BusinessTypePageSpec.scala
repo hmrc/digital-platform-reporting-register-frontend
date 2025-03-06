@@ -22,11 +22,18 @@ import builders.UserBuilder.aUser
 import controllers.routes
 import models.{BusinessType, CheckMode, Nino, NormalMode, Utr}
 import org.scalatest.{OptionValues, TryValues}
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 class BusinessTypePageSpec extends SpecBase with TryValues with OptionValues {
 
   ".nextPage" - {
     "in Normal Mode" - {
+      "must go to CannotUseServiceThirdPartyOrganisation for an individual business type and Organisation affinityGroup" in {
+        val answersWithNino = anEmptyAnswer.copy(user = aUser.copy(affinityGroup = Some(AffinityGroup.Organisation)))
+        val answers = answersWithNino.set(BusinessTypePage, BusinessType.Individual).success.value
+        BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.CannotUseServiceThirdPartyOrganisationController.onPageLoad()
+      }
+
       "must go to Individual Name for an Individual business type when we know their NINO" in {
         val answersWithNino = anEmptyAnswer.copy(user = aUser.copy(taxIdentifier = Some(Nino("nino"))))
         val answers = answersWithNino.set(BusinessTypePage, BusinessType.Individual).success.value
@@ -38,32 +45,38 @@ class BusinessTypePageSpec extends SpecBase with TryValues with OptionValues {
         BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.HasNinoController.onPageLoad(NormalMode)
       }
 
-
       "must go to Has Nino for an Individual business type when we know their UTR instead of their NINO" in {
         val answersWithUtr = anEmptyAnswer.copy(user = aUser.copy(taxIdentifier = Some(Utr("utr"))))
         val answers = answersWithUtr.set(BusinessTypePage, BusinessType.Individual).success.value
         BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.HasNinoController.onPageLoad(NormalMode)
       }
 
+      "must go to CannotUseServiceThirdPartyIndividualController for an LimitedCompany business type and Individual affinityGroup" in {
+        val answersWithNino = anEmptyAnswer.copy(user = aUser.copy(affinityGroup = Some(AffinityGroup.Individual)))
+        val answers = answersWithNino.set(BusinessTypePage, BusinessType.LimitedCompany).success.value
+        BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.CannotUseServiceThirdPartyIndividualController.onPageLoad()
+      }
+
+      "must go to CannotUseServiceThirdPartyIndividualController for an AssociationOrTrust business type and Individual affinityGroup" in {
+        val answersWithNino = anEmptyAnswer.copy(user = aUser.copy(affinityGroup = Some(AffinityGroup.Individual)))
+        val answers = answersWithNino.set(BusinessTypePage, BusinessType.AssociationOrTrust).success.value
+        BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.CannotUseServiceThirdPartyIndividualController.onPageLoad()
+      }
+
       "must go to Registered in UK for all other business types" in {
-
         for (businessType <- BusinessType.values.filterNot(_ == BusinessType.Individual)) {
-
           val answers = anEmptyAnswer.set(BusinessTypePage, businessType).success.value
           BusinessTypePage.nextPage(NormalMode, answers) mustEqual routes.RegisteredInUkController.onPageLoad(NormalMode)
         }
       }
 
       "must go to Journey Recovery if business type has not been answered" in {
-
         BusinessTypePage.nextPage(NormalMode, anEmptyAnswer) mustEqual routes.JourneyRecoveryController.onPageLoad()
       }
     }
 
     "in Check Mode" - {
-
       "must go to Check Answers" in {
-
         BusinessTypePage.nextPage(CheckMode, anEmptyAnswer) mustEqual routes.CheckYourAnswersController.onPageLoad()
       }
     }

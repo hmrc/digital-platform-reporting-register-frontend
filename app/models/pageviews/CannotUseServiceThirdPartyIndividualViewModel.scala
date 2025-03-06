@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package models
+package models.pageviews
 
-import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
+import models.BusinessType
 
-case class User(id: String,
-                providerId: Option[String] = None,
-                groupId: Option[String] = None,
-                taxIdentifier: Option[TaxIdentifier] = None,
-                affinityGroup: Option[AffinityGroup] = None) {
-
-  lazy val isIndividualAffinityGroup: Boolean = affinityGroup.contains(Individual)
-  lazy val isOrganisationAffinityGroup: Boolean = affinityGroup.contains(Organisation)
-}
+case class CannotUseServiceThirdPartyIndividualViewModel(businessType: BusinessType)

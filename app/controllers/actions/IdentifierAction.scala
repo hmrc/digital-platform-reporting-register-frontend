@@ -69,13 +69,18 @@ class AuthenticatedIdentifierAction(override val authConnector: AuthConnector,
 
       case Some(Individual) ~ _ ~ Some(internalId) ~ maybeNino ~ enrolments ~ Some(groupIdentifier) ~ Some(credentials) =>
         userAllowListService.isUserAllowed(enrolments).flatMap {
-          case true => block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), maybeNino.map(Nino.apply)), request))
+          case true => loginContinue match {
+            case LoginContinue.PlatformOperator => Future.successful(Redirect(routes.CannotUseServiceIndividualController.onPageLoad()))
+            case _ => block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some
+              (groupIdentifier), maybeNino.map(Nino.apply), affinityGroup = Some(Individual)), request))
+          }
           case false => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
         }
 
       case Some(Organisation) ~ _ ~ Some(internalId) ~ _ ~ enrolments ~ Some(groupIdentifier) ~ Some(credentials) =>
         userAllowListService.isUserAllowed(enrolments).flatMap {
-          case true => block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some(groupIdentifier), getCtUtrEnrolment(enrolments)), request))
+          case true => block(IdentifierRequest(models.User(internalId, Some(credentials.providerId), Some
+            (groupIdentifier), getCtUtrEnrolment(enrolments), affinityGroup = Some(Organisation)), request))
           case false => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
         }
 
