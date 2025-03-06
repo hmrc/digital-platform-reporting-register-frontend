@@ -72,6 +72,22 @@ cannotUseServiceAssistant.p2 = You need to find an administrator who can then si
 cannotUseServiceAssistant.p3 = Once registered, they can give you permission to use the service to send digital platform reports using your own sign in details.
 cannotUseServiceAssistant.p4 = Your administrator can add, delete or change access for team members in the ‘Manage account’ section within your organisation’s business tax account.
 
+cannotUseServiceIndividual.title = You’re unable to use this service with your individual account
+cannotUseServiceIndividual.heading = You’re unable to use this service with your individual account
+cannotUseServiceIndividual.p.1 = This is because you’ve signed in as individual, rather than with an organisation account.
+cannotUseServiceIndividual.p.2.link.text = Sign in with your organisation account
+
+cannotUseServiceThirdPartyIndividual.title = You’re unable to use this service with these sign in details
+cannotUseServiceThirdPartyIndividual.heading = You’re unable to use this service with these sign in details
+cannotUseServiceThirdPartyIndividual.p.1.1.a = This is because you’ve signed in as an individual but you have chosen to register as a
+cannotUseServiceThirdPartyIndividual.p.1.1.an = This is because you’ve signed in as an individual but you have chosen to register as an
+cannotUseServiceThirdPartyIndividual.p.2.link.text = Sign in with your organisation account
+
+cannotUseServiceThirdPartyOrganisation.title = You’re unable to use this service with these sign in details
+cannotUseServiceThirdPartyOrganisation.heading = You’re unable to use this service with these sign in details
+cannotUseServiceThirdPartyOrganisation.p.1 = This is because you’ve signed in with an organisation account but you have chosen to register as an individual not connected to a business.
+cannotUseServiceThirdPartyOrganisation.p.2.link.text = Sign in with your individual account
+
 registrationType.title = What are you registering for this service as?
 registrationType.heading = What are you registering for this service as?
 registrationType.platformOperator = An operator of a digital platform

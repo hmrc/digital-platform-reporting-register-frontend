@@ -21,6 +21,7 @@ import base.ControllerSpecBase
 import com.google.inject.Inject
 import config.AppConfig
 import controllers.routes
+import models.LoginContinue
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
@@ -48,7 +49,7 @@ class AuthActionSpec extends ControllerSpecBase with MockitoSugar with BeforeAnd
     applicationBuilder(userAnswers = None)
       .overrides(bind[UserAllowListService].toInstance(mockAllowListService))
       .build()
-    
+
   private val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
   private val appConfig = application.injector.instanceOf[AppConfig]
   private val emptyEnrolments = Enrolments(Set.empty)
@@ -58,7 +59,7 @@ class AuthActionSpec extends ControllerSpecBase with MockitoSugar with BeforeAnd
     Mockito.reset(mockAllowListService)
     super.beforeEach()
   }
-  
+
   class Harness(authAction: IdentifierAction) {
     def onPageLoad(): Action[AnyContent] = authAction { request =>
       Results.Ok(s"${request.user.id}${request.user.taxIdentifier.map(_.value).getOrElse("")}")
@@ -148,7 +149,7 @@ class AuthActionSpec extends ControllerSpecBase with MockitoSugar with BeforeAnd
           }
         }
       }
-      
+
       "and is not allowed into the service" - {
         "must redirect the user to `unauthorised`" in {
           when(mockAllowListService.isUserAllowed(any())(any())).thenReturn(Future.successful(false))
@@ -167,7 +168,7 @@ class AuthActionSpec extends ControllerSpecBase with MockitoSugar with BeforeAnd
         }
       }
     }
-    
+
     "when the user is an individual" - {
       "and the user is allowed into the service" - {
         "must succeed" - {
@@ -201,8 +202,24 @@ class AuthActionSpec extends ControllerSpecBase with MockitoSugar with BeforeAnd
             contentAsString(result) mustEqual "internalId"
           }
         }
+
+        "must redirect to /platform-incorrect-individual-sign-in when loginContinue is PlatformOperator" in {
+          when(mockAllowListService.isUserAllowed(any())(any())).thenReturn(Future.successful(true))
+          val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(
+            Some(Individual) ~ None ~ Some("internalId") ~ Some(" nino") ~ emptyEnrolments ~ Some("some-group-identifier") ~ Some(credentials)),
+            mockAllowListService,
+            appConfig,
+            bodyParsers,
+            loginContinue = LoginContinue.PlatformOperator
+          )
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustEqual routes.CannotUseServiceIndividualController.onPageLoad().url
+        }
       }
-      
+
       "and the user is not allowed into the service" - {
         "must redirect the user to `unauthorised`" in {
           when(mockAllowListService.isUserAllowed(any())(any())).thenReturn(Future.successful(false))
