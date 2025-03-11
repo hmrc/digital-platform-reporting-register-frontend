@@ -14,8 +14,11 @@
  * limitations under the License.
  *@
 
+@import config.AppConfig
+
 @this(
-        layout: templates.Layout
+    layout: templates.Layout,
+    appConfig: AppConfig
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -31,7 +34,7 @@
     
     <p class="govuk-body">
         @messages("cannotUseServiceAgent.p2.1")
-        <a class="govuk-link" href="@messages("cannotUseServiceAgent.p2.link1.href")">@messages("cannotUseServiceAgent.p2.link1.text")</a>.
+        <a class="govuk-link" href=@{appConfig.loginUrl}?continue=@{appConfig.loginContinueUrl}>@messages("cannotUseServiceAgent.p2.link1.text")</a>.
         @messages("cannotUseServiceAgent.p2.2")
         <a class="govuk-link" href="@messages("cannotUseServiceAgent.p2.link2.href")">@messages("cannotUseServiceAgent.p2.link2.text")</a>.
     </p>

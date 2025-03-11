@@ -14,13 +14,15 @@
  * limitations under the License.
  *@
 
+@import config.AppConfig
 @import models.CountriesList
 @import models.pageviews.BusinessDetailsMatchOtherViewModel
 @import views.ViewUtils
 
 @this(
-        layout: templates.Layout,
-        countriesList: CountriesList
+    layout: templates.Layout,
+    countriesList: CountriesList,
+    appConfig: AppConfig
 )
 
 @(viewModel: BusinessDetailsMatchOtherViewModel)(implicit request: Request[_], messages: Messages)
@@ -37,6 +39,6 @@
 
     <p class="govuk-body">
         @messages("businessDetailsMatchOther.p2")
-        <a class="govuk-link" href="https://www.tax.service.gov.uk/account">@messages("businessDetailsMatchOther.p2.link.text")</a>
+        <a class="govuk-link" href=@{appConfig.loginUrl}?continue=@{appConfig.loginContinueUrl}>@messages("businessDetailsMatchOther.p2.link.text")</a>
     </p>
 }
