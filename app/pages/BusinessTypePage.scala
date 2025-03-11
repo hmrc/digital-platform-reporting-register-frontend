@@ -28,7 +28,6 @@ case object BusinessTypePage extends QuestionPage[BusinessType] {
 
   override def toString: String = "businessType"
 
-  // TODO: (Hristo) Test me
   override protected def nextPageNormalMode(answers: UserAnswers): Call = answers.get(this).map {
     case Individual if answers.user.isOrganisationAffinityGroup =>
       routes.CannotUseServiceThirdPartyOrganisationController.onPageLoad()
