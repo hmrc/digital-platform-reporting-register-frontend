@@ -66,7 +66,6 @@ class AppConfig @Inject()(configuration: Configuration) {
   val dataEncryptionEnabled: Boolean = configuration.get[Boolean]("features.use-encryption")
   val languageTranslationEnabled: Boolean = configuration.get[Boolean]("features.welsh-translation")
   val userAllowListEnabled: Boolean = configuration.get[Boolean]("features.user-allow-list")
-  val extendedCountriesListEnabled: Boolean = configuration.get[Boolean]("features.extended-countries-list")
 
   val utrAllowListFeature = "UTR"
   val vrnAllowListFeature = "VRN"
