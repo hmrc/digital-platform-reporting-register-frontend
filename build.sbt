@@ -38,7 +38,6 @@ lazy val microservice = (project in file("."))
     scalacOptions += "-Wconf:msg=Flag.*repeatedly:s",
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
-    resolvers ++= Seq(Resolver.jcenterRepo),
     // concatenate js
     Concat.groups := Seq(
       "javascripts/application.js" ->
