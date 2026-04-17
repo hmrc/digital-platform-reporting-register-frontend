@@ -25,7 +25,7 @@ import play.api.libs.ws.writeableOf_JsValue
 import services.UuidService
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, RequestId, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,7 +38,7 @@ class TaxEnrolmentConnector @Inject()(appConfig: AppConfig,
 
   def upsert(upsertKnownFacts: UpsertKnownFacts)
             (implicit hc: HeaderCarrier): Future[Done] = {
-    val correlationId = hc.requestId.getOrElse(RequestId(uuidService.generate())).value
+    val correlationId = uuidService.generate()
     val conversationId = uuidService.generate()
     httpClient.put(url"${appConfig.taxEnrolmentsBaseUrl}/tax-enrolments/enrolments/${upsertKnownFacts.enrolmentKey}")
       .setHeader("X-Correlation-ID" -> correlationId)
@@ -55,7 +55,7 @@ class TaxEnrolmentConnector @Inject()(appConfig: AppConfig,
 
   def allocateEnrolmentToGroup(groupEnrolment: GroupEnrolment)
                               (implicit hc: HeaderCarrier): Future[Done] = {
-    val correlationId = hc.requestId.getOrElse(RequestId(uuidService.generate())).value
+    val correlationId = uuidService.generate()
     httpClient.post(url"${appConfig.taxEnrolmentsBaseUrl}/tax-enrolments/groups/${groupEnrolment.groupId}/enrolments/${groupEnrolment.enrolmentKey}")
       .setHeader("X-Correlation-ID" -> correlationId)
       .setHeader("X-Conversation-ID" -> uuidService.generate())
