@@ -57,7 +57,6 @@ class AppConfig @Inject()(configuration: Configuration) {
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
   val dataEncryptionEnabled: Boolean = configuration.get[Boolean]("features.use-encryption")
-  val languageTranslationEnabled: Boolean = configuration.get[Boolean]("features.welsh-translation")
   val userAllowListEnabled: Boolean = configuration.get[Boolean]("features.user-allow-list")
 
   val utrAllowListFeature = "UTR"
