@@ -38,7 +38,7 @@ class AppConfig @Inject()(configuration: Configuration) {
   val emailServiceUrl: String = configuration.get[Service](EmailServiceUrlKey).baseUrl
 
   private val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.host")
-  val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/digital-platform-reporting-register-frontend"
+  val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/digital-platform-reporting-register-frontend?useServiceNavigation"
 
   val auditSource: String = configuration.get[String]("auditing.auditSource")
 
