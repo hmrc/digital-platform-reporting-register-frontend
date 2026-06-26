@@ -395,7 +395,6 @@ primaryContactEmailAddress.error.length = Email must be {0} characters or less
 primaryContactEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
 primaryContactEmailAddress.change.hidden = the email address for {0}
 
-primaryContactName.title = What is the name of the first person or team we should contact?
 primaryContactName.heading = What is the name of the first person or team we should contact?
 primaryContactName.p1.thirdParty = This should be the name of a person or team within your business, not the digital platform operator you are reporting for.
 primaryContactName.hint = For example, ‘Ashley Smith’ or ‘Tax Team’.
@@ -423,7 +422,6 @@ secondaryContactEmailAddress.error.length = Email must be 132 characters or less
 secondaryContactEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
 secondaryContactEmailAddress.change.hidden = the email address for {0}
 
-secondaryContactName.title = What is the name of the second person or team we should contact?
 secondaryContactName.heading = What is the name of the second person or team we should contact?
 secondaryContactName.p1.thirdParty = This should be the name of a person or team within your business, not the digital platform operator you are reporting for.
 secondaryContactName.hint = For example, ‘Ashley Smith’ or ‘Tax Team’.

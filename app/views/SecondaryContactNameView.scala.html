@@ -27,7 +27,7 @@
 
 @(viewModel: SecondaryContactNameViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(viewModel.form, messages("secondaryContactName.title"))) {
+@layout(pageTitle = title(viewModel.form, messages("secondaryContactName.heading"))) {
 
     @formHelper(action = routes.SecondaryContactNameController.onSubmit(viewModel.mode)) {
 
