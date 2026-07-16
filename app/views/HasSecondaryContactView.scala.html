@@ -26,7 +26,7 @@
 
 @(viewModel: HasSecondaryContactViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(viewModel.form, messages("hasSecondaryContact.title"))) {
+@layout(pageTitle = title(viewModel.form, messages("hasSecondaryContact.heading", viewModel.contactName))) {
 
     @formHelper(action = routes.HasSecondaryContactController.onSubmit(viewModel.mode), Symbol("autoComplete") -> "off") {
 

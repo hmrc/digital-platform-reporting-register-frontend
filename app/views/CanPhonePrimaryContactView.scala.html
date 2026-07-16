@@ -26,7 +26,7 @@
 
 @(viewModel: CanPhonePrimaryContactViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(viewModel.form, messages("canPhonePrimaryContact.title"))) {
+@layout(pageTitle = title(viewModel.form, messages("canPhonePrimaryContact.heading", viewModel.contactName))) {
 
     @formHelper(action = routes.CanPhonePrimaryContactController.onSubmit(viewModel.mode), Symbol("autoComplete") -> "off") {
 
