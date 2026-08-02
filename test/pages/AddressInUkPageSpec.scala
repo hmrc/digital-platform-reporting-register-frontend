@@ -40,7 +40,7 @@ class AddressInUkPageSpec extends SpecBase with TryValues with OptionValues {
         val headings = document.select("h1")
 
         headings.size() shouldBe 1
-        headings.first().hasClass("govuk-heading-xl") shouldBe true
+        headings.first().hasClass("govuk-heading-l") shouldBe true
       }
 
       "must go to International Address page if Rest of world" in {
