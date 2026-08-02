@@ -24,6 +24,8 @@ import builders.UserAnswersBuilder.anEmptyAnswer
 import controllers.routes
 import models.registration.RegisteredAddressCountry
 import models.{CheckMode, NormalMode}
+import org.jsoup.Jsoup
+import org.scalatest.matchers.should.Matchers.shouldBe
 import org.scalatest.{OptionValues, TryValues}
 
 class AddressInUkPageSpec extends SpecBase with TryValues with OptionValues {
@@ -33,6 +35,12 @@ class AddressInUkPageSpec extends SpecBase with TryValues with OptionValues {
       "must go to Uk Address page if Uk" in {
         val answers = anEmptyAnswer.set(AddressInUkPage, RegisteredAddressCountry.Uk).success.value
         AddressInUkPage.nextPage(NormalMode, answers) mustEqual routes.UkAddressController.onPageLoad(NormalMode)
+
+        val document = Jsoup.parse(AddressInUkPage)
+        val headings = document.select("h1")
+
+        headings.size() shouldBe 1
+        headings.first().hasClass("govuk-heading-xl") shouldBe true
       }
 
       "must go to International Address page if Rest of world" in {
