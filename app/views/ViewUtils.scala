@@ -64,7 +64,7 @@ object ViewUtils {
       SelectItemViewModel(
         value = country.code,
         text = country.name
-      ).withAttribute("aria-describedby", country.name)
+      )
     }
 
   private def formatLine(line: Option[String]): Option[String] =
