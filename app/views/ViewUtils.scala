@@ -22,7 +22,7 @@ import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.select.SelectItem
-import viewmodels.govuk.all.{FluentSelectItem, SelectItemViewModel}
+import viewmodels.govuk.all.SelectItemViewModel
 
 object ViewUtils {
 
