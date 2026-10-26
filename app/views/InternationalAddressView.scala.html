@@ -86,7 +86,7 @@
             SelectViewModel(
                 field = form("country"),
                 items = countrySelectItems(countriesList.internationalCountries),
-                label = LabelViewModel(messages("internationalAddress.country"))
+                label = LabelViewModel(messages("internationalAddress.country")).withAttribute("id", "country-label")
             )
             .withCssClass("govuk-input")
             .asAccessibleAutocomplete(Some(AccessibleAutocomplete(showAllValues = true)))
